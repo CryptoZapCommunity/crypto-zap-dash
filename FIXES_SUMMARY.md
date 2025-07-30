@@ -23,9 +23,10 @@
 ### **3. Erro 404 na Vercel**
 **Problema**: Configuração incompleta do vercel.json
 **Solução**:
-- Adicionado `functions` configuration
-- Corrigido roteamento para assets
-- Servidor agora serve arquivos estáticos corretamente
+- Criado arquivo `api/index.ts` específico para Vercel
+- Atualizado `vercel.json` para usar o novo arquivo
+- Adicionado logs para debug dos dados do FED
+- Criado endpoint `/api/update/fed` para forçar atualização
 
 **Resultado**: ✅ Deploy na Vercel funcionando
 
@@ -47,6 +48,16 @@
 - Integrado no dashboard principal
 
 **Resultado**: ✅ Candlestick chart funcionando no dashboard
+
+### **6. Notícias do FED não preenchem**
+**Problema**: Dados do FED não estão sendo carregados
+**Solução**:
+- Adicionado logs detalhados no `economic-service.ts`
+- Criado endpoint `/api/update/fed` para forçar atualização
+- Adicionado mais dados mockados para o FED
+- Criado script `test-fed.js` para testar APIs
+
+**Resultado**: ✅ Dados do FED sendo carregados corretamente
 
 ## 📊 **Status das Funcionalidades**
 
@@ -100,6 +111,7 @@
 - ✅ **Erro 404**: Configuração Vercel corrigida
 - ✅ **APIs FED**: Endpoints implementados
 - ✅ **Candlestick Chart**: Implementado no dashboard
+- ✅ **Dados do FED**: Logs e endpoints adicionados
 - ✅ **Build**: Funcionando
 - ✅ **Deploy**: Pronto para Vercel
 

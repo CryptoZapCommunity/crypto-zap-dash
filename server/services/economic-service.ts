@@ -59,6 +59,8 @@ export class EconomicService {
 
   async updateFedUpdates(): Promise<void> {
     try {
+      console.log('🔄 Starting FED updates...');
+      
       // Try to get Federal Reserve data from FRED API
       const response = await fetch(
         `https://api.stlouisfed.org/fred/releases?api_key=${this.FRED_API_KEY}&file_type=json&limit=10`
@@ -73,6 +75,8 @@ export class EconomicService {
       const data = await response.json();
       const releases = data.releases || [];
 
+      console.log(`📊 Found ${releases.length} FED releases`);
+
       for (const release of releases) {
         const fedUpdate: InsertFedUpdate = {
           title: release.name,
@@ -85,7 +89,10 @@ export class EconomicService {
         };
 
         await storage.createFedUpdate(fedUpdate);
+        console.log(`✅ Created FED update: ${release.name}`);
       }
+      
+      console.log('✅ FED updates completed');
     } catch (error) {
       console.error('Error updating FED updates:', error);
       // Fallback to mock data
@@ -136,6 +143,8 @@ export class EconomicService {
   }
 
   private async createMockFedUpdates(): Promise<void> {
+    console.log('🔄 Creating mock FED updates...');
+    
     const mockUpdates = [
       {
         title: 'Federal Reserve Maintains Interest Rates at 5.25%-5.50%',
@@ -155,11 +164,32 @@ export class EconomicService {
         sourceUrl: 'https://www.federalreserve.gov/newsevents/speech/powell20240101a.htm',
         publishedAt: new Date(Date.now() - 24 * 60 * 60 * 1000), // Yesterday
       },
+      {
+        title: 'FOMC Minutes: Economic Recovery Continues',
+        type: 'fomc_minutes' as const,
+        content: 'The Federal Open Market Committee minutes show continued economic recovery with inflation concerns.',
+        interestRate: null,
+        speaker: null,
+        sourceUrl: 'https://www.federalreserve.gov/monetarypolicy/fomccalendars.htm',
+        publishedAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000), // 3 days ago
+      },
+      {
+        title: 'Fed Governor Speech on Digital Currency',
+        type: 'speech' as const,
+        content: 'Federal Reserve Governor discusses the future of digital currency and CBDC development.',
+        interestRate: null,
+        speaker: 'Federal Reserve Governor',
+        sourceUrl: 'https://www.federalreserve.gov/newsevents/speech/',
+        publishedAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000), // 5 days ago
+      },
     ];
 
     for (const update of mockUpdates) {
       await storage.createFedUpdate(update);
+      console.log(`✅ Created mock FED update: ${update.title}`);
     }
+    
+    console.log('✅ Mock FED updates completed');
   }
 
   private mapCountryCode(country: string): string {

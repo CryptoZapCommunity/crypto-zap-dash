@@ -416,14 +416,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/update/economic", async (req, res) => {
     try {
+      console.log('🔄 Starting economic data update...');
       await Promise.all([
         economicService.updateEconomicCalendar(),
         economicService.updateFedUpdates(),
       ]);
+      console.log('✅ Economic data update completed');
       res.json({ message: 'Economic data updated successfully' });
     } catch (error) {
       console.error('Error updating economic data:', error);
       res.status(500).json({ message: 'Failed to update economic data' });
+    }
+  });
+
+  // Force update FED data
+  app.post("/api/update/fed", async (req, res) => {
+    try {
+      console.log('🔄 Force updating FED data...');
+      await economicService.updateFedUpdates();
+      console.log('✅ FED data update completed');
+      res.json({ message: 'FED data updated successfully' });
+    } catch (error) {
+      console.error('Error updating FED data:', error);
+      res.status(500).json({ message: 'Failed to update FED data' });
     }
   });
 

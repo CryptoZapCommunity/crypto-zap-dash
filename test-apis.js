@@ -1,4 +1,4 @@
-const fetch = require('node-fetch');
+import fetch from 'node-fetch';
 
 const BASE_URL = 'http://localhost:5000';
 
@@ -61,8 +61,8 @@ async function runTests() {
 }
 
 // Run tests if this file is executed directly
-if (require.main === module) {
+if (import.meta.url === `file://${process.argv[1]}`) {
   runTests().catch(console.error);
 }
 
-module.exports = { runTests }; 
+export { runTests }; 
