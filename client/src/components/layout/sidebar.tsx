@@ -41,29 +41,14 @@ const navigationItems = [
     href: '/',
   },
   {
-    icon: BarChart3,
-    label: 'Análise de Mercado',
-    href: '/market-analysis',
-  },
-  {
-    icon: Newspaper,
-    label: 'Notícias',
-    href: '/news',
-  },
-  {
-    icon: Calendar,
-    label: 'Calendário Econômico',
-    href: '/economic-calendar',
-  },
-  {
-    icon: Settings,
-    label: 'Configurações',
-    href: '/settings',
-  },
-  {
     icon: Coins,
     label: 'Crypto Market',
     href: '/crypto',
+  },
+  {
+    icon: BarChart3,
+    label: 'Análise de Mercado',
+    href: '/market-analysis',
   },
   {
     icon: Fish,
@@ -79,6 +64,21 @@ const navigationItems = [
     icon: Building2,
     label: 'FED Monitor',
     href: '/fed',
+  },
+  {
+    icon: Calendar,
+    label: 'Calendário Econômico',
+    href: '/economic-calendar',
+  },
+  {
+    icon: Newspaper,
+    label: 'Notícias',
+    href: '/news',
+  },
+  {
+    icon: Settings,
+    label: 'Configurações',
+    href: '/settings',
   },
 ];
 
@@ -125,29 +125,124 @@ export function Sidebar({ collapsed, onToggle, className }: SidebarProps) {
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 p-4 space-y-2">
-        {navigationItems.map((item) => {
-          const Icon = item.icon;
-          const isActive = location === item.href;
+      <nav className="flex-1 p-4 space-y-4">
+        {/* Main Dashboard */}
+        <div className="space-y-2">
+          {navigationItems.slice(0, 1).map((item) => {
+            const Icon = item.icon;
+            const isActive = location === item.href;
 
-          return (
-            <Link key={item.href} href={item.href}>
-              <Button
-                variant={isActive ? 'default' : 'ghost'}
-                className={cn(
-                  'w-full justify-start h-10',
-                  collapsed && 'px-2',
-                  isActive && 'bg-primary text-primary-foreground'
-                )}
-              >
-                <Icon className="w-5 h-5 flex-shrink-0" />
-                {!collapsed && (
-                  <span className="ml-3 truncate">{item.label}</span>
-                )}
-              </Button>
-            </Link>
-          );
-        })}
+            return (
+              <Link key={item.href} href={item.href}>
+                <Button
+                  variant={isActive ? 'default' : 'ghost'}
+                  className={cn(
+                    'w-full justify-start h-10',
+                    collapsed && 'px-2',
+                    isActive && 'bg-primary text-primary-foreground'
+                  )}
+                >
+                  <Icon className="w-5 h-5 flex-shrink-0" />
+                  {!collapsed && (
+                    <span className="ml-3 truncate">{item.label}</span>
+                  )}
+                </Button>
+              </Link>
+            );
+          })}
+        </div>
+
+        {/* Market & Trading */}
+        {!collapsed && (
+          <div className="pt-2">
+            <div className="px-3 py-1 text-xs font-medium text-muted-foreground uppercase tracking-wider">
+              Mercado & Trading
+            </div>
+          </div>
+        )}
+        <div className="space-y-2">
+          {navigationItems.slice(1, 5).map((item) => {
+            const Icon = item.icon;
+            const isActive = location === item.href;
+
+            return (
+              <Link key={item.href} href={item.href}>
+                <Button
+                  variant={isActive ? 'default' : 'ghost'}
+                  className={cn(
+                    'w-full justify-start h-10',
+                    collapsed && 'px-2',
+                    isActive && 'bg-primary text-primary-foreground'
+                  )}
+                >
+                  <Icon className="w-5 h-5 flex-shrink-0" />
+                  {!collapsed && (
+                    <span className="ml-3 truncate">{item.label}</span>
+                  )}
+                </Button>
+              </Link>
+            );
+          })}
+        </div>
+
+        {/* Research & News */}
+        {!collapsed && (
+          <div className="pt-2">
+            <div className="px-3 py-1 text-xs font-medium text-muted-foreground uppercase tracking-wider">
+              Pesquisa & Notícias
+            </div>
+          </div>
+        )}
+        <div className="space-y-2">
+          {navigationItems.slice(5, 7).map((item) => {
+            const Icon = item.icon;
+            const isActive = location === item.href;
+
+            return (
+              <Link key={item.href} href={item.href}>
+                <Button
+                  variant={isActive ? 'default' : 'ghost'}
+                  className={cn(
+                    'w-full justify-start h-10',
+                    collapsed && 'px-2',
+                    isActive && 'bg-primary text-primary-foreground'
+                  )}
+                >
+                  <Icon className="w-5 h-5 flex-shrink-0" />
+                  {!collapsed && (
+                    <span className="ml-3 truncate">{item.label}</span>
+                  )}
+                </Button>
+              </Link>
+            );
+          })}
+        </div>
+
+        {/* Settings */}
+        <div className="space-y-2">
+          {navigationItems.slice(7).map((item) => {
+            const Icon = item.icon;
+            const isActive = location === item.href;
+
+            return (
+              <Link key={item.href} href={item.href}>
+                <Button
+                  variant={isActive ? 'default' : 'ghost'}
+                  className={cn(
+                    'w-full justify-start h-10',
+                    collapsed && 'px-2',
+                    isActive && 'bg-primary text-primary-foreground'
+                  )}
+                >
+                  <Icon className="w-5 h-5 flex-shrink-0" />
+                  {!collapsed && (
+                    <span className="ml-3 truncate">{item.label}</span>
+                  )}
+                </Button>
+              </Link>
+            );
+          })}
+        </div>
       </nav>
 
       {/* Settings */}
