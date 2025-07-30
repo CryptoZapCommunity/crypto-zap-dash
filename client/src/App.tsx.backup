@@ -7,7 +7,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { ThemeProvider } from "@/components/ui/theme-provider";
 import { Sidebar } from "@/components/layout/sidebar";
 import { Header } from "@/components/layout/header";
-
+import { useWebSocket } from "@/hooks/use-websocket";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { invalidateQueries } from "@/lib/api";
 import { cn } from "@/lib/utils";
