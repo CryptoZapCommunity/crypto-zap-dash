@@ -114,7 +114,7 @@ export function Sidebar({ collapsed, onToggle, className }: SidebarProps) {
           {!collapsed && (
             <div className="min-w-0">
               <h1 className="text-lg font-bold text-foreground truncate">
-                CryptoFinance
+                Crypto ZAP DASH
               </h1>
               <p className="text-xs text-muted-foreground truncate">
                 Premium Dashboard

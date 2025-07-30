@@ -17,24 +17,24 @@ export default function Dashboard() {
   const { data: marketData, isLoading: marketLoading, error: marketError } = useQuery({
     queryKey: ['/api/market-summary'],
     queryFn: () => apiClient.getMarketSummary(),
-    refetchInterval: false, // WebSocket handles real-time updates
-    staleTime: 15 * 60 * 1000, // 15 minutes (increased further)
+    refetchInterval: 5 * 60 * 1000, // Poll every 5 minutes
+    staleTime: 15 * 60 * 1000, // 15 minutes
     gcTime: 30 * 60 * 1000, // 30 minutes garbage collection
   });
 
   const { data: trendingCoins, isLoading: trendingLoading } = useQuery({
     queryKey: ['/api/trending-coins'],
     queryFn: () => apiClient.getTrendingCoins(),
-    refetchInterval: false, // WebSocket handles real-time updates
-    staleTime: 10 * 60 * 1000, // 10 minutes (increased)
+    refetchInterval: 5 * 60 * 1000, // Poll every 5 minutes
+    staleTime: 10 * 60 * 1000, // 10 minutes
     gcTime: 20 * 60 * 1000, // 20 minutes garbage collection
   });
 
   const { data: btcChart, isLoading: chartLoading } = useQuery({
     queryKey: ['/api/charts', 'bitcoin'],
     queryFn: () => apiClient.getChartData('bitcoin'),
-    refetchInterval: false, // WebSocket handles real-time updates
-    staleTime: 10 * 60 * 1000, // 10 minutes (increased)
+    refetchInterval: 5 * 60 * 1000, // Poll every 5 minutes
+    staleTime: 10 * 60 * 1000, // 10 minutes
     gcTime: 20 * 60 * 1000, // 20 minutes garbage collection
   });
 
@@ -42,8 +42,8 @@ export default function Dashboard() {
   const { data: latestNews, isLoading: newsLoading } = useQuery({
     queryKey: ['/api/news'],
     queryFn: () => apiClient.getNews(undefined, 5), // Reduced from 10 to 5
-    refetchInterval: false, // WebSocket handles updates
-    staleTime: 30 * 60 * 1000, // 30 minutes (increased significantly)
+    refetchInterval: 10 * 60 * 1000, // Poll every 10 minutes
+    staleTime: 30 * 60 * 1000, // 30 minutes
     gcTime: 60 * 60 * 1000, // 1 hour garbage collection
   });
 
@@ -64,8 +64,8 @@ export default function Dashboard() {
   const { data: whaleTransactions, isLoading: whaleLoading } = useQuery({
     queryKey: ['/api/whale-movements'],
     queryFn: () => apiClient.getWhaleMovements(5), // Reduced from 10 to 5
-    refetchInterval: false, // WebSocket handles updates
-    staleTime: 15 * 60 * 1000, // 15 minutes (increased)
+    refetchInterval: 15 * 60 * 1000, // Poll every 15 minutes
+    staleTime: 15 * 60 * 1000, // 15 minutes
     gcTime: 30 * 60 * 1000, // 30 minutes garbage collection
   });
 

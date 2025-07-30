@@ -1,2 +1,2 @@
 # crypto-zap-dash
-CryptoZap Dashboard
+Crypto ZAP DASH

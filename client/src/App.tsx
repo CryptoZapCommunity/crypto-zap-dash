@@ -9,6 +9,7 @@ import { Sidebar } from "@/components/layout/sidebar";
 import { Header } from "@/components/layout/header";
 
 import { useIsMobile } from "@/hooks/use-mobile";
+import { usePolling } from "@/hooks/use-polling";
 import { invalidateQueries } from "@/lib/api";
 import { cn } from "@/lib/utils";
 import Dashboard from "@/pages/dashboard";
@@ -22,7 +23,7 @@ import Airdrops from "@/pages/airdrops";
 import FedMonitor from "@/pages/fed";
 import CryptoIconsDemo from "@/pages/crypto-icons-demo";
 import NotFound from "@/pages/not-found";
-import type { WebSocketMessage } from "@/types";
+
 
 function Layout({ children }: { children: React.ReactNode }) {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
@@ -40,35 +41,16 @@ function Layout({ children }: { children: React.ReactNode }) {
     await queryClient.invalidateQueries();
   };
 
-  const handleWebSocketMessage = (message: WebSocketMessage) => {
-    switch (message.type) {
-      case 'CRYPTO_UPDATE':
-        // Only invalidate specific queries, not all
-        invalidateQueries(['/api/market-summary']);
-        invalidateQueries(['/api/trending-coins']);
-        break;
-      case 'NEWS_UPDATE':
-        invalidateQueries(['/api/news']);
-        break;
-      case 'WHALE_UPDATE':
-        invalidateQueries(['/api/whale-movements']);
-        break;
-      case 'INITIAL_DATA':
-        // Don't invalidate all queries - this causes excessive calls!
-        // Only invalidate if data is actually stale
-        console.log('Received initial WebSocket data');
-        break;
-    }
-  };
-
-  // Temporarily disable WebSocket to prevent spam
-  const { isConnected, connectionStatus } = useWebSocket({
-    onMessage: handleWebSocketMessage,
-    onConnect: () => console.log('WebSocket connected'),
-    onDisconnect: () => console.log('WebSocket disconnected'),
-    onError: (error) => console.error('WebSocket error:', error),
-    reconnectAttempts: 1, // Only try once
-    reconnectInterval: 10000, // 10 seconds
+  // Polling for real-time updates (replaces WebSocket)
+  const { isConnected, connectionStatus } = usePolling({
+    onUpdate: () => {
+      console.log('Polling update triggered');
+    },
+    onConnect: () => console.log('Polling started'),
+    onDisconnect: () => console.log('Polling stopped'),
+    onError: (error) => console.error('Polling error:', error),
+    interval: 5 * 60 * 1000, // 5 minutes
+    queries: ['/api/market-summary', '/api/trending-coins'],
   });
 
   return (

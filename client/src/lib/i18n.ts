@@ -26,7 +26,7 @@ export const translations = {
       fedMonitor: 'FED Monitor',
     },
     dashboard: {
-      title: 'Main Dashboard',
+      title: 'Crypto ZAP DASH',
       subtitle: 'Real-time market monitoring',
       marketOverview: 'Market Overview',
       latestNews: 'Latest News',
@@ -94,7 +94,7 @@ export const translations = {
       fedMonitor: 'Monitor FED',
     },
     dashboard: {
-      title: 'Dashboard Principal',
+      title: 'Crypto ZAP DASH',
       subtitle: 'Monitoramento em tempo real dos mercados',
       marketOverview: 'Visão Geral do Mercado',
       latestNews: 'Últimas Notícias',
