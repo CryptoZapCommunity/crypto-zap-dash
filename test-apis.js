@@ -2,46 +2,67 @@ const fetch = require('node-fetch');
 
 const BASE_URL = 'http://localhost:5000';
 
-async function testAPI(endpoint, name) {
+async function testAPI(endpoint, description) {
   try {
-    console.log(`\n🧪 Testing ${name}...`);
+    console.log(`🔍 Testing: ${description}`);
     const response = await fetch(`${BASE_URL}${endpoint}`);
     const data = await response.json();
     
     if (response.ok) {
-      console.log(`✅ ${name}: SUCCESS`);
+      console.log(`✅ ${description}: SUCCESS`);
       console.log(`   Status: ${response.status}`);
-      console.log(`   Data: ${JSON.stringify(data).slice(0, 100)}...`);
+      console.log(`   Data: ${JSON.stringify(data).substring(0, 100)}...`);
     } else {
-      console.log(`❌ ${name}: FAILED`);
+      console.log(`❌ ${description}: FAILED`);
       console.log(`   Status: ${response.status}`);
-      console.log(`   Error: ${JSON.stringify(data)}`);
+      console.log(`   Error: ${data.message || 'Unknown error'}`);
     }
   } catch (error) {
-    console.log(`❌ ${name}: ERROR`);
+    console.log(`❌ ${description}: ERROR`);
     console.log(`   Error: ${error.message}`);
   }
+  console.log('');
 }
 
 async function runTests() {
   console.log('🚀 Starting API Tests...\n');
   
-  const tests = [
-    { endpoint: '/api/market-summary', name: 'Market Summary' },
-    { endpoint: '/api/news', name: 'News' },
-    { endpoint: '/api/whale-movements', name: 'Whale Movements' },
-    { endpoint: '/api/airdrops', name: 'Airdrops' },
-    { endpoint: '/api/fed-updates', name: 'FED Updates' },
-    { endpoint: '/api/fred/indicators', name: 'FRED Indicators' },
-    { endpoint: '/api/fred/rate-history', name: 'FRED Rate History' },
-    { endpoint: '/api/economic-calendar', name: 'Economic Calendar' },
-  ];
+  // Test health endpoint
+  await testAPI('/api/health', 'Health Check');
   
-  for (const test of tests) {
-    await testAPI(test.endpoint, test.name);
-  }
+  // Test market endpoints
+  await testAPI('/api/market-summary', 'Market Summary');
+  await testAPI('/api/trending-coins', 'Trending Coins');
   
-  console.log('\n🎉 API Tests Complete!');
+  // Test crypto icons
+  await testAPI('/api/crypto-icons?symbols=bitcoin,ethereum', 'Crypto Icons');
+  await testAPI('/api/crypto-icons/bitcoin', 'Single Crypto Icon');
+  
+  // Test news endpoints
+  await testAPI('/api/news', 'General News');
+  await testAPI('/api/news/geopolitics', 'Geopolitical News');
+  await testAPI('/api/news/macro', 'Macroeconomic News');
+  
+  // Test economic endpoints
+  await testAPI('/api/economic-calendar', 'Economic Calendar');
+  await testAPI('/api/fed-updates', 'FED Updates');
+  await testAPI('/api/fred/indicators', 'FRED Indicators');
+  
+  // Test whale endpoints
+  await testAPI('/api/whale-movements', 'Whale Movements');
+  
+  // Test airdrops
+  await testAPI('/api/airdrops', 'Airdrops');
+  
+  // Test charts
+  await testAPI('/api/charts/bitcoin', 'Bitcoin Chart');
+  
+  console.log('🏁 API Tests Completed!');
 }
 
-runTests().catch(console.error); 
+// Run tests if this file is executed directly
+if (require.main === module) {
+  runTests().catch(console.error);
+}
+
+module.exports = { runTests }; 

@@ -26,18 +26,6 @@ app.get("/api/health", (req, res) => {
   });
 });
 
-// Error handling middleware
-app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
-  console.error("Server error:", err);
-  const status = err.status || err.statusCode || 500;
-  const message = err.message || "Internal Server Error";
-
-  res.status(status).json({ 
-    message,
-    error: process.env.NODE_ENV === "development" ? err.stack : undefined
-  });
-});
-
 // Initialize routes
 (async () => {
   try {
@@ -45,6 +33,12 @@ app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
 
     // Serve static files in production
     if (process.env.NODE_ENV === "production") {
+      app.use(express.static("dist"));
+      app.get("*", (req, res) => {
+        res.sendFile(path.join(process.cwd(), "dist/index.html"));
+      });
+    } else {
+      // In development, serve static files from dist as well
       app.use(express.static("dist"));
       app.get("*", (req, res) => {
         res.sendFile(path.join(process.cwd(), "dist/index.html"));
@@ -61,3 +55,15 @@ app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
     process.exit(1);
   }
 })();
+
+// Error handling middleware (must be last)
+app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
+  console.error("Server error:", err);
+  const status = err.status || err.statusCode || 500;
+  const message = err.message || "Internal Server Error";
+
+  res.status(status).json({ 
+    message,
+    error: process.env.NODE_ENV === "development" ? err.stack : undefined
+  });
+});

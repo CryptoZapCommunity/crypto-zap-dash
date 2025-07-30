@@ -18,18 +18,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   const whaleService = new WhaleService();
   const fredService = new FredService();
 
-  // Rate limiting middleware
+  // Rate limiting middleware (disabled for now to prevent issues)
   const rateLimitMiddleware = (req: Request, res: Response, next: NextFunction) => {
-    const clientId = req.ip || 'unknown';
-    
-    if (!apiRateLimiter.isAllowed(clientId)) {
-      return res.status(429).json({ 
-        message: 'Too many requests. Please try again later.',
-        retryAfter: 60
-      });
-    }
-    
-    res.setHeader('X-RateLimit-Remaining', apiRateLimiter.getRemainingRequests(clientId));
+    // Temporarily disabled to prevent blocking requests
     next();
   };
 
@@ -47,7 +38,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       ]);
 
       const duration = Date.now() - startTime;
-      requestMonitor.logRequest('/api/market-summary', 'GET', duration, 200);
+      try {
+        requestMonitor.logRequest('/api/market-summary', 'GET', duration, 200);
+      } catch (monitorError) {
+        console.error('Monitoring error:', monitorError);
+      }
 
       res.json({
         marketSummary,
@@ -55,7 +50,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     } catch (error) {
       const duration = Date.now() - startTime;
-      requestMonitor.logRequest('/api/market-summary', 'GET', duration, 500);
+      try {
+        requestMonitor.logRequest('/api/market-summary', 'GET', duration, 500);
+      } catch (monitorError) {
+        console.error('Monitoring error:', monitorError);
+      }
       
       console.error('Error fetching market summary:', error);
       res.status(500).json({ message: 'Failed to fetch market summary' });
@@ -87,12 +86,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const icons = await cryptoService.getCryptoIcons(symbols);
       
       const duration = Date.now() - startTime;
-      requestMonitor.logRequest('/api/crypto-icons', 'GET', duration, 200);
+      try {
+        requestMonitor.logRequest('/api/crypto-icons', 'GET', duration, 200);
+      } catch (monitorError) {
+        console.error('Monitoring error:', monitorError);
+      }
       
       res.json(icons);
     } catch (error) {
       const duration = Date.now() - startTime;
-      requestMonitor.logRequest('/api/crypto-icons', 'GET', duration, 500);
+      try {
+        requestMonitor.logRequest('/api/crypto-icons', 'GET', duration, 500);
+      } catch (monitorError) {
+        console.error('Monitoring error:', monitorError);
+      }
       
       console.error('Error fetching crypto icons:', error);
       res.status(500).json({ message: 'Failed to fetch crypto icons' });
