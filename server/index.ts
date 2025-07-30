@@ -1,7 +1,7 @@
-import 'dotenv/config';
+import "dotenv/config";
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
-import { setupVite, serveStatic, log } from "./vite";
+import path from "path";
 
 const app = express();
 app.use(express.json());
@@ -27,10 +27,10 @@ app.use((req, res, next) => {
       }
 
       if (logLine.length > 80) {
-        logLine = logLine.slice(0, 79) + "…";
+        logLine = logLine.slice(0, 79) + "";
       }
 
-      log(logLine);
+      console.log(logLine);
     }
   });
 
@@ -45,27 +45,19 @@ app.use((req, res, next) => {
     const message = err.message || "Internal Server Error";
 
     res.status(status).json({ message });
-    throw err;
+    console.error(err);
   });
 
-  // importantly only setup vite in development and after
-  // setting up all the other routes so the catch-all route
-  // doesn't interfere with the other routes
-  if (app.get("env") === "development") {
-    await setupVite(app, server);
-  } else {
-    serveStatic(app);
+  // Serve static files in production
+  if (process.env.NODE_ENV === "production") {
+    app.use(express.static("dist/public"));
+    app.get("*", (req, res) => {
+      res.sendFile(path.join(process.cwd(), "dist/public/index.html"));
+    });
   }
 
-  // ALWAYS serve the app on the port specified in the environment variable PORT
-  // Other ports are firewalled. Default to 5000 if not specified.
-  // this serves both the API and the client.
-  // It is the only port that is not firewalled.
-  const port = parseInt(process.env.PORT || '5000', 10);
-  server.listen({
-    port,
-    host: "0.0.0.0",
-  }, () => {
-    log(`serving on port ${port}`);
+  const port = parseInt(process.env.PORT || "3000", 10);
+  server.listen(port, () => {
+    console.log(`Server running on port ${port}`);
   });
 })();
