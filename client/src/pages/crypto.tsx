@@ -38,6 +38,21 @@ export default function CryptoMarket() {
   const [showFavorites, setShowFavorites] = useState(false);
   const [favorites, setFavorites] = useState<string[]>([]);
 
+  // Helper function to format large numbers
+  const formatLargeNumber = (num: number): string => {
+    if (num >= 1e12) {
+      return (num / 1e12).toFixed(2) + 'T';
+    } else if (num >= 1e9) {
+      return (num / 1e9).toFixed(2) + 'B';
+    } else if (num >= 1e6) {
+      return (num / 1e6).toFixed(2) + 'M';
+    } else if (num >= 1e3) {
+      return (num / 1e3).toFixed(2) + 'K';
+    } else {
+      return num.toFixed(2);
+    }
+  };
+
   // Fetch crypto market data
   const { data: marketData, isLoading, error } = useQuery({
     queryKey: ['/api/market-summary'],
@@ -137,7 +152,7 @@ export default function CryptoMarket() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
-                ${(parseFloat(marketSummary.totalMarketCap) / 1e12).toFixed(2)}T
+                ${(parseFloat(marketSummary.totalMarketCap) / 1e9).toFixed(2)}B
               </div>
               <p className="text-xs text-muted-foreground">
                 {marketSummary.marketChange24h && (
@@ -156,7 +171,7 @@ export default function CryptoMarket() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
-                ${(parseFloat(marketSummary.totalVolume24h) / 1e9).toFixed(2)}B
+                ${(parseFloat(marketSummary.totalVolume24h) / 1e6).toFixed(2)}M
               </div>
             </CardContent>
           </Card>
@@ -179,11 +194,13 @@ export default function CryptoMarket() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
-                {marketSummary.fearGreedIndex || 50}
+                {marketSummary.fearGreedIndex || 'N/A'}
               </div>
               <p className="text-xs text-muted-foreground">
-                {marketSummary.fearGreedIndex && marketSummary.fearGreedIndex > 70 ? 'Greed' : 
-                 marketSummary.fearGreedIndex && marketSummary.fearGreedIndex < 30 ? 'Fear' : 'Neutral'}
+                {marketSummary.fearGreedIndex ? 
+                  (marketSummary.fearGreedIndex > 70 ? 'Greed' : 
+                   marketSummary.fearGreedIndex < 30 ? 'Fear' : 'Neutral') : 
+                  'No Data'}
               </p>
             </CardContent>
           </Card>
@@ -282,7 +299,10 @@ export default function CryptoMarket() {
               <CardContent className="space-y-3">
                 <div className="flex items-center justify-between">
                   <span className="text-2xl font-bold">
-                    ${parseFloat(asset.price).toLocaleString()}
+                    ${parseFloat(asset.price).toLocaleString(undefined, {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: parseFloat(asset.price) > 1 ? 2 : 6
+                    })}
                   </span>
                   <div className={cn("flex items-center space-x-1", getChangeColor(asset.priceChange24h || '0'))}>
                     {getChangeIcon(asset.priceChange24h || '0')}
@@ -296,13 +316,13 @@ export default function CryptoMarket() {
                   <div>
                     <span className="text-muted-foreground">Market Cap</span>
                     <p className="font-medium">
-                      ${(parseFloat(asset.marketCap || '0') / 1e9).toFixed(2)}B
+                      ${formatLargeNumber(parseFloat(asset.marketCap || '0'))}
                     </p>
                   </div>
                   <div>
                     <span className="text-muted-foreground">Volume 24h</span>
                     <p className="font-medium">
-                      ${(parseFloat(asset.volume24h || '0') / 1e6).toFixed(2)}M
+                      ${formatLargeNumber(parseFloat(asset.volume24h || '0'))}
                     </p>
                   </div>
                 </div>

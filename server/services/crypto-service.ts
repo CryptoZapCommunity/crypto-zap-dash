@@ -12,26 +12,25 @@ export class CryptoService {
     try {
       console.log('🪙 Fetching trending coins...');
       const response = await fetch(
-        `${this.baseUrl}/search/trending?x_cg_demo_api_key=${this.apiKey}`
+        `${this.baseUrl}/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=20&page=1&sparkline=false&price_change_percentage=24h&x_cg_demo_api_key=${this.apiKey}`
       );
 
       if (!response.ok) {
         throw new Error(`CoinGecko API error: ${response.status}`);
       }
 
-      const data = await response.json();
-      const coins = data.coins || [];
+      const coins = await response.json();
 
-      console.log(`✅ Found ${coins.length} trending coins`);
+      console.log(`✅ Found ${coins.length} coins`);
       
       const trendingCoins = coins.slice(0, 10).map((coin: any) => ({
-        id: coin.item.id,
-        symbol: coin.item.symbol?.toUpperCase(),
-        name: coin.item.name,
-        price: coin.item.price_btc,
-        marketCapRank: coin.item.market_cap_rank,
-        image: coin.item.large,
-        priceChange24h: coin.item.data?.price_change_percentage_24h?.usd || 0,
+        id: coin.id,
+        symbol: coin.symbol?.toUpperCase(),
+        name: coin.name,
+        price: coin.current_price || 0,
+        marketCapRank: coin.market_cap_rank,
+        image: coin.image,
+        priceChange24h: coin.price_change_percentage_24h || 0,
       }));
 
       // Split into gainers and losers
