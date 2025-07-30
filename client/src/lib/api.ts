@@ -161,6 +161,11 @@ export class ApiClient {
     const query = params.toString() ? `?${params}` : '';
     return this.request(`/candlestick/${symbol}${query}`);
   }
+
+  // Market analysis
+  async getMarketAnalysis() {
+    return this.request('/market-analysis');
+  }
 }
 
 export const apiClient = new ApiClient();

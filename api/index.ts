@@ -26,31 +26,26 @@ app.get("/api/health", (req, res) => {
   });
 });
 
-// Initialize routes
-(async () => {
+// Initialize routes and serve static files
+const initializeApp = async () => {
   try {
     await registerRoutes(app);
 
-    // Serve static files in production
-    if (process.env.NODE_ENV === "production") {
-      app.use(express.static("dist"));
-      app.get("*", (req, res) => {
-        res.sendFile(path.join(process.cwd(), "dist/index.html"));
-      });
-    } else {
-      // In development, serve static files from dist as well
-      app.use(express.static("dist"));
-      app.get("*", (req, res) => {
-        res.sendFile(path.join(process.cwd(), "dist/index.html"));
-      });
-    }
+    // Serve static files
+    app.use(express.static("dist"));
+    app.get("*", (req, res) => {
+      res.sendFile(path.join(process.cwd(), "dist/index.html"));
+    });
 
     console.log("Server initialized successfully");
   } catch (error) {
     console.error("Failed to initialize server:", error);
     process.exit(1);
   }
-})();
+};
+
+// Initialize the app
+initializeApp();
 
 // Error handling middleware (must be last)
 app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {

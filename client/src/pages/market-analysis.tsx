@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
+import { apiClient } from '@/lib/api';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -255,9 +256,11 @@ function AssetAnalysisCard({ analysis }: { analysis: MarketAnalysis }) {
 }
 
 export default function MarketAnalysisPage() {
-  const { data: analysisData, isLoading } = useQuery({
+  const { data: analysisData, isLoading, error } = useQuery({
     queryKey: ['/api/market-analysis'],
-    select: () => mockAnalysis,
+    queryFn: () => apiClient.getMarketAnalysis(),
+    refetchInterval: 5 * 60 * 1000, // 5 minutes
+    staleTime: 10 * 60 * 1000, // 10 minutes
   });
 
   if (isLoading) {
@@ -268,6 +271,22 @@ export default function MarketAnalysisPage() {
           <Skeleton className="w-32 h-10" />
         </div>
         <Skeleton className="w-full h-96" />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="container mx-auto py-6">
+        <div className="flex items-center justify-center h-64">
+          <div className="text-center">
+            <AlertTriangle className="w-12 h-12 text-red-500 mx-auto mb-4" />
+            <h2 className="text-xl font-semibold mb-2">Erro ao carregar análise</h2>
+            <p className="text-muted-foreground">
+              Não foi possível carregar os dados de análise de mercado.
+            </p>
+          </div>
+        </div>
       </div>
     );
   }

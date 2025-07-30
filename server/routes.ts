@@ -386,6 +386,85 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Market analysis endpoint
+  app.get("/api/market-analysis", async (req, res) => {
+    const startTime = Date.now();
+    try {
+      // Generate mock market analysis data
+      const analysis = [
+        {
+          asset: 'BTC',
+          price: 102547,
+          change24h: 2.34,
+          volume24h: 28500000000,
+          marketCap: 2050000000000,
+          technicalIndicators: [
+            { name: 'RSI', value: 68, signal: 'neutral', strength: 75 },
+            { name: 'MACD', value: 1200, signal: 'buy', strength: 85 },
+            { name: 'SMA 50', value: 98500, signal: 'buy', strength: 70 },
+            { name: 'Bollinger', value: 0.85, signal: 'neutral', strength: 60 },
+          ],
+          supportLevels: [98000, 95500, 92000],
+          resistanceLevels: [105000, 108500, 112000],
+          sentiment: 72,
+          riskScore: 45,
+        },
+        {
+          asset: 'ETH',
+          price: 3847,
+          change24h: 4.12,
+          volume24h: 15200000000,
+          marketCap: 462000000000,
+          technicalIndicators: [
+            { name: 'RSI', value: 72, signal: 'buy', strength: 80 },
+            { name: 'MACD', value: 45, signal: 'buy', strength: 90 },
+            { name: 'SMA 50', value: 3650, signal: 'buy', strength: 85 },
+            { name: 'Bollinger', value: 0.92, signal: 'buy', strength: 75 },
+          ],
+          supportLevels: [3650, 3400, 3200],
+          resistanceLevels: [4000, 4200, 4500],
+          sentiment: 78,
+          riskScore: 38,
+        },
+        {
+          asset: 'SOL',
+          price: 145.67,
+          change24h: -1.23,
+          volume24h: 8500000000,
+          marketCap: 65000000000,
+          technicalIndicators: [
+            { name: 'RSI', value: 45, signal: 'sell', strength: 65 },
+            { name: 'MACD', value: -25, signal: 'sell', strength: 70 },
+            { name: 'SMA 50', value: 150, signal: 'sell', strength: 60 },
+            { name: 'Bollinger', value: 0.78, signal: 'neutral', strength: 55 },
+          ],
+          supportLevels: [140, 135, 130],
+          resistanceLevels: [150, 155, 160],
+          sentiment: 45,
+          riskScore: 65,
+        },
+      ];
+      
+      const duration = Date.now() - startTime;
+      try {
+        requestMonitor.logRequest('/api/market-analysis', 'GET', duration, 200);
+      } catch (monitorError) {
+        console.error('Monitoring error:', monitorError);
+      }
+      
+      res.json(analysis);
+    } catch (error) {
+      console.error('Error fetching market analysis:', error);
+      const duration = Date.now() - startTime;
+      try {
+        requestMonitor.logRequest('/api/market-analysis', 'GET', duration, 500);
+      } catch (monitorError) {
+        console.error('Monitoring error:', monitorError);
+      }
+      res.status(500).json({ message: 'Failed to fetch market analysis' });
+    }
+  });
+
   // Manual update endpoints for testing
   app.post("/api/update/crypto", async (req, res) => {
     try {
