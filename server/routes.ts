@@ -371,19 +371,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
   const httpServer = createServer(app);
 
   // Initialize WebSocket server (removed for Vercel)
-  
 
-  // Initialize data on startup
+  // Initialize data on startup (optimized for Vercel)
   setTimeout(async () => {
     try {
       console.log('Initializing data...');
-      await Promise.all([
-        cryptoService.updateCryptoPrices(),
-        cryptoService.updateMarketSummary(),
+      // Load essential data first, then others
+      await cryptoService.updateCryptoPrices();
+      await cryptoService.updateMarketSummary();
+      
+      // Load other data in background
+      Promise.all([
         newsService.updateGeopoliticalNews(),
         economicService.updateEconomicCalendar(),
         whaleService.updateWhaleTransactions(),
-      ]);
+      ]).catch(error => {
+        console.error('Background data loading error:', error);
+      });
+      
       console.log('Initial data loaded successfully');
     } catch (error) {
       console.error('Error loading initial data:', error);
