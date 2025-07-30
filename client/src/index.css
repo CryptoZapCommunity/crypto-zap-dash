@@ -1,0 +1,203 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: hsl(0, 0%, 100%);
+  --foreground: hsl(20, 14.3%, 4.1%);
+  --muted: hsl(60, 4.8%, 95.9%);
+  --muted-foreground: hsl(25, 5.3%, 44.7%);
+  --popover: hsl(0, 0%, 100%);
+  --popover-foreground: hsl(20, 14.3%, 4.1%);
+  --card: hsl(0, 0%, 100%);
+  --card-foreground: hsl(20, 14.3%, 4.1%);
+  --border: hsl(20, 5.9%, 90%);
+  --input: hsl(20, 5.9%, 90%);
+  --primary: hsl(221, 100%, 60%);
+  --primary-foreground: hsl(211, 100%, 99%);
+  --secondary: hsl(60, 4.8%, 95.9%);
+  --secondary-foreground: hsl(24, 9.8%, 10%);
+  --accent: hsl(60, 4.8%, 95.9%);
+  --accent-foreground: hsl(24, 9.8%, 10%);
+  --destructive: hsl(0, 84.2%, 60.2%);
+  --destructive-foreground: hsl(60, 9.1%, 97.8%);
+  --ring: hsl(20, 14.3%, 4.1%);
+  --radius: 0.5rem;
+  
+  /* Custom financial dashboard colors */
+  --success: hsl(152, 100%, 39%);
+  --success-foreground: hsl(0, 0%, 100%);
+  --danger: hsl(0, 84%, 63%);
+  --danger-foreground: hsl(0, 0%, 100%);
+  --warning: hsl(43, 100%, 49%);
+  --warning-foreground: hsl(0, 0%, 100%);
+  
+  /* Dark theme specific */
+  --dark-100: hsl(230, 30%, 14%);
+  --dark-200: hsl(230, 35%, 11%);
+  --dark-300: hsl(230, 45%, 4%);
+}
+
+.dark {
+  --background: hsl(230, 45%, 4%);
+  --foreground: hsl(0, 0%, 98%);
+  --muted: hsl(230, 35%, 11%);
+  --muted-foreground: hsl(240, 5%, 64.9%);
+  --popover: hsl(230, 35%, 11%);
+  --popover-foreground: hsl(0, 0%, 98%);
+  --card: hsl(230, 35%, 11%);
+  --card-foreground: hsl(0, 0%, 98%);
+  --border: hsl(230, 30%, 14%);
+  --input: hsl(230, 30%, 14%);
+  --primary: hsl(221, 100%, 60%);
+  --primary-foreground: hsl(211, 100%, 99%);
+  --secondary: hsl(230, 30%, 14%);
+  --secondary-foreground: hsl(0, 0%, 98%);
+  --accent: hsl(230, 30%, 14%);
+  --accent-foreground: hsl(0, 0%, 98%);
+  --destructive: hsl(0, 62.8%, 30.6%);
+  --destructive-foreground: hsl(0, 0%, 98%);
+  --ring: hsl(240, 4.9%, 83.9%);
+  --radius: 0.5rem;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply font-sans antialiased bg-background text-foreground;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  }
+}
+
+@layer components {
+  .glassmorphism {
+    @apply bg-white/10 backdrop-blur-lg border border-white/20;
+  }
+  
+  .dark .glassmorphism {
+    @apply bg-white/5 border-white/10;
+  }
+  
+  .gradient-border {
+    background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--success)) 100%);
+    padding: 1px;
+    border-radius: calc(var(--radius) + 1px);
+  }
+  
+  .gradient-border-content {
+    @apply bg-card rounded-[var(--radius)];
+  }
+  
+  .sparkline-bar {
+    @apply w-1 rounded-full transition-all duration-300;
+  }
+  
+  .impact-high {
+    @apply text-danger bg-danger/10 border-danger/20;
+  }
+  
+  .impact-medium {
+    @apply text-warning bg-warning/10 border-warning/20;
+  }
+  
+  .impact-low {
+    @apply text-primary bg-primary/10 border-primary/20;
+  }
+  
+  .sentiment-positive {
+    @apply text-success bg-success/10 border-success/20;
+  }
+  
+  .sentiment-negative {
+    @apply text-danger bg-danger/10 border-danger/20;
+  }
+  
+  .sentiment-neutral {
+    @apply text-muted-foreground bg-muted border-border;
+  }
+}
+
+@layer utilities {
+  .animate-pulse-slow {
+    animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+  
+  .animate-fade-in {
+    animation: fadeIn 0.5s ease-in-out;
+  }
+  
+  .animate-slide-up {
+    animation: slideUp 0.3s ease-out;
+  }
+  
+  @keyframes fadeIn {
+    0% { 
+      opacity: 0; 
+      transform: translateY(10px); 
+    }
+    100% { 
+      opacity: 1; 
+      transform: translateY(0); 
+    }
+  }
+  
+  @keyframes slideUp {
+    0% { 
+      transform: translateY(100%); 
+    }
+    100% { 
+      transform: translateY(0); 
+    }
+  }
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-muted;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-border rounded-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-muted-foreground;
+}
+
+/* Custom chart styling */
+.chart-container {
+  @apply relative w-full h-full;
+}
+
+.chart-container canvas {
+  @apply rounded-lg;
+}
+
+/* Loading states */
+.loading-shimmer {
+  background: linear-gradient(
+    90deg,
+    hsl(var(--muted)) 0%,
+    hsl(var(--muted-foreground) / 0.1) 50%,
+    hsl(var(--muted)) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
