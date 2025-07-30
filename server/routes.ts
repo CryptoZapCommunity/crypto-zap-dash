@@ -6,6 +6,7 @@ import { NewsService } from './services/news-service';
 import { EconomicService } from './services/economic-service';
 import { WhaleService } from './services/whale-service';
 import { FredService } from './services/fred-service';
+import { AirdropService } from './services/airdrop-service';
 
 import { apiRateLimiter } from './rate-limiter';
 import { requestMonitor } from './monitoring';
@@ -17,6 +18,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   const economicService = new EconomicService();
   const whaleService = new WhaleService();
   const fredService = new FredService();
+  const airdropService = new AirdropService();
 
   // Rate limiting middleware (disabled for now to prevent issues)
   const rateLimitMiddleware = (req: Request, res: Response, next: NextFunction) => {
@@ -230,12 +232,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Airdrops endpoint
   app.get("/api/airdrops", async (req, res) => {
+    const startTime = Date.now();
     try {
       const status = req.query.status as string;
-      const airdrops = await storage.getAirdrops(status);
-      res.json(airdrops);
+      console.log('🪂 Fetching airdrops from external APIs...', { status });
+      
+      const airdrops = await airdropService.getAirdrops();
+      console.log(`✅ Found ${airdrops.length} airdrops from external APIs`);
+      
+      // Filter by status if provided
+      const filteredAirdrops = status 
+        ? airdrops.filter(airdrop => airdrop.status === status)
+        : airdrops;
+      
+      const duration = Date.now() - startTime;
+      try {
+        requestMonitor.logRequest('/api/airdrops', 'GET', duration, 200);
+      } catch (monitorError) {
+        console.error('Monitoring error:', monitorError);
+      }
+      
+      res.json(filteredAirdrops);
     } catch (error) {
       console.error('Error fetching airdrops:', error);
+      const duration = Date.now() - startTime;
+      try {
+        requestMonitor.logRequest('/api/airdrops', 'GET', duration, 500);
+      } catch (monitorError) {
+        console.error('Monitoring error:', monitorError);
+      }
       res.status(500).json({ message: 'Failed to fetch airdrops' });
     }
   });
@@ -542,6 +567,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Load essential data first, then others
       await cryptoService.updateCryptoPrices();
       await cryptoService.updateMarketSummary();
+      
+
       
       // Load other data in background
       Promise.all([

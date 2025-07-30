@@ -69,6 +69,17 @@
 
 **Resultado**: ✅ Página de análise de mercado funcionando
 
+### **8. Página de Airdrops sem dados reais**
+**Problema**: Página usava dados mockados em vez de APIs externas
+**Solução**:
+- Criado `AirdropService` para buscar dados de APIs externas
+- Integrado com CoinGecko Trending API
+- Integrado com DeFi Llama API
+- Removido dados mockados da inicialização
+- Endpoint agora busca dados reais de múltiplas fontes
+
+**Resultado**: ✅ Página de airdrops com dados reais de APIs externas
+
 ## 📊 **Status das Funcionalidades**
 
 ### **✅ APIs Funcionando:**
@@ -124,6 +135,7 @@
 - ✅ **Candlestick Chart**: Implementado no dashboard
 - ✅ **Dados do FED**: Logs e endpoints adicionados
 - ✅ **Análise de Mercado**: Endpoint e página corrigidos
+- ✅ **Airdrops**: Dados reais de APIs externas
 - ✅ **Build**: Funcionando
 - ✅ **Deploy**: Pronto para Vercel
 
