@@ -56,13 +56,29 @@ export default function FedMonitor() {
     staleTime: 30 * 60 * 1000,
   });
 
-  // Mock FED data (in real implementation, this would come from FRED API)
+  // Fetch FRED economic indicators
+  const { data: fredData, isLoading: fredLoading } = useQuery({
+    queryKey: ['/api/fred/indicators'],
+    queryFn: () => apiClient.getFredIndicators(),
+    refetchInterval: 60 * 60 * 1000, // 1 hour
+    staleTime: 30 * 60 * 1000,
+  });
+
+  // Fetch rate history
+  const { data: rateHistory, isLoading: historyLoading } = useQuery({
+    queryKey: ['/api/fred/rate-history'],
+    queryFn: () => apiClient.getFredRateHistory(12),
+    refetchInterval: 60 * 60 * 1000, // 1 hour
+    staleTime: 30 * 60 * 1000,
+  });
+
+  // Use real data or fallback to mock data
   const fedData: FedData = {
-    currentRate: 5.50,
-    previousRate: 5.25,
-    nextMeeting: '2024-01-31',
-    lastUpdate: '2024-01-15',
-    rateHistory: [
+    currentRate: fredData?.federalFundsRate || 5.50,
+    previousRate: fredData?.federalFundsRate || 5.25,
+    nextMeeting: '2024-01-31', // This would need a separate API
+    lastUpdate: fredData?.lastUpdated || '2024-01-15',
+    rateHistory: rateHistory || [
       { date: '2024-01-15', rate: 5.50 },
       { date: '2023-12-13', rate: 5.25 },
       { date: '2023-11-01', rate: 5.25 },
@@ -75,9 +91,9 @@ export default function FedMonitor() {
       { date: '2022-12-14', rate: 4.25 },
     ],
     economicIndicators: {
-      inflation: 3.1,
-      unemployment: 3.7,
-      gdp: 2.1,
+      inflation: fredData?.inflationRate || 3.1,
+      unemployment: fredData?.unemploymentRate || 3.7,
+      gdp: fredData?.gdpGrowth || 2.1,
     }
   };
 

@@ -141,6 +141,16 @@ export class ApiClient {
   async getCryptoIcon(symbol: string) {
     return this.request(`/crypto-icons/${symbol}`);
   }
+
+  // FRED economic indicators
+  async getFredIndicators() {
+    return this.request('/fred/indicators');
+  }
+
+  async getFredRateHistory(months?: number) {
+    const query = months ? `?months=${months}` : '';
+    return this.request(`/fred/rate-history${query}`);
+  }
 }
 
 export const apiClient = new ApiClient();
