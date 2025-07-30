@@ -131,6 +131,16 @@ export class ApiClient {
   async updateWhale() {
     return this.request('/update/whale', { method: 'POST' });
   }
+
+  // Crypto icons
+  async getCryptoIcons(symbols: string[]) {
+    const query = `?symbols=${symbols.join(',')}`;
+    return this.request(`/crypto-icons${query}`);
+  }
+
+  async getCryptoIcon(symbol: string) {
+    return this.request(`/crypto-icons/${symbol}`);
+  }
 }
 
 export const apiClient = new ApiClient();

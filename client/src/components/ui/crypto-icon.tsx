@@ -1,133 +1,165 @@
-import { cn } from '@/lib/utils';
+import { useState, useEffect } from 'react';
+import { apiClient } from '@/lib/api';
+import { Skeleton } from './skeleton';
 
 interface CryptoIconProps {
   symbol: string;
   size?: 'sm' | 'md' | 'lg';
   className?: string;
+  fallback?: string;
 }
 
-const CRYPTO_ICONS: Record<string, string> = {
-  BTC: 'https://cryptologos.cc/logos/bitcoin-btc-logo.svg',
-  ETH: 'https://cryptologos.cc/logos/ethereum-eth-logo.svg',
-  SOL: 'https://cryptologos.cc/logos/solana-sol-logo.svg',
-  USDT: 'https://cryptologos.cc/logos/tether-usdt-logo.svg',
-  USDC: 'https://cryptologos.cc/logos/usd-coin-usdc-logo.svg',
-  BNB: 'https://cryptologos.cc/logos/bnb-bnb-logo.svg',
-  XRP: 'https://cryptologos.cc/logos/xrp-xrp-logo.svg',
-  ADA: 'https://cryptologos.cc/logos/cardano-ada-logo.svg',
-  DOGE: 'https://cryptologos.cc/logos/dogecoin-doge-logo.svg',
-  AVAX: 'https://cryptologos.cc/logos/avalanche-avax-logo.svg',
-  DOT: 'https://cryptologos.cc/logos/polkadot-new-dot-logo.svg',
-  MATIC: 'https://cryptologos.cc/logos/polygon-matic-logo.svg',
-  LINK: 'https://cryptologos.cc/logos/chainlink-link-logo.svg',
-  UNI: 'https://cryptologos.cc/logos/uniswap-uni-logo.svg',
-  LTC: 'https://cryptologos.cc/logos/litecoin-ltc-logo.svg',
-  BCH: 'https://cryptologos.cc/logos/bitcoin-cash-bch-logo.svg',
-  ATOM: 'https://cryptologos.cc/logos/cosmos-atom-logo.svg',
-  FTT: 'https://cryptologos.cc/logos/ftx-token-ftt-logo.svg',
-  NEAR: 'https://cryptologos.cc/logos/near-protocol-near-logo.svg',
-  ALGO: 'https://cryptologos.cc/logos/algorand-algo-logo.svg',
+const sizeClasses = {
+  sm: 'w-6 h-6',
+  md: 'w-8 h-8',
+  lg: 'w-12 h-12',
 };
 
-const FALLBACK_ICONS: Record<string, string> = {
-  BTC: '₿',
-  ETH: 'Ξ',
-  SOL: '◎',
-  USDT: '₮',
-  USDC: '⊡',
-  BNB: 'Ⓑ',
-  XRP: '✕',
-  ADA: '₳',
-  DOGE: 'Ð',
-  AVAX: '△',
-  DOT: '●',
-  MATIC: '⬟',
-  LINK: '⧉',
-  UNI: '🦄',
-  LTC: 'Ł',
-  BCH: '₿',
-  ATOM: '⚛',
-  FTT: 'Ⓕ',
-  NEAR: 'Ⓝ',
-  ALGO: '△',
-};
+// Cache local para ícones
+const iconCache = new Map<string, string>();
 
-const CRYPTO_COLORS: Record<string, string> = {
-  BTC: 'bg-orange-500',
-  ETH: 'bg-blue-500',
-  SOL: 'bg-purple-500',
-  USDT: 'bg-green-500',
-  USDC: 'bg-blue-600',
-  BNB: 'bg-yellow-500',
-  XRP: 'bg-blue-400',
-  ADA: 'bg-blue-700',
-  DOGE: 'bg-yellow-400',
-  AVAX: 'bg-red-500',
-  DOT: 'bg-pink-500',
-  MATIC: 'bg-purple-600',
-  LINK: 'bg-blue-500',
-  UNI: 'bg-pink-400',
-  LTC: 'bg-gray-400',
-  BCH: 'bg-green-400',
-  ATOM: 'bg-indigo-500',
-  FTT: 'bg-cyan-500',
-  NEAR: 'bg-black',
-  ALGO: 'bg-gray-700',
-};
+export function CryptoIcon({ 
+  symbol, 
+  size = 'md', 
+  className = '',
+  fallback = symbol.slice(0, 2).toUpperCase()
+}: CryptoIconProps) {
+  const [iconUrl, setIconUrl] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [hasError, setHasError] = useState(false);
 
-export function CryptoIcon({ symbol, size = 'md', className }: CryptoIconProps) {
-  const normalizedSymbol = symbol.toUpperCase();
-  const iconUrl = CRYPTO_ICONS[normalizedSymbol];
-  const fallbackIcon = FALLBACK_ICONS[normalizedSymbol] || normalizedSymbol.charAt(0);
-  const colorClass = CRYPTO_COLORS[normalizedSymbol] || 'bg-gray-500';
+  useEffect(() => {
+    let isMounted = true;
+    
+    const fetchIcon = async () => {
+      // Check cache first
+      const cachedIcon = iconCache.get(symbol);
+      if (cachedIcon) {
+        if (isMounted) {
+          setIconUrl(cachedIcon);
+          setIsLoading(false);
+        }
+        return;
+      }
 
-  const sizeClasses = {
-    sm: 'w-6 h-6 text-xs',
-    md: 'w-8 h-8 text-sm',
-    lg: 'w-10 h-10 text-base',
-  };
+      try {
+        setIsLoading(true);
+        setHasError(false);
+        
+        const response = await apiClient.getCryptoIcon(symbol);
+        if (isMounted && response.iconUrl) {
+          setIconUrl(response.iconUrl);
+          // Cache the icon
+          iconCache.set(symbol, response.iconUrl);
+        } else if (isMounted) {
+          setHasError(true);
+        }
+      } catch (error) {
+        if (isMounted) {
+          console.error(`Error fetching icon for ${symbol}:`, error);
+          setHasError(true);
+        }
+      } finally {
+        if (isMounted) {
+          setIsLoading(false);
+        }
+      }
+    };
 
-  if (iconUrl) {
+    if (symbol) {
+      fetchIcon();
+    }
+
+    return () => {
+      isMounted = false;
+    };
+  }, [symbol]);
+
+  if (isLoading) {
     return (
-      <div className={cn('relative rounded-full overflow-hidden flex-shrink-0', sizeClasses[size], className)}>
-        <img
-          src={iconUrl}
-          alt={`${symbol} logo`}
-          className="w-full h-full object-cover"
-          onError={(e) => {
-            // Fallback to text icon if image fails to load
-            const target = e.target as HTMLImageElement;
-            const parent = target.parentElement;
-            if (parent) {
-              parent.innerHTML = `
-                <div class="${cn('w-full h-full rounded-full flex items-center justify-center text-white font-bold', colorClass)}">
-                  ${fallbackIcon}
-                </div>
-              `;
-            }
-          }}
-        />
+      <Skeleton className={`${sizeClasses[size]} rounded-full ${className}`} />
+    );
+  }
+
+  if (hasError || !iconUrl) {
+    return (
+      <div 
+        className={`
+          ${sizeClasses[size]} 
+          rounded-full 
+          bg-gradient-to-br from-primary to-primary/70 
+          flex items-center justify-center 
+          text-white font-bold text-xs
+          ${className}
+        `}
+        title={symbol}
+      >
+        {fallback}
       </div>
     );
   }
 
-  // Fallback to text icon
   return (
-    <div className={cn(
-      'rounded-full flex items-center justify-center text-white font-bold flex-shrink-0',
-      sizeClasses[size],
-      colorClass,
-      className
-    )}>
-      {fallbackIcon}
-    </div>
+    <img
+      src={iconUrl}
+      alt={`${symbol} icon`}
+      className={`${sizeClasses[size]} rounded-full object-cover ${className}`}
+      onError={() => {
+        setHasError(true);
+        setIconUrl(null);
+      }}
+    />
   );
 }
 
-export function getCryptoColor(symbol: string): string {
-  return CRYPTO_COLORS[symbol.toUpperCase()] || 'bg-gray-500';
+interface CryptoIconsProps {
+  symbols: string[];
+  size?: 'sm' | 'md' | 'lg';
+  className?: string;
 }
 
-export function getCryptoIcon(symbol: string): string {
-  return FALLBACK_ICONS[symbol.toUpperCase()] || symbol.charAt(0);
+export function CryptoIcons({ symbols, size = 'md', className = '' }: CryptoIconsProps) {
+  const [icons, setIcons] = useState<Record<string, string>>({});
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchIcons = async () => {
+      try {
+        setIsLoading(true);
+        const response = await apiClient.getCryptoIcons(symbols);
+        setIcons(response);
+      } catch (error) {
+        console.error('Error fetching crypto icons:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    if (symbols.length > 0) {
+      fetchIcons();
+    }
+  }, [symbols]);
+
+  if (isLoading) {
+    return (
+      <div className={`flex gap-2 ${className}`}>
+        {symbols.map((symbol, index) => (
+          <Skeleton key={index} className={`${sizeClasses[size]} rounded-full`} />
+        ))}
+      </div>
+    );
+  }
+
+  return (
+    <div className={`flex gap-2 ${className}`}>
+      {symbols.map((symbol) => (
+        <CryptoIcon
+          key={symbol}
+          symbol={symbol}
+          size={size}
+          fallback={symbol.slice(0, 2).toUpperCase()}
+        />
+      ))}
+    </div>
+  );
 }

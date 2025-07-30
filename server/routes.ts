@@ -9,6 +9,7 @@ import { FredService } from './services/fred-service';
 import { WebSocketManager } from './websocket';
 import { apiRateLimiter } from './rate-limiter';
 import { requestMonitor } from './monitoring';
+import { apiCache } from './api-cache';
 
 export async function registerRoutes(app: Express): Promise<Server> {
   const cryptoService = new CryptoService();
@@ -72,6 +73,57 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Crypto icons endpoint
+  app.get("/api/crypto-icons", async (req, res) => {
+    const startTime = Date.now();
+    
+    try {
+      const symbols = (req.query.symbols as string)?.split(',') || [];
+      
+      if (symbols.length === 0) {
+        return res.status(400).json({ message: 'Symbols parameter is required' });
+      }
+
+      const icons = await cryptoService.getCryptoIcons(symbols);
+      
+      const duration = Date.now() - startTime;
+      requestMonitor.logRequest('/api/crypto-icons', 'GET', duration, 200);
+      
+      res.json(icons);
+    } catch (error) {
+      const duration = Date.now() - startTime;
+      requestMonitor.logRequest('/api/crypto-icons', 'GET', duration, 500);
+      
+      console.error('Error fetching crypto icons:', error);
+      res.status(500).json({ message: 'Failed to fetch crypto icons' });
+    }
+  });
+
+  // Single crypto icon endpoint
+  app.get("/api/crypto-icons/:symbol", async (req, res) => {
+    const startTime = Date.now();
+    
+    try {
+      const { symbol } = req.params;
+      const iconUrl = await cryptoService.getCryptoIcon(symbol);
+      
+      const duration = Date.now() - startTime;
+      requestMonitor.logRequest('/api/crypto-icons/:symbol', 'GET', duration, 200);
+      
+      if (iconUrl) {
+        res.json({ symbol: symbol.toUpperCase(), iconUrl });
+      } else {
+        res.status(404).json({ message: 'Icon not found' });
+      }
+    } catch (error) {
+      const duration = Date.now() - startTime;
+      requestMonitor.logRequest('/api/crypto-icons/:symbol', 'GET', duration, 500);
+      
+      console.error('Error fetching crypto icon:', error);
+      res.status(500).json({ message: 'Failed to fetch crypto icon' });
+    }
+  });
+
   // News endpoints
   app.get("/api/news/geopolitics", async (req, res) => {
     try {
@@ -96,13 +148,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   app.get("/api/news", async (req, res) => {
+    const startTime = Date.now();
+    
     try {
       const limit = parseInt(req.query.limit as string) || 20;
       const category = req.query.category as string;
+      
+      console.log('📰 Fetching news - Category:', category, 'Limit:', limit);
+      
       const news = await storage.getNews(category, limit);
+      
+      console.log('📰 News found:', news.length);
+      
+      const duration = Date.now() - startTime;
+      requestMonitor.logRequest('/api/news', 'GET', duration, 200);
+      
       res.json(news);
     } catch (error) {
-      console.error('Error fetching news:', error);
+      const duration = Date.now() - startTime;
+      requestMonitor.logRequest('/api/news', 'GET', duration, 500);
+      
+      console.error('❌ Error fetching news:', error);
       res.status(500).json({ message: 'Failed to fetch news' });
     }
   });
@@ -123,11 +189,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Whale movements endpoint
   app.get("/api/whale-movements", async (req, res) => {
+    const startTime = Date.now();
+    
     try {
       const limit = parseInt(req.query.limit as string) || 50;
+      const cacheKey = `whale-movements-${limit}`;
+      
+      // Check cache first
+      const cachedData = apiCache.get(cacheKey);
+      if (cachedData) {
+        const duration = Date.now() - startTime;
+        requestMonitor.logRequest('/api/whale-movements', 'GET', duration, 200);
+        return res.json(cachedData);
+      }
+      
       const transactions = await storage.getWhaleTransactions(limit);
+      
+      // Cache the result for 5 minutes
+      apiCache.set(cacheKey, transactions, 5 * 60 * 1000);
+      
+      const duration = Date.now() - startTime;
+      requestMonitor.logRequest('/api/whale-movements', 'GET', duration, 200);
+      
       res.json(transactions);
     } catch (error) {
+      const duration = Date.now() - startTime;
+      requestMonitor.logRequest('/api/whale-movements', 'GET', duration, 500);
+      
       console.error('Error fetching whale movements:', error);
       res.status(500).json({ message: 'Failed to fetch whale movements' });
     }
@@ -243,14 +331,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/update/news", async (req, res) => {
     try {
+      console.log('📰 Starting news update...');
       await Promise.all([
         newsService.updateGeopoliticalNews(),
         newsService.updateCryptoNews(),
         newsService.updateMacroeconomicNews(),
       ]);
+      console.log('✅ News update completed');
       res.json({ message: 'News updated successfully' });
     } catch (error) {
-      console.error('Error updating news:', error);
+      console.error('❌ Error updating news:', error);
       res.status(500).json({ message: 'Failed to update news' });
     }
   });

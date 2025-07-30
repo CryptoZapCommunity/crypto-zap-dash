@@ -51,14 +51,12 @@ function CryptoAssetCard({ asset }: { asset: CryptoAsset }) {
   const change = parseFloat(asset.priceChange24h || '0');
   const isPositive = change >= 0;
 
-
-
   return (
     <Card className="glassmorphism hover:scale-105 transition-transform duration-200">
       <CardContent className="p-6">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center space-x-3">
-            <CryptoIcon symbol={asset.symbol} size="lg" />
+            <CryptoIcon symbol={asset.symbol} size="md" /> {/* Reduced from lg to md */}
             <div>
               <h3 className="font-semibold text-foreground">{asset.name}</h3>
               <p className="text-sm text-muted-foreground">{asset.symbol.toUpperCase()}</p>

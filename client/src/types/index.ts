@@ -64,6 +64,31 @@ export interface WhaleTransaction {
   createdAt: string | null;
 }
 
+export interface Airdrop {
+  id: string;
+  projectName: string;
+  tokenSymbol: string | null;
+  description: string | null;
+  estimatedValue: string | null;
+  eligibility: string | null;
+  deadline: string | null;
+  status: string;
+  website: string | null;
+  createdAt: string | null;
+}
+
+export interface FedUpdate {
+  id: string;
+  title: string;
+  type: string;
+  content: string | null;
+  sourceUrl: string | null;
+  publishedAt: string;
+  createdAt: string | null;
+  interestRate: string | null;
+  speaker: string | null;
+}
+
 export interface TrendingCoin {
   id: string;
   name: string;

@@ -13,37 +13,41 @@ import { t } from '@/lib/i18n';
 import type { CryptoAsset, MarketSummary, TrendingCoins as TrendingCoinsType, News, EconomicEvent, WhaleTransaction } from '@/types';
 
 export default function Dashboard() {
-  // Market data queries - DISABLED refetchInterval since WebSocket handles updates
+  // Market data queries - OPTIMIZED for performance
   const { data: marketData, isLoading: marketLoading, error: marketError } = useQuery({
     queryKey: ['/api/market-summary'],
     queryFn: () => apiClient.getMarketSummary(),
     refetchInterval: false, // WebSocket handles real-time updates
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: 15 * 60 * 1000, // 15 minutes (increased further)
+    gcTime: 30 * 60 * 1000, // 30 minutes garbage collection
   });
 
   const { data: trendingCoins, isLoading: trendingLoading } = useQuery({
     queryKey: ['/api/trending-coins'],
     queryFn: () => apiClient.getTrendingCoins(),
     refetchInterval: false, // WebSocket handles real-time updates
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: 10 * 60 * 1000, // 10 minutes (increased)
+    gcTime: 20 * 60 * 1000, // 20 minutes garbage collection
   });
 
   const { data: btcChart, isLoading: chartLoading } = useQuery({
     queryKey: ['/api/charts', 'bitcoin'],
     queryFn: () => apiClient.getChartData('bitcoin'),
     refetchInterval: false, // WebSocket handles real-time updates
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: 10 * 60 * 1000, // 10 minutes (increased)
+    gcTime: 20 * 60 * 1000, // 20 minutes garbage collection
   });
 
-  // News queries - Less frequent updates
+  // News queries - Much less frequent updates
   const { data: latestNews, isLoading: newsLoading } = useQuery({
     queryKey: ['/api/news'],
-    queryFn: () => apiClient.getNews(undefined, 10),
-    refetchInterval: 10 * 60 * 1000, // Refetch every 10 minutes (was 5)
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    queryFn: () => apiClient.getNews(undefined, 5), // Reduced from 10 to 5
+    refetchInterval: false, // WebSocket handles updates
+    staleTime: 30 * 60 * 1000, // 30 minutes (increased significantly)
+    gcTime: 60 * 60 * 1000, // 1 hour garbage collection
   });
 
-  // Economic calendar query - Much less frequent
+  // Economic calendar query - Very infrequent
   const { data: economicEvents, isLoading: economicLoading } = useQuery({
     queryKey: ['/api/economic-calendar'],
     queryFn: () => {
@@ -51,16 +55,18 @@ export default function Dashboard() {
       const nextWeek = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000);
       return apiClient.getEconomicCalendar(today, nextWeek);
     },
-    refetchInterval: 60 * 60 * 1000, // Refetch every hour (unchanged)
-    staleTime: 30 * 60 * 1000, // 30 minutes
+    refetchInterval: 2 * 60 * 60 * 1000, // Refetch every 2 hours (increased)
+    staleTime: 60 * 60 * 1000, // 1 hour (increased)
+    gcTime: 2 * 60 * 60 * 1000, // 2 hours garbage collection
   });
 
-  // Whale activity query - Less frequent
+  // Whale activity query - Much less frequent
   const { data: whaleTransactions, isLoading: whaleLoading } = useQuery({
     queryKey: ['/api/whale-movements'],
-    queryFn: () => apiClient.getWhaleMovements(10),
-    refetchInterval: 5 * 60 * 1000, // Refetch every 5 minutes (was 2)
-    staleTime: 2 * 60 * 1000, // 2 minutes
+    queryFn: () => apiClient.getWhaleMovements(5), // Reduced from 10 to 5
+    refetchInterval: false, // WebSocket handles updates
+    staleTime: 15 * 60 * 1000, // 15 minutes (increased)
+    gcTime: 30 * 60 * 1000, // 30 minutes garbage collection
   });
 
   const cryptoAssets: CryptoAsset[] = (marketData as any)?.cryptoAssets || [];
@@ -96,7 +102,7 @@ export default function Dashboard() {
         />
       </section>
 
-      {/* Main Dashboard Grid */}
+      {/* Main Dashboard Grid - OPTIMIZED */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Left Column: Charts & Analysis */}
         <div className="lg:col-span-2 space-y-6">
@@ -115,45 +121,27 @@ export default function Dashboard() {
               isLoading={trendingLoading}
             />
           </section>
-
-          {/* Portfolio Tracker */}
-          <section>
-            <PortfolioTracker />
-          </section>
         </div>
 
-        {/* Right Column: News & Events */}
+        {/* Right Column: News & Events - REDUCED */}
         <div className="space-y-6">
           {/* Alerts Panel */}
           <section>
             <AlertsPanel />
           </section>
 
-          {/* Market Sentiment */}
-          <section>
-            <MarketSentiment />
-          </section>
-
-          {/* Latest News */}
+          {/* Latest News - REDUCED */}
           <section>
             <NewsSection
-              news={news}
+              news={news.slice(0, 3)} // Reduced from 5 to 3
               isLoading={newsLoading}
             />
           </section>
 
-          {/* Economic Calendar */}
-          <section>
-            <EconomicCalendar
-              events={events}
-              isLoading={economicLoading}
-            />
-          </section>
-
-          {/* Whale Activity */}
+          {/* Whale Activity - REDUCED */}
           <section>
             <WhaleActivity
-              whaleTransactions={whales}
+              whaleTransactions={whales.slice(0, 3)} // Reduced from 5 to 3
               isLoading={whaleLoading}
             />
           </section>

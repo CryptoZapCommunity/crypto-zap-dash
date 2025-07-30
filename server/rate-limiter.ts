@@ -67,12 +67,18 @@ class RateLimiter {
 // Create rate limiters for different endpoints
 export const apiRateLimiter = new RateLimiter({
   windowMs: 60 * 1000, // 1 minute
-  maxRequests: 100, // 100 requests per minute
+  maxRequests: 50, // Reduced from 100 to 50 requests per minute
 });
 
 export const wsRateLimiter = new RateLimiter({
   windowMs: 60 * 1000, // 1 minute
-  maxRequests: 200, // 200 WebSocket messages per minute
+  maxRequests: 50, // Increased to allow normal WebSocket communication
+});
+
+// Special rate limiter for paid APIs
+export const paidApiRateLimiter = new RateLimiter({
+  windowMs: 60 * 1000, // 1 minute
+  maxRequests: 10, // Very conservative for paid APIs
 });
 
 // Cleanup old entries every 5 minutes

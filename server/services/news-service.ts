@@ -17,16 +17,27 @@ export class NewsService {
 
   async updateGeopoliticalNews(): Promise<void> {
     try {
+      console.log('🔍 Fetching geopolitical news...');
+      console.log('📰 NewsAPI Key:', this.NEWS_API_KEY ? '✅ Configured' : '❌ Not configured');
+      
       const keywords = 'finance OR economy OR fed OR central bank OR inflation OR gdp';
-      const response = await fetch(
-        `https://newsapi.org/v2/everything?q=${encodeURIComponent(keywords)}&language=en&sortBy=publishedAt&pageSize=20&apiKey=${this.NEWS_API_KEY}`
-      );
+      const url = `https://newsapi.org/v2/everything?q=${encodeURIComponent(keywords)}&language=en&sortBy=publishedAt&pageSize=20&apiKey=${this.NEWS_API_KEY}`;
+      
+      console.log('🌐 Requesting URL:', url.replace(this.NEWS_API_KEY, '***'));
+      
+      const response = await fetch(url);
 
+      console.log('📊 Response status:', response.status);
+      
       if (!response.ok) {
-        throw new Error(`NewsAPI error: ${response.status}`);
+        const errorText = await response.text();
+        console.error('❌ NewsAPI error response:', errorText);
+        throw new Error(`NewsAPI error: ${response.status} - ${errorText}`);
       }
 
       const data = await response.json();
+      console.log('📰 Articles received:', data.articles?.length || 0);
+      
       const articles: NewsAPIArticle[] = data.articles || [];
 
       for (const article of articles) {
@@ -44,9 +55,12 @@ export class NewsService {
         };
 
         await storage.createNews(news);
+        console.log('✅ News saved:', article.title.substring(0, 50) + '...');
       }
+      
+      console.log('🎉 Geopolitical news update completed');
     } catch (error) {
-      console.error('Error updating geopolitical news:', error);
+      console.error('❌ Error updating geopolitical news:', error);
     }
   }
 

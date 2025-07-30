@@ -20,6 +20,7 @@ import CryptoMarket from "@/pages/crypto";
 import WhaleTracker from "@/pages/whale";
 import Airdrops from "@/pages/airdrops";
 import FedMonitor from "@/pages/fed";
+import CryptoIconsDemo from "@/pages/crypto-icons-demo";
 import NotFound from "@/pages/not-found";
 import type { WebSocketMessage } from "@/types";
 
@@ -60,11 +61,14 @@ function Layout({ children }: { children: React.ReactNode }) {
     }
   };
 
+  // Temporarily disable WebSocket to prevent spam
   const { isConnected, connectionStatus } = useWebSocket({
     onMessage: handleWebSocketMessage,
     onConnect: () => console.log('WebSocket connected'),
     onDisconnect: () => console.log('WebSocket disconnected'),
     onError: (error) => console.error('WebSocket error:', error),
+    reconnectAttempts: 1, // Only try once
+    reconnectInterval: 10000, // 10 seconds
   });
 
   return (
@@ -84,19 +88,8 @@ function Layout({ children }: { children: React.ReactNode }) {
           onRefresh={handleRefresh}
         />
         
-        {/* Connection Status Indicator */}
-        {connectionStatus !== 'connected' && (
-          <div className={cn(
-            "px-4 py-2 text-sm text-center",
-            connectionStatus === 'connecting' && "bg-yellow-500/10 text-yellow-600",
-            connectionStatus === 'disconnected' && "bg-red-500/10 text-red-600",
-            connectionStatus === 'error' && "bg-red-500/10 text-red-600"
-          )}>
-            {connectionStatus === 'connecting' && 'Connecting to real-time data...'}
-            {connectionStatus === 'disconnected' && 'Disconnected from real-time data'}
-            {connectionStatus === 'error' && 'Error connecting to real-time data'}
-          </div>
-        )}
+        {/* Connection Status Indicator - Hidden to prevent confusion */}
+        {/* Real-time updates are temporarily disabled to prevent API spam */}
         
         <div className="p-6">
           {children}
@@ -118,6 +111,7 @@ function Router() {
       <Route path="/whale" component={WhaleTracker} />
       <Route path="/airdrops" component={Airdrops} />
       <Route path="/fed" component={FedMonitor} />
+      <Route path="/crypto-icons-demo" component={CryptoIconsDemo} />
       <Route component={NotFound} />
     </Switch>
   );

@@ -64,12 +64,16 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
         setConnectionStatus('disconnected');
         onDisconnect?.();
         
-        // Attempt to reconnect if within limits
+        // Only attempt to reconnect if we haven't exceeded attempts
         if (reconnectCountRef.current < reconnectAttempts) {
           reconnectCountRef.current++;
+          console.log(`WebSocket disconnected. Attempting reconnect ${reconnectCountRef.current}/${reconnectAttempts}`);
           reconnectTimeoutRef.current = setTimeout(() => {
             connect();
-          }, reconnectInterval);
+          }, reconnectInterval * reconnectCountRef.current); // Exponential backoff
+        } else {
+          console.log('WebSocket: Max reconnection attempts reached');
+          setConnectionStatus('error');
         }
       };
 

@@ -37,8 +37,8 @@ export default function WhaleTracker() {
   const { data: whaleTransactions, isLoading, error } = useQuery({
     queryKey: ['/api/whale-movements'],
     queryFn: () => apiClient.getWhaleMovements(100),
-    refetchInterval: 5 * 60 * 1000, // 5 minutes
-    staleTime: 2 * 60 * 1000,
+    refetchInterval: false, // WebSocket handles updates
+    staleTime: 10 * 60 * 1000, // 10 minutes (increased)
   });
 
   const transactions: WhaleTransaction[] = (whaleTransactions as WhaleTransaction[]) || [];
@@ -66,7 +66,7 @@ export default function WhaleTracker() {
     .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
 
   // Get unique assets for filter
-  const uniqueAssets = [...new Set(transactions.map(tx => tx.asset))];
+  const uniqueAssets = Array.from(new Set(transactions.map(tx => tx.asset)));
 
   // Calculate statistics
   const totalValue = filteredTransactions.reduce((sum, tx) => sum + parseFloat(tx.valueUsd || '0'), 0);
@@ -108,9 +108,10 @@ export default function WhaleTracker() {
     return `${address.slice(0, 6)}...${address.slice(-4)}`;
   };
 
-  const formatTimeAgo = (timestamp: Date) => {
+  const formatTimeAgo = (timestamp: string) => {
     const now = new Date();
-    const diff = now.getTime() - timestamp.getTime();
+    const txDate = new Date(timestamp);
+    const diff = now.getTime() - txDate.getTime();
     const minutes = Math.floor(diff / (1000 * 60));
     const hours = Math.floor(diff / (1000 * 60 * 60));
     const days = Math.floor(diff / (1000 * 60 * 60 * 24));

@@ -107,11 +107,12 @@ export default function Airdrops() {
     }
   };
 
-  const formatDeadline = (deadline: Date | null) => {
+  const formatDeadline = (deadline: string | null) => {
     if (!deadline) return 'No deadline';
     
     const now = new Date();
-    const diff = deadline.getTime() - now.getTime();
+    const deadlineDate = new Date(deadline);
+    const diff = deadlineDate.getTime() - now.getTime();
     const days = Math.floor(diff / (1000 * 60 * 60 * 24));
     const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
     
@@ -121,10 +122,11 @@ export default function Airdrops() {
     return 'Ending soon';
   };
 
-  const isUrgent = (deadline: Date | null) => {
+  const isUrgent = (deadline: string | null) => {
     if (!deadline) return false;
     const now = new Date();
-    const diff = deadline.getTime() - now.getTime();
+    const deadlineDate = new Date(deadline);
+    const diff = deadlineDate.getTime() - now.getTime();
     return diff > 0 && diff < 24 * 60 * 60 * 1000; // Less than 24 hours
   };
 

@@ -163,7 +163,6 @@ export function PriceChart({ chartData, isLoading }: PriceChartProps) {
             x: {
               grid: {
                 color: 'hsl(230, 30%, 14%)',
-                drawBorder: false,
               },
               ticks: {
                 color: 'hsl(240, 5%, 64.9%)',
@@ -173,7 +172,6 @@ export function PriceChart({ chartData, isLoading }: PriceChartProps) {
             y: {
               grid: {
                 color: 'hsl(230, 30%, 14%)',
-                drawBorder: false,
               },
               ticks: {
                 color: 'hsl(240, 5%, 64.9%)',

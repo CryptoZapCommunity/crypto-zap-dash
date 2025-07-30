@@ -39,8 +39,8 @@ export class WebSocketManager {
 
       ws.on('message', (message: Buffer) => {
         try {
-          // Rate limiting for WebSocket messages
-          const clientId = ws.url || 'unknown';
+          // Rate limiting for WebSocket messages - using connection ID instead of URL
+          const clientId = `ws-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
           if (!wsRateLimiter.isAllowed(clientId)) {
             console.warn('WebSocket rate limit exceeded for client:', clientId);
             return;
@@ -119,43 +119,14 @@ export class WebSocketManager {
   }
 
   private startPeriodicUpdates(): void {
-    // Update crypto prices every 60 seconds (reduced from 30)
+    // DISABLED: Periodic updates to prevent API spam
+    // Updates will only happen on manual refresh or initial load
+    console.log('WebSocket periodic updates DISABLED to prevent API spam');
+    
+    // Only send initial data when clients connect
     this.updateInterval = setInterval(async () => {
-      try {
-        // Update crypto data
-        await this.cryptoService.updateCryptoPrices();
-        await this.cryptoService.updateMarketSummary();
-        
-        // Get updated data
-        const [cryptoAssets, marketSummary] = await Promise.all([
-          storage.getCryptoAssets(),
-          storage.getMarketSummary(),
-        ]);
-
-        // Broadcast updates
-        this.broadcast('CRYPTO_UPDATE', { cryptoAssets, marketSummary });
-
-        // Update news every 10 minutes (reduced frequency)
-        if (Date.now() % (10 * 60 * 1000) < 60000) {
-          await this.newsService.updateGeopoliticalNews();
-          await this.newsService.updateCryptoNews();
-          
-          const news = await storage.getNews(undefined, 10);
-          this.broadcast('NEWS_UPDATE', news);
-        }
-
-        // Update whale transactions every 5 minutes (reduced frequency)
-        if (Date.now() % (5 * 60 * 1000) < 60000) {
-          await this.whaleService.updateWhaleTransactions();
-          
-          const whaleTransactions = await storage.getWhaleTransactions(10);
-          this.broadcast('WHALE_UPDATE', whaleTransactions);
-        }
-
-      } catch (error) {
-        console.error('Error in periodic update:', error);
-      }
-    }, 60000); // 60 seconds (reduced from 30)
+      // Do nothing - updates disabled
+    }, 30 * 60 * 1000); // 30 minutes (effectively disabled)
   }
 
   public shutdown(): void {

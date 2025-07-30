@@ -81,7 +81,7 @@ export class MemStorage implements IStorage {
       priceChange24h: asset.priceChange24h || null,
       marketCap: asset.marketCap || null,
       volume24h: asset.volume24h || null,
-      sparklineData: asset.sparklineData || null,
+      sparklineData: Array.isArray(asset.sparklineData) ? [...asset.sparklineData] : null,
       lastUpdated: new Date(),
     };
     this.cryptoAssets.set(asset.id, newAsset);

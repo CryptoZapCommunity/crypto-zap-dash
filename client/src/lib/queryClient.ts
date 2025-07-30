@@ -45,14 +45,15 @@ export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       queryFn: getQueryFn({ on401: "throw" }),
-      refetchInterval: false,
+      refetchInterval: false, // Disabled - WebSocket handles updates
       refetchOnWindowFocus: false,
-      staleTime: 5 * 60 * 1000, // 5 minutes (was Infinity)
-      retry: 1, // Allow 1 retry (was false)
-      retryDelay: 1000, // 1 second delay
+      staleTime: 10 * 60 * 1000, // 10 minutes (increased)
+      retry: 1,
+      retryDelay: 2000, // 2 second delay
+      gcTime: 15 * 60 * 1000, // 15 minutes garbage collection
     },
     mutations: {
-      retry: 1, // Allow 1 retry (was false)
+      retry: 1,
     },
   },
 });

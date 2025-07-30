@@ -154,4 +154,53 @@ export class CryptoService {
       return { gainers: [], losers: [] };
     }
   }
+
+  async getCryptoIcons(symbols: string[]): Promise<Record<string, string>> {
+    try {
+      const icons: Record<string, string> = {};
+      
+      for (const symbol of symbols) {
+        const response = await fetch(
+          `${this.COINGECKO_API}/coins/${symbol.toLowerCase()}?x_cg_demo_api_key=${this.API_KEY}`
+        );
+
+        if (response.ok) {
+          const coinData = await response.json();
+          if (coinData.image?.small) {
+            icons[symbol.toUpperCase()] = coinData.image.small;
+          }
+        }
+      }
+
+      return icons;
+    } catch (error) {
+      console.error('Error getting crypto icons:', error);
+      return {};
+    }
+  }
+
+  async getCryptoIcon(symbol: string): Promise<string | null> {
+    try {
+      console.log('🪙 Fetching icon for:', symbol);
+      
+      const url = `${this.COINGECKO_API}/coins/${symbol.toLowerCase()}?x_cg_demo_api_key=${this.API_KEY}`;
+      console.log('🌐 Requesting URL:', url.replace(this.API_KEY, '***'));
+      
+      const response = await fetch(url);
+      console.log('📊 Response status:', response.status);
+
+      if (response.ok) {
+        const coinData = await response.json();
+        const iconUrl = coinData.image?.small || null;
+        console.log('✅ Icon found:', iconUrl ? 'Yes' : 'No');
+        return iconUrl;
+      }
+
+      console.log('❌ Icon not found for:', symbol);
+      return null;
+    } catch (error) {
+      console.error('❌ Error getting crypto icon for', symbol, ':', error);
+      return null;
+    }
+  }
 }
