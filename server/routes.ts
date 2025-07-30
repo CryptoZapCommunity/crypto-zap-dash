@@ -324,6 +324,68 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Candlestick data endpoint
+  app.get("/api/candlestick/:symbol", async (req, res) => {
+    const startTime = Date.now();
+    try {
+      const { symbol } = req.params;
+      const { timeframe = '1D', limit = 100 } = req.query;
+      
+      // Generate mock candlestick data
+      const now = Date.now();
+      const interval = timeframe === '1H' ? 60 * 60 * 1000 : 
+                      timeframe === '4H' ? 4 * 60 * 60 * 1000 :
+                      timeframe === '1D' ? 24 * 60 * 60 * 1000 :
+                      timeframe === '1W' ? 7 * 24 * 60 * 60 * 1000 :
+                      30 * 24 * 60 * 60 * 1000;
+      
+      const data = [];
+      let basePrice = 45000;
+      
+      for (let i = parseInt(limit as string) - 1; i >= 0; i--) {
+        const time = now - (i * interval);
+        const volatility = 0.02;
+        const open = basePrice;
+        const close = open + (Math.random() - 0.5) * open * volatility;
+        const high = Math.max(open, close) + Math.random() * open * volatility * 0.5;
+        const low = Math.min(open, close) - Math.random() * open * volatility * 0.5;
+        
+        data.push({
+          time: Math.floor(time / 1000),
+          open,
+          high,
+          low,
+          close,
+          volume: Math.random() * 1000000 + 500000
+        });
+        
+        basePrice = close;
+      }
+      
+      const duration = Date.now() - startTime;
+      try {
+        requestMonitor.logRequest(`/api/candlestick/${symbol}`, 'GET', duration, 200);
+      } catch (monitorError) {
+        console.error('Monitoring error:', monitorError);
+      }
+      
+      res.json({
+        symbol: symbol.toUpperCase(),
+        timeframe,
+        data
+      });
+    } catch (error) {
+      console.error('Error fetching candlestick data:', error);
+      const duration = Date.now() - startTime;
+      try {
+        requestMonitor.logRequest(`/api/candlestick/${symbol}`, 'GET', duration, 500);
+      } catch (monitorError) {
+        console.error('Monitoring error:', monitorError);
+      }
+      res.status(500).json({ message: 'Failed to fetch candlestick data' });
+    }
+  });
+
   // Manual update endpoints for testing
   app.post("/api/update/crypto", async (req, res) => {
     try {

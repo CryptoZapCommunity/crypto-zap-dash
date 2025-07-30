@@ -38,6 +38,16 @@
 
 **Resultado**: ✅ APIs do FED funcionais
 
+### **5. Candlestick Chart no Dashboard**
+**Problema**: Dashboard não tinha visualização em candles
+**Solução**:
+- Instalado `lightweight-charts` para gráficos profissionais
+- Criado componente `CandlestickChart` com múltiplos timeframes
+- Adicionado endpoint `/api/candlestick/:symbol` para dados
+- Integrado no dashboard principal
+
+**Resultado**: ✅ Candlestick chart funcionando no dashboard
+
 ## 📊 **Status das Funcionalidades**
 
 ### **✅ APIs Funcionando:**
@@ -53,10 +63,12 @@
 - `/api/fred/indicators` - Indicadores econômicos (NOVO)
 - `/api/fred/rate-history` - Histórico de taxas (NOVO)
 - `/api/charts/:symbol` - Gráficos
+- `/api/candlestick/:symbol` - Dados de candlestick (NOVO)
 
 ### **✅ Frontend Funcionando:**
 - Ícones de crypto carregando corretamente
 - Página do FED com dados reais
+- Candlestick chart no dashboard (NOVO)
 - Todas as rotas funcionais
 - Build otimizado
 
@@ -87,6 +99,7 @@
 - ✅ **Página FED**: Dados reais implementados
 - ✅ **Erro 404**: Configuração Vercel corrigida
 - ✅ **APIs FED**: Endpoints implementados
+- ✅ **Candlestick Chart**: Implementado no dashboard
 - ✅ **Build**: Funcionando
 - ✅ **Deploy**: Pronto para Vercel
 

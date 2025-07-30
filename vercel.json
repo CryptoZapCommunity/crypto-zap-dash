@@ -12,17 +12,8 @@
       "dest": "/server/index.ts"
     },
     {
-      "src": "/assets/(.*)",
-      "dest": "/dist/assets/$1"
-    },
-    {
       "src": "/(.*)",
       "dest": "/dist/index.html"
     }
-  ],
-  "functions": {
-    "server/index.ts": {
-      "maxDuration": 30
-    }
-  }
+  ]
 } 

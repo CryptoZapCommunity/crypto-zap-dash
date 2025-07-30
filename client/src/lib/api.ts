@@ -151,6 +151,16 @@ export class ApiClient {
     const query = months ? `?months=${months}` : '';
     return this.request(`/fred/rate-history${query}`);
   }
+
+  // Candlestick data
+  async getCandlestickData(symbol: string, timeframe?: string, limit?: number) {
+    const params = new URLSearchParams();
+    if (timeframe) params.append('timeframe', timeframe);
+    if (limit) params.append('limit', limit.toString());
+    
+    const query = params.toString() ? `?${params}` : '';
+    return this.request(`/candlestick/${symbol}${query}`);
+  }
 }
 
 export const apiClient = new ApiClient();
