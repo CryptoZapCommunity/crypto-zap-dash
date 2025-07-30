@@ -46,8 +46,8 @@ export function CryptoIcon({
         setIsLoading(true);
         setHasError(false);
         
-        const response = await apiClient.getCryptoIcon(symbol);
-        if (isMounted && response.iconUrl) {
+        const response = await apiClient.getCryptoIcon(symbol) as { iconUrl?: string };
+        if (isMounted && response?.iconUrl) {
           setIconUrl(response.iconUrl);
           // Cache the icon
           iconCache.set(symbol, response.iconUrl);
@@ -126,7 +126,7 @@ export function CryptoIcons({ symbols, size = 'md', className = '' }: CryptoIcon
     const fetchIcons = async () => {
       try {
         setIsLoading(true);
-        const response = await apiClient.getCryptoIcons(symbols);
+        const response = await apiClient.getCryptoIcons(symbols) as Record<string, string>;
         setIcons(response);
       } catch (error) {
         console.error('Error fetching crypto icons:', error);
