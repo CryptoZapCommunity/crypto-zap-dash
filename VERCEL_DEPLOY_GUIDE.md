@@ -18,8 +18,11 @@
       "use": "@vercel/node"
     },
     {
-      "src": "dist/**",
-      "use": "@vercel/static"
+      "src": "package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "dist"
+      }
     }
   ],
   "routes": [
@@ -36,6 +39,9 @@
     "api/index.ts": {
       "maxDuration": 30
     }
+  },
+  "env": {
+    "NODE_ENV": "production"
   }
 }
 ```
@@ -82,6 +88,15 @@ vercel --prod
 1. Verifique se o `package.json` tem os scripts corretos
 2. Teste o build localmente: `npm run build`
 3. Verifique se todas as dependências estão instaladas
+4. Certifique-se de que o `vercel.json` está configurado corretamente
+5. Use `@vercel/static-build` para o frontend e `@vercel/node` para a API
+
+### Problema: API não funciona no Vercel
+**Solução:**
+1. Verifique se o arquivo `api/index.ts` existe
+2. Configure as variáveis de ambiente no painel do Vercel
+3. Verifique os logs da função no painel do Vercel
+4. Teste a API localmente primeiro: `curl http://localhost:5000/api/health`
 
 ### Problema: 404 em rotas
 **Solução:**
