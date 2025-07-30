@@ -67,14 +67,7 @@ vercel
   "builds": [
     {
       "src": "server/index.ts",
-      "use": "@vercel/node",
-      "config": {
-        "includeFiles": ["server/**", "shared/**", "dist/**"]
-      }
-    },
-    {
-      "src": "client/index.html",
-      "use": "@vercel/static"
+      "use": "@vercel/node"
     }
   ],
   "routes": [
@@ -83,20 +76,10 @@ vercel
       "dest": "/server/index.ts"
     },
     {
-      "src": "/assets/(.*)",
-      "dest": "/dist/assets/$1"
-    },
-    {
       "src": "/(.*)",
       "dest": "/dist/index.html"
     }
-  ],
-  "functions": {
-    "server/index.ts": {
-      "maxDuration": 30,
-      "memory": 1024
-    }
-  }
+  ]
 }
 ```
 
@@ -111,7 +94,15 @@ vercel
 
 ## 🚨 **Possíveis Problemas e Soluções**
 
-### **1. Build Falha**
+### **1. Conflicting Functions and Builds Configuration**
+Este erro ocorre quando há conflito entre configurações antigas e novas no `vercel.json`.
+
+**Solução:**
+- Usar apenas `builds` ou apenas `functions`, não ambos
+- Configuração simplificada sem conflitos
+- Remover configurações desnecessárias
+
+### **2. Build Falha**
 - Verificar se todas as dependências estão instaladas
 - Verificar se as variáveis de ambiente estão configuradas
 - Verificar logs do build no dashboard da Vercel
