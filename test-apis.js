@@ -65,4 +65,5 @@ if (import.meta.url === `file://${process.argv[1]}`) {
   runTests().catch(console.error);
 }
 
-export { runTests }; 
+// Also run if called directly
+runTests().catch(console.error); 

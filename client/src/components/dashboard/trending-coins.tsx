@@ -19,7 +19,7 @@ interface CoinListProps {
     name: string;
     symbol: string;
     price: number;
-    change: number;
+    priceChange24h: number;
   }>;
   isGainers: boolean;
 }
@@ -67,7 +67,7 @@ function CoinList({ title, icon, coins, isGainers }: CoinListProps) {
                   'text-xs font-medium',
                   isGainers ? 'text-green-500' : 'text-red-500'
                 )}>
-                  {isGainers ? '+' : ''}{coin.change.toFixed(2)}%
+                  {isGainers ? '+' : ''}{coin.priceChange24h.toFixed(2)}%
                 </p>
               </div>
             </div>
@@ -104,6 +104,20 @@ export function TrendingCoins({ trendingCoins, isLoading }: TrendingCoinsProps) 
                 <Skeleton key={i} className="w-full h-16 rounded-lg" />
               ))}
             </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  if (!trendingCoins || (!trendingCoins.gainers && !trendingCoins.losers)) {
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <Card className="glassmorphism">
+          <CardContent className="p-6">
+            <p className="text-muted-foreground text-center">
+              {t('common.noData')}
+            </p>
           </CardContent>
         </Card>
       </div>

@@ -331,7 +331,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/charts/:symbol", async (req, res) => {
     try {
       const { symbol } = req.params;
-      const asset = await storage.getCryptoAsset(symbol.toLowerCase());
+      const asset = await storage.getCryptoAsset(symbol.toUpperCase());
       
       if (!asset) {
         return res.status(404).json({ message: 'Asset not found' });

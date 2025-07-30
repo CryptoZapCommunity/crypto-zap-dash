@@ -8,7 +8,7 @@ export class CryptoService {
   private cacheExpiry = 24 * 60 * 60 * 1000; // 24 hours
   private lastCacheUpdate = 0;
 
-  async getTrendingCoins(): Promise<TrendingCoin[]> {
+  async getTrendingCoins(): Promise<{ gainers: TrendingCoin[], losers: TrendingCoin[] }> {
     try {
       console.log('🪙 Fetching trending coins...');
       const response = await fetch(
@@ -23,7 +23,8 @@ export class CryptoService {
       const coins = data.coins || [];
 
       console.log(`✅ Found ${coins.length} trending coins`);
-      return coins.slice(0, 10).map((coin: any) => ({
+      
+      const trendingCoins = coins.slice(0, 10).map((coin: any) => ({
         id: coin.item.id,
         symbol: coin.item.symbol?.toUpperCase(),
         name: coin.item.name,
@@ -32,9 +33,15 @@ export class CryptoService {
         image: coin.item.large,
         priceChange24h: coin.item.data?.price_change_percentage_24h?.usd || 0,
       }));
+
+      // Split into gainers and losers
+      const gainers = trendingCoins.filter(coin => coin.priceChange24h > 0);
+      const losers = trendingCoins.filter(coin => coin.priceChange24h < 0);
+
+      return { gainers, losers };
     } catch (error) {
       console.error('Error fetching trending coins:', error);
-      return [];
+      return { gainers: [], losers: [] };
     }
   }
 
@@ -220,9 +227,43 @@ export class CryptoService {
   async updateCryptoPrices(): Promise<void> {
     try {
       console.log('🔄 Updating crypto prices...');
-      // This would typically update prices in storage
-      // For now, we'll just log the action
-      console.log('✅ Crypto prices update completed');
+      
+      // Fetch top cryptocurrencies from CoinGecko
+      const response = await fetch(
+        `${this.baseUrl}/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=50&page=1&sparkline=false&x_cg_demo_api_key=${this.apiKey}`
+      );
+
+      if (!response.ok) {
+        throw new Error(`CoinGecko API error: ${response.status}`);
+      }
+
+      const coins = await response.json();
+      
+      // Import storage here to avoid circular dependency
+      const { storage } = await import('../storage');
+      
+      // Save each coin to storage
+      console.log(`📊 Saving ${coins.length} coins to storage...`);
+      for (const coin of coins) {
+        try {
+          const asset = await storage.upsertCryptoAsset({
+            id: coin.id,
+            symbol: coin.symbol.toUpperCase(),
+            name: coin.name,
+            price: coin.current_price.toString(),
+            priceChange24h: coin.price_change_percentage_24h?.toString() || null,
+            marketCap: coin.market_cap?.toString() || null,
+            volume24h: coin.total_volume?.toString() || null,
+            sparklineData: null,
+            lastUpdated: new Date().toISOString(),
+          });
+          console.log(`✅ Saved: ${asset.symbol} - $${asset.price}`);
+        } catch (error) {
+          console.error(`❌ Error saving ${coin.symbol}:`, error);
+        }
+      }
+
+      console.log(`✅ Updated ${coins.length} crypto prices`);
     } catch (error) {
       console.error('Error updating crypto prices:', error);
     }
@@ -231,9 +272,33 @@ export class CryptoService {
   async updateMarketSummary(): Promise<void> {
     try {
       console.log('🔄 Updating market summary...');
-      // This would typically update market summary in storage
-      // For now, we'll just log the action
-      console.log('✅ Market summary update completed');
+      
+      // Fetch global market data
+      const response = await fetch(
+        `${this.baseUrl}/global?x_cg_demo_api_key=${this.apiKey}`
+      );
+
+      if (!response.ok) {
+        throw new Error(`CoinGecko API error: ${response.status}`);
+      }
+
+      const data = await response.json();
+      const globalData = data.data;
+
+      // Import storage here to avoid circular dependency
+      const { storage } = await import('../storage');
+      
+      // Update market summary
+      await storage.updateMarketSummary({
+        totalMarketCap: globalData.total_market_cap.usd.toString(),
+        totalVolume24h: globalData.total_volume.usd.toString(),
+        btcDominance: globalData.market_cap_percentage.btc.toString(),
+        fearGreedIndex: null, // Would need separate API
+        marketChange24h: globalData.market_cap_change_percentage_24h_usd?.toString() || null,
+        lastUpdated: new Date().toISOString(),
+      });
+
+      console.log('✅ Market summary updated');
     } catch (error) {
       console.error('Error updating market summary:', error);
     }

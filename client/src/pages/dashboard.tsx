@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { apiClient } from '@/lib/api';
 import { MarketOverview } from '@/components/dashboard/market-overview';
-import { TrendingCoins } from '@/components/dashboard/trending-coins';
+import { TrendingCoins as TrendingCoinsComponent } from '@/components/dashboard/trending-coins';
 import { PriceChart } from '@/components/dashboard/price-chart';
 import { CandlestickChart } from '@/components/dashboard/candlestick-chart';
 import { NewsSection } from '@/components/dashboard/news-section';
@@ -11,9 +11,11 @@ import { AlertsPanel } from '@/components/dashboard/alerts-panel';
 import { MarketSentiment } from '@/components/dashboard/market-sentiment';
 import { PortfolioTracker } from '@/components/dashboard/portfolio-tracker';
 import { t } from '@/lib/i18n';
-import type { CryptoAsset, MarketSummary, TrendingCoins as TrendingCoinsType, News, EconomicEvent, WhaleTransaction } from '@/types';
+import type { CryptoAsset, MarketSummary, TrendingCoins, News, EconomicEvent, WhaleTransaction } from '@/types';
 
 export default function Dashboard() {
+  console.log('🚀 Dashboard component rendering...');
+
   // Market data queries - OPTIMIZED for performance
   const { data: marketData, isLoading: marketLoading, error: marketError } = useQuery({
     queryKey: ['/api/market-summary'],
@@ -23,6 +25,8 @@ export default function Dashboard() {
     gcTime: 30 * 60 * 1000, // 30 minutes garbage collection
   });
 
+  console.log('📊 Market data:', { marketData, marketLoading, marketError });
+
   const { data: trendingCoins, isLoading: trendingLoading } = useQuery({
     queryKey: ['/api/trending-coins'],
     queryFn: () => apiClient.getTrendingCoins(),
@@ -30,6 +34,8 @@ export default function Dashboard() {
     staleTime: 10 * 60 * 1000, // 10 minutes
     gcTime: 20 * 60 * 1000, // 20 minutes garbage collection
   });
+
+  console.log('📈 Trending coins:', { trendingCoins, trendingLoading });
 
   const { data: btcChart, isLoading: chartLoading } = useQuery({
     queryKey: ['/api/charts', 'bitcoin'],
@@ -46,7 +52,7 @@ export default function Dashboard() {
     refetchInterval: 5 * 60 * 1000, // Poll every 5 minutes
     staleTime: 10 * 60 * 1000, // 10 minutes
     gcTime: 20 * 60 * 1000, // 20 minutes garbage collection
-  });
+  }) as { data: { data: any[] } | undefined, isLoading: boolean };
 
   // News queries - Much less frequent updates
   const { data: latestNews, isLoading: newsLoading } = useQuery({
@@ -81,12 +87,22 @@ export default function Dashboard() {
 
   const cryptoAssets: CryptoAsset[] = (marketData as any)?.cryptoAssets || [];
   const marketSummary: MarketSummary | null = (marketData as any)?.marketSummary || null;
-  const trending: TrendingCoinsType | null = trendingCoins as TrendingCoinsType || null;
+  const trending: TrendingCoins | null = trendingCoins as TrendingCoins || null;
   const news: News[] = (latestNews as News[]) || [];
   const events: EconomicEvent[] = (economicEvents as EconomicEvent[]) || [];
   const whales: WhaleTransaction[] = (whaleTransactions as WhaleTransaction[]) || [];
 
+  console.log('🔍 Processed data:', { 
+    cryptoAssets: cryptoAssets.length, 
+    marketSummary: !!marketSummary, 
+    trending: !!trending,
+    news: news.length,
+    events: events.length,
+    whales: whales.length
+  });
+
   if (marketError) {
+    console.error('❌ Market error:', marketError);
     return (
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
@@ -100,6 +116,8 @@ export default function Dashboard() {
       </div>
     );
   }
+
+  console.log('✅ Rendering dashboard...');
 
   return (
     <div className="space-y-6 animate-fade-in">
@@ -135,7 +153,7 @@ export default function Dashboard() {
 
           {/* Trending Coins */}
           <section>
-            <TrendingCoins
+            <TrendingCoinsComponent
               trendingCoins={trending}
               isLoading={trendingLoading}
             />

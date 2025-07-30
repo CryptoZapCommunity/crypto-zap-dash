@@ -12,7 +12,6 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { 
   TrendingUp, 
   TrendingDown, 
-  DollarSign, 
   BarChart3, 
   Search,
   Filter,
@@ -24,6 +23,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { t } from '@/lib/i18n';
+import { CryptoIcon } from '@/components/ui/crypto-icon';
 import type { CryptoAsset, MarketSummary } from '@/types';
 
 interface CryptoMarketData {
@@ -259,9 +259,7 @@ export default function CryptoMarket() {
               <CardHeader className="pb-3">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-3">
-                    <div className="w-8 h-8 bg-gradient-to-r from-primary to-green-500 rounded-lg flex items-center justify-center">
-                      <DollarSign className="w-4 h-4 text-white" />
-                    </div>
+                    <CryptoIcon symbol={asset.symbol} size="md" />
                     <div>
                       <CardTitle className="text-lg">{asset.symbol}</CardTitle>
                       <CardDescription className="text-sm">{asset.name}</CardDescription>

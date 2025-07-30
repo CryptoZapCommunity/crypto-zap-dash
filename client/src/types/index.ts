@@ -94,7 +94,9 @@ export interface TrendingCoin {
   name: string;
   symbol: string;
   price: number;
-  change: number;
+  marketCapRank?: number;
+  image?: string;
+  priceChange24h: number;
 }
 
 export interface TrendingCoins {

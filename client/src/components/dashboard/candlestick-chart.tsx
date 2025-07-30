@@ -23,6 +23,8 @@ interface CandlestickChartProps {
 type Timeframe = '1H' | '4H' | '1D' | '1W' | '1M';
 
 export function CandlestickChart({ symbol, data, isLoading }: CandlestickChartProps) {
+  console.log('🕯️ CandlestickChart rendering:', { symbol, data: data?.length, isLoading });
+  
   const chartContainerRef = useRef<HTMLDivElement>(null);
   const chartRef = useRef<any>(null);
   const [selectedTimeframe, setSelectedTimeframe] = useState<Timeframe>('1D');
@@ -75,6 +77,14 @@ export function CandlestickChart({ symbol, data, isLoading }: CandlestickChartPr
 
     const loadChart = async () => {
       try {
+        console.log('📊 Loading candlestick chart...');
+        console.log('📊 Chart container:', chartContainerRef.current);
+        
+        if (!chartContainerRef.current) {
+          console.error('❌ Chart container not found');
+          return;
+        }
+        
         const { createChart } = await import('lightweight-charts');
         
         // Destroy existing chart
@@ -84,39 +94,39 @@ export function CandlestickChart({ symbol, data, isLoading }: CandlestickChartPr
 
         const chart = createChart(chartContainerRef.current, {
           width: chartContainerRef.current.clientWidth,
-          height: 400,
+          height: 320,
           layout: {
             background: { type: 'solid', color: 'transparent' },
-            textColor: 'hsl(240, 5%, 64.9%)',
+            textColor: '#9ca3af',
           },
           grid: {
-            vertLines: { color: 'hsl(230, 30%, 14%)' },
-            horzLines: { color: 'hsl(230, 30%, 14%)' },
+            vertLines: { color: '#374151' },
+            horzLines: { color: '#374151' },
           },
           crosshair: {
             mode: 1,
           },
           rightPriceScale: {
-            borderColor: 'hsl(230, 30%, 14%)',
+            borderColor: '#374151',
           },
           timeScale: {
-            borderColor: 'hsl(230, 30%, 14%)',
+            borderColor: '#374151',
             timeVisible: true,
             secondsVisible: false,
           },
         });
 
         const candlestickSeries = chart.addCandlestickSeries({
-          upColor: 'hsl(152, 100%, 39%)',
-          downColor: 'hsl(0, 84%, 63%)',
-          borderDownColor: 'hsl(0, 84%, 63%)',
-          borderUpColor: 'hsl(152, 100%, 39%)',
-          wickDownColor: 'hsl(0, 84%, 63%)',
-          wickUpColor: 'hsl(152, 100%, 39%)',
+          upColor: '#10b981',
+          downColor: '#ef4444',
+          borderDownColor: '#ef4444',
+          borderUpColor: '#10b981',
+          wickDownColor: '#ef4444',
+          wickUpColor: '#10b981',
         });
 
         const volumeSeries = chart.addHistogramSeries({
-          color: 'hsl(240, 5%, 64.9%)',
+          color: '#6b7280',
           priceFormat: {
             type: 'volume',
           },
@@ -130,11 +140,17 @@ export function CandlestickChart({ symbol, data, isLoading }: CandlestickChartPr
         // Use real data or generate mock data
         const chartData = data || generateMockData(selectedTimeframe);
         
+        console.log('📈 Chart data:', { 
+          dataLength: data?.length, 
+          chartDataLength: chartData.length,
+          firstDataPoint: chartData[0]
+        });
+        
         candlestickSeries.setData(chartData);
         volumeSeries.setData(chartData.map(d => ({
           time: d.time,
           value: d.volume || 0,
-          color: d.close >= d.open ? 'hsl(152, 100%, 39%)' : 'hsl(0, 84%, 63%)'
+          color: d.close >= d.open ? '#10b981' : '#ef4444'
         })));
 
         // Handle resize
@@ -149,6 +165,7 @@ export function CandlestickChart({ symbol, data, isLoading }: CandlestickChartPr
         window.addEventListener('resize', handleResize);
         chartRef.current = chart;
         setIsChartLoaded(true);
+        console.log('✅ Candlestick chart loaded successfully');
 
         return () => {
           window.removeEventListener('resize', handleResize);
@@ -157,7 +174,7 @@ export function CandlestickChart({ symbol, data, isLoading }: CandlestickChartPr
           }
         };
       } catch (error) {
-        console.error('Error loading chart:', error);
+        console.error('❌ Error loading candlestick chart:', error);
       }
     };
 
@@ -221,6 +238,7 @@ export function CandlestickChart({ symbol, data, isLoading }: CandlestickChartPr
         <div 
           ref={chartContainerRef}
           className="h-80 w-full rounded-lg"
+          style={{ minHeight: '320px' }}
         />
       </CardContent>
     </Card>

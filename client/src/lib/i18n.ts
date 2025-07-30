@@ -36,6 +36,7 @@ export const translations = {
       topLosers: 'Top Losers',
       priceChart: 'Price Chart',
       fearGreed: 'Fear & Greed',
+      candlestickChart: 'Candlestick Chart',
     },
     market: {
       marketCap: 'Market Cap',
@@ -98,6 +99,7 @@ export const translations = {
       subtitle: 'Monitoramento em tempo real dos mercados',
       marketOverview: 'Visão Geral do Mercado',
       latestNews: 'Últimas Notícias',
+      candlestickChart: 'Gráfico de Candlestick',
       economicCalendar: 'Calendário Econômico',
       whaleActivity: 'Atividade das Baleias',
       topGainers: 'Maiores Altas',
