@@ -370,7 +370,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   const httpServer = createServer(app);
 
-  // Initialize WebSocket server
+  // Initialize WebSocket server (removed for Vercel)
   
 
   // Initialize data on startup
