@@ -1,5 +1,5 @@
 import "dotenv/config";
-import express, { type Request, Response, NextFunction } from "express";
+import express, { Request, Response, NextFunction } from "express";
 import { registerRoutes } from "../server/routes";
 import path from "path";
 
@@ -19,44 +19,31 @@ app.use((req, res, next) => {
 
 // Health check endpoint
 app.get("/api/health", (req, res) => {
-  res.json({ 
-    status: "ok", 
+  res.json({
+    status: "ok",
     timestamp: new Date().toISOString(),
     environment: process.env.NODE_ENV || "development"
   });
 });
 
-// Initialize routes and serve static files
-const initializeApp = async () => {
-  try {
-    await registerRoutes(app);
 
-    // Serve static files
-    app.use(express.static("dist"));
-    app.get("*", (req, res) => {
-      res.sendFile(path.join(process.cwd(), "dist/index.html"));
-    });
+registerRoutes(app);
 
-    console.log("Server initialized successfully");
-  } catch (error) {
-    console.error("Failed to initialize server:", error);
-    process.exit(1);
-  }
-};
-
-// Initialize the app
-initializeApp();
+// Serve static files
+app.use(express.static("dist"));
+app.get("*", (req, res) => {
+  res.sendFile(path.join(process.cwd(), "dist/index.html"));
+});
 
 // Error handling middleware (must be last)
 app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
   console.error("Server error:", err);
   const status = err.status || err.statusCode || 500;
   const message = err.message || "Internal Server Error";
-
-  res.status(status).json({ 
+  res.status(status).json({
     message,
     error: process.env.NODE_ENV === "development" ? err.stack : undefined
   });
 });
 
-export default app; 
+export default app;
