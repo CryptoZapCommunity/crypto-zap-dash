@@ -1,25 +1,46 @@
-# Script para iniciar o desenvolvimento completo
-Write-Host "🚀 Iniciando Crypto Zap Dashboard..." -ForegroundColor Green
+# Crypto Zap Dashboard - Development Script
+# This script starts the development server with proper port management
 
-# Definir variáveis de ambiente
-$env:PORT = "5000"
-$env:NODE_ENV = "development"
+Write-Host "🚀 Starting Crypto Zap Dashboard Development Server..." -ForegroundColor Green
 
-# Iniciar API em background
-Write-Host "📡 Iniciando API..." -ForegroundColor Yellow
-Start-Process -NoNewWindow -FilePath "npx" -ArgumentList "tsx api/index.ts"
+# Check if port 5000 is in use
+$portInUse = netstat -ano | findstr :5000
 
-# Aguardar um pouco
-Start-Sleep -Seconds 5
+if ($portInUse) {
+    Write-Host "⚠️  Port 5000 is already in use. Attempting to free it..." -ForegroundColor Yellow
+    
+    # Get the PID using the port
+    $processInfo = netstat -ano | findstr :5000 | Select-Object -First 1
+    if ($processInfo) {
+        $pid = ($processInfo -split '\s+')[-1]
+        Write-Host "🔄 Terminating process with PID: $pid" -ForegroundColor Yellow
+        taskkill /PID $pid /F 2>$null
+        
+        # Wait a moment for the process to terminate
+        Start-Sleep -Seconds 2
+    }
+}
 
-# Iniciar Client em background
-Write-Host "🖥️ Iniciando Client..." -ForegroundColor Yellow
-Start-Process -NoNewWindow -FilePath "npm" -ArgumentList "run dev"
+# Check if port 3000 is in use (for Vite dev server)
+$port3000InUse = netstat -ano | findstr :3000
 
-Write-Host "✅ Serviços iniciados!" -ForegroundColor Green
-Write-Host "📡 API: http://localhost:5000" -ForegroundColor Cyan
-Write-Host "🖥️ Frontend: http://localhost:5000" -ForegroundColor Cyan
-Write-Host "🏥 Health Check: http://localhost:5000/api/health" -ForegroundColor Cyan
-Write-Host "🔗 Frontend: http://localhost:5000" -ForegroundColor Cyan
+if ($port3000InUse) {
+    Write-Host "⚠️  Port 3000 is already in use. Attempting to free it..." -ForegroundColor Yellow
+    
+    # Get the PID using the port
+    $processInfo = netstat -ano | findstr :3000 | Select-Object -First 1
+    if ($processInfo) {
+        $pid = ($processInfo -split '\s+')[-1]
+        Write-Host "🔄 Terminating process with PID: $pid" -ForegroundColor Yellow
+        taskkill /PID $pid /F 2>$null
+        
+        # Wait a moment for the process to terminate
+        Start-Sleep -Seconds 2
+    }
+}
 
-Write-Host "`nPressione Ctrl+C para parar todos os serviços" -ForegroundColor Red 
+Write-Host "✅ Ports checked and freed if necessary" -ForegroundColor Green
+Write-Host "🎯 Starting development server..." -ForegroundColor Cyan
+
+# Start the development server
+npm run dev 
