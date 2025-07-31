@@ -1,0 +1,10 @@
+<svg width="80" height="80" viewBox="0 0 80 80" xmlns="http://www.w3.org/2000/svg">
+  <!-- Círculo principal -->
+  <circle cx="40" cy="40" r="35" fill="#f5f5dc" stroke="none"/>
+  
+  <!-- Símbolo Bitcoin -->
+  <text x="40" y="48" font-family="Arial, sans-serif" font-size="24" font-weight="bold" text-anchor="middle" fill="#ff6b35">₿</text>
+  
+  <!-- Raio diagonal - lightning bolt -->
+  <path d="M 25 25 L 55 55" stroke="#ff6b35" stroke-width="3" fill="none" opacity="0.8"/>
+</svg> 
