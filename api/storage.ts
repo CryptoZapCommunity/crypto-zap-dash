@@ -331,24 +331,22 @@ function initializeMockData() {
   // Mock economic events
   storage.createEconomicEvent({
     title: 'US CPI Data Release',
-    description: 'Consumer Price Index for December',
+    country: 'US',
     eventDate: new Date(Date.now() + 24 * 60 * 60 * 1000),
     previous: '3.1%',
     actual: null,
     currency: 'USD',
-    impact: 'high',
-    category: 'inflation'
+    impact: 'high'
   });
 
   storage.createEconomicEvent({
     title: 'Fed Interest Rate Decision',
-    description: 'Federal Reserve FOMC Meeting',
+    country: 'US',
     eventDate: new Date(Date.now() + 48 * 60 * 60 * 1000),
     previous: '5.50%',
     actual: null,
     currency: 'USD',
-    impact: 'high',
-    category: 'monetary'
+    impact: 'high'
   });
 
   // Mock whale transactions
