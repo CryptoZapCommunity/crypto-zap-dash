@@ -41,18 +41,18 @@ export class NewsService {
       const articles: NewsAPIArticle[] = data.articles || [];
 
       for (const article of articles) {
-        const news: NewsArticle = {
-          title: article.title,
-          summary: article.description || '',
-          content: article.content || '',
-          source: article.source.name,
-          sourceUrl: article.url,
-          category: 'geopolitics',
-          country: this.extractCountryFromContent(article.title + ' ' + article.description),
-          impact: this.determineImpact(article.title + ' ' + article.description),
-          sentiment: this.analyzeSentiment(article.title + ' ' + article.description),
-          publishedAt: new Date(article.publishedAt),
-        };
+                 const news: News = {
+           title: article.title,
+           summary: article.description || '',
+           content: article.content || '',
+           source: article.source.name,
+           sourceUrl: article.url,
+           category: 'geopolitics',
+           country: this.extractCountryFromContent(article.title + ' ' + article.description),
+           impact: this.determineImpact(article.title + ' ' + article.description),
+           sentiment: this.analyzeSentiment(article.title + ' ' + article.description),
+           publishedAt: new Date(article.publishedAt),
+         };
 
         await storage.createNews(news);
         console.log('✅ News saved:', article.title.substring(0, 50) + '...');

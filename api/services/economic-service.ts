@@ -36,7 +36,7 @@ export class EconomicService {
       const events: TradingEconomicsEvent[] = await response.json();
 
       for (const event of events) {
-        const economicEvent: EconomicData = {
+                 const economicEvent: EconomicEvent = {
           title: event.title,
           country: this.mapCountryCode(event.country),
           currency: event.currency,
@@ -78,7 +78,7 @@ export class EconomicService {
       console.log(`📊 Found ${releases.length} FED releases`);
 
       for (const release of releases) {
-        const fedUpdate: EconomicData = {
+                 const fedUpdate: any = {
           title: release.name,
           type: this.classifyFedUpdateType(release.name),
           content: release.notes || '',

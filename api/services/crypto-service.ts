@@ -143,7 +143,7 @@ export class CryptoService {
         throw new Error(`Failed to fetch coins list: ${response.status}`);
       }
 
-      const coins = await response.json();
+      const coins = await response.json() as any[];
       
       // Clear existing cache
       this.coinsCache.clear();
@@ -263,8 +263,7 @@ export class CryptoService {
             priceChange24h: coin.price_change_percentage_24h?.toString() || null,
             marketCap: coin.market_cap?.toString() || null,
             volume24h: coin.total_volume?.toString() || null,
-            sparklineData: coin.sparkline_in_7d?.price || null,
-            lastUpdated: new Date().toISOString(),
+                         sparklineData: coin.sparkline_in_7d?.price || null,
           });
           console.log(`✅ Saved: ${asset.symbol} - $${asset.price} - Sparkline: ${asset.sparklineData?.length || 0} points`);
         } catch (error) {
@@ -303,8 +302,7 @@ export class CryptoService {
         totalVolume24h: globalData.total_volume.usd.toString(),
         btcDominance: globalData.market_cap_percentage.btc.toString(),
         fearGreedIndex: null, // Would need separate API
-        marketChange24h: globalData.market_cap_change_percentage_24h_usd?.toString() || null,
-        lastUpdated: new Date().toISOString(),
+                 marketChange24h: globalData.market_cap_change_percentage_24h_usd?.toString() || null,
       });
 
       console.log('✅ Market summary updated');

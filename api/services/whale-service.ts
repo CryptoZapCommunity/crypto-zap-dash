@@ -42,7 +42,7 @@ export class WhaleService {
       const transactions: WhaleAlertTransaction[] = data.transactions || [];
 
       for (const tx of transactions) {
-        const whaleTransaction: WhaleActivity = {
+                 const whaleTransaction: WhaleTransaction = {
           transactionHash: tx.hash,
           asset: tx.symbol.toUpperCase(),
           amount: tx.amount.toString(),

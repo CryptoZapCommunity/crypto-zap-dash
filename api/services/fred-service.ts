@@ -1,5 +1,5 @@
 import fetch from 'node-fetch';
-import type { FedData } from '../../shared/schema.js';
+// FedData type not needed for this service
 
 interface FredSeries {
   id: string;
