@@ -243,3 +243,86 @@ export class MemStorage implements IStorage {
 }
 
 export const storage = new MemStorage();
+
+// Initialize with mock data
+function initializeMockData() {
+  // Mock crypto assets
+  storage.upsertCryptoAsset({
+    id: 'bitcoin',
+    symbol: 'BTC',
+    name: 'Bitcoin',
+    price: 43250.50,
+    priceChange24h: 2.5,
+    marketCap: 850000000000,
+    volume24h: 25000000000,
+    sparklineData: [42000, 42500, 43000, 43250],
+    lastUpdated: new Date()
+  });
+
+  storage.upsertCryptoAsset({
+    id: 'ethereum',
+    symbol: 'ETH',
+    name: 'Ethereum',
+    price: 2650.75,
+    priceChange24h: 1.8,
+    marketCap: 320000000000,
+    volume24h: 15000000000,
+    sparklineData: [2600, 2620, 2640, 2650],
+    lastUpdated: new Date()
+  });
+
+  storage.upsertCryptoAsset({
+    id: 'solana',
+    symbol: 'SOL',
+    name: 'Solana',
+    price: 98.25,
+    priceChange24h: 5.2,
+    marketCap: 45000000000,
+    volume24h: 3000000000,
+    sparklineData: [95, 96, 97, 98],
+    lastUpdated: new Date()
+  });
+
+  // Mock market summary
+  storage.updateMarketSummary({
+    totalMarketCap: 1200000000000,
+    totalVolume24h: 45000000000,
+    btcDominance: 52.5,
+    marketSentiment: 'bullish',
+    fearGreedIndex: 65,
+    lastUpdated: new Date()
+  });
+
+  // Mock news
+  storage.createNews({
+    title: 'Bitcoin Surges Past $43,000',
+    summary: 'Bitcoin reaches new yearly high as institutional adoption increases',
+    content: 'Bitcoin has surged past $43,000 for the first time this year...',
+    source: 'CryptoNews',
+    sourceUrl: 'https://example.com/bitcoin-surge',
+    category: 'crypto',
+    country: null,
+    impact: 'high',
+    sentiment: 'positive',
+    publishedAt: new Date()
+  });
+
+  // Mock whale transactions
+  storage.createWhaleTransaction({
+    transactionHash: '0x1234567890abcdef',
+    asset: 'BTC',
+    amount: '847.2',
+    valueUsd: '36700000',
+    type: 'inflow',
+    fromAddress: '1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa',
+    toAddress: '1BvBMSEYstWetqTFn5Au4m4GFg7xJaNVN2',
+    fromExchange: 'Binance',
+    toExchange: null,
+    timestamp: new Date(Date.now() - 12 * 60 * 1000)
+  });
+
+  console.log('✅ Mock data initialized');
+}
+
+// Initialize mock data
+initializeMockData();

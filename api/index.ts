@@ -4,6 +4,10 @@ import { registerRoutes } from "./routes.js";
 import { corsMiddleware } from "./middleware/cors.js";
 import path from "path";
 
+// Polyfill fetch for Node.js
+import fetch from 'node-fetch';
+globalThis.fetch = fetch as any;
+
 const app = express();
 
 // Basic middleware
