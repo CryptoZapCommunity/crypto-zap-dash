@@ -50,6 +50,15 @@ app.options("/api/cors-test", (req, res) => {
   res.status(200).json({ message: "Preflight successful" });
 });
 
+// Simple test endpoint
+app.get("/api/test", (req, res) => {
+  res.json({ 
+    message: "API is working!",
+    timestamp: new Date().toISOString(),
+    environment: process.env.NODE_ENV || "development"
+  });
+});
+
 // Register all API routes synchronously
 registerRoutes(app).catch(error => {
   console.error("Failed to register routes:", error);

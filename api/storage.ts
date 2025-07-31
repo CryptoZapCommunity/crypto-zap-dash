@@ -251,46 +251,41 @@ function initializeMockData() {
     id: 'bitcoin',
     symbol: 'BTC',
     name: 'Bitcoin',
-    price: 43250.50,
-    priceChange24h: 2.5,
-    marketCap: 850000000000,
-    volume24h: 25000000000,
-    sparklineData: [42000, 42500, 43000, 43250],
-    lastUpdated: new Date()
+    price: '43250.50',
+    priceChange24h: '2.5',
+    marketCap: '850000000000',
+    volume24h: '25000000000',
+    sparklineData: [42000, 42500, 43000, 43250]
   });
 
   storage.upsertCryptoAsset({
     id: 'ethereum',
     symbol: 'ETH',
     name: 'Ethereum',
-    price: 2650.75,
-    priceChange24h: 1.8,
-    marketCap: 320000000000,
-    volume24h: 15000000000,
-    sparklineData: [2600, 2620, 2640, 2650],
-    lastUpdated: new Date()
+    price: '2650.75',
+    priceChange24h: '1.8',
+    marketCap: '320000000000',
+    volume24h: '15000000000',
+    sparklineData: [2600, 2620, 2640, 2650]
   });
 
   storage.upsertCryptoAsset({
     id: 'solana',
     symbol: 'SOL',
     name: 'Solana',
-    price: 98.25,
-    priceChange24h: 5.2,
-    marketCap: 45000000000,
-    volume24h: 3000000000,
-    sparklineData: [95, 96, 97, 98],
-    lastUpdated: new Date()
+    price: '98.25',
+    priceChange24h: '5.2',
+    marketCap: '45000000000',
+    volume24h: '3000000000',
+    sparklineData: [95, 96, 97, 98]
   });
 
   // Mock market summary
   storage.updateMarketSummary({
-    totalMarketCap: 1200000000000,
-    totalVolume24h: 45000000000,
-    btcDominance: 52.5,
-    marketSentiment: 'bullish',
-    fearGreedIndex: 65,
-    lastUpdated: new Date()
+    totalMarketCap: '1200000000000',
+    totalVolume24h: '45000000000',
+    btcDominance: '52.5',
+    fearGreedIndex: 65
   });
 
   // Mock news
