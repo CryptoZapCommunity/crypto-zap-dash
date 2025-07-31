@@ -74,11 +74,11 @@ export default function FedMonitor() {
 
   // Use real data or fallback to mock data
   const fedData: FedData = {
-    currentRate: fredData?.federalFundsRate || 5.50,
-    previousRate: fredData?.federalFundsRate || 5.25,
+    currentRate: (fredData as any)?.federalFundsRate || 5.50,
+    previousRate: (fredData as any)?.federalFundsRate || 5.25,
     nextMeeting: '2024-01-31', // This would need a separate API
-    lastUpdate: fredData?.lastUpdated || '2024-01-15',
-    rateHistory: rateHistory || [
+    lastUpdate: (fredData as any)?.lastUpdated || '2024-01-15',
+    rateHistory: (rateHistory as any) || [
       { date: '2024-01-15', rate: 5.50 },
       { date: '2023-12-13', rate: 5.25 },
       { date: '2023-11-01', rate: 5.25 },
@@ -91,9 +91,9 @@ export default function FedMonitor() {
       { date: '2022-12-14', rate: 4.25 },
     ],
     economicIndicators: {
-      inflation: fredData?.inflationRate || 3.1,
-      unemployment: fredData?.unemploymentRate || 3.7,
-      gdp: fredData?.gdpGrowth || 2.1,
+      inflation: (fredData as any)?.inflationRate || 3.1,
+      unemployment: (fredData as any)?.unemploymentRate || 3.7,
+      gdp: (fredData as any)?.gdpGrowth || 2.1,
     }
   };
 

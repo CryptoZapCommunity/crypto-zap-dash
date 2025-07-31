@@ -121,7 +121,7 @@ export function CandlestickChart({ symbol, data, isLoading }: CandlestickChartPr
           width: chartContainerRef.current.clientWidth,
           height: 320,
           layout: {
-            background: { type: 'solid', color: 'transparent' },
+            background: { color: 'transparent' },
             textColor: '#9ca3af',
           },
           grid: {
@@ -155,14 +155,14 @@ export function CandlestickChart({ symbol, data, isLoading }: CandlestickChartPr
         
         // Try to add a simple area series first (more compatible)
         console.log('📊 Adding line series...');
-        const lineSeries = chart.addSeries('line', {
+        const lineSeries = (chart as any).addLineSeries({
           color: '#10b981',
           lineWidth: 2,
         });
         
         console.log('📊 Setting line data...');
         lineSeries.setData(chartData.map(d => ({
-          time: d.time,
+          time: d.time as any,
           value: d.close
         })));
         console.log('✅ Line data set');

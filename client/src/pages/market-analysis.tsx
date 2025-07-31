@@ -256,12 +256,15 @@ function AssetAnalysisCard({ analysis }: { analysis: MarketAnalysis }) {
 }
 
 export default function MarketAnalysisPage() {
-  const { data: analysisData, isLoading, error } = useQuery({
+  const { data: analysisDataRaw, isLoading, error } = useQuery({
     queryKey: ['/api/market-analysis'],
     queryFn: () => apiClient.getMarketAnalysis(),
     refetchInterval: 5 * 60 * 1000, // 5 minutes
     staleTime: 10 * 60 * 1000, // 10 minutes
   });
+
+  // Use real data or fallback to mock data
+  const analysisData: MarketAnalysis[] = (analysisDataRaw as MarketAnalysis[]) || mockAnalysis;
 
   if (isLoading) {
     return (
@@ -306,7 +309,7 @@ export default function MarketAnalysisPage() {
 
       <Tabs defaultValue="BTC" className="space-y-6">
         <TabsList className="grid w-full grid-cols-2 lg:w-auto lg:grid-cols-4">
-          {analysisData?.map((analysis) => (
+          {analysisData.map((analysis) => (
             <TabsTrigger key={analysis.asset} value={analysis.asset} className="flex items-center space-x-2">
               <CryptoIcon symbol={analysis.asset} size="sm" />
               <span>{analysis.asset}</span>
@@ -314,7 +317,7 @@ export default function MarketAnalysisPage() {
           ))}
         </TabsList>
 
-        {analysisData?.map((analysis) => (
+        {analysisData.map((analysis) => (
           <TabsContent key={analysis.asset} value={analysis.asset}>
             <AssetAnalysisCard analysis={analysis} />
           </TabsContent>
