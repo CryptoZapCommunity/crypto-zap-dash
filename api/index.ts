@@ -26,35 +26,22 @@ app.get("/api/health", (req, res) => {
   });
 });
 
-// Initialize routes
+// Register all API routes
 (async () => {
   try {
-    const server = await registerRoutes(app);
-
-    // Serve static files in production
-    if (process.env.NODE_ENV === "production") {
-      app.use(express.static("dist"));
-      app.get("*", (req, res) => {
-        res.sendFile(path.join(process.cwd(), "dist/index.html"));
-      });
-    } else {
-      // In development, serve static files from dist as well
-      app.use(express.static("dist"));
-      app.get("*", (req, res) => {
-        res.sendFile(path.join(process.cwd(), "dist/index.html"));
-      });
-    }
-
-    const port = parseInt(process.env.PORT || "5000", 10);
-    server.listen(port, () => {
-      console.log(`Server running on port ${port}`);
-      console.log(`Environment: ${process.env.NODE_ENV || "development"}`);
-    });
+    await registerRoutes(app);
   } catch (error) {
-    console.error("Failed to start server:", error);
-    process.exit(1);
+    console.error("Failed to register routes:", error);
   }
 })();
+
+// Serve static files for production
+if (process.env.NODE_ENV === "production") {
+  app.use(express.static("dist"));
+  app.get("*", (req, res) => {
+    res.sendFile(path.join(process.cwd(), "dist/index.html"));
+  });
+}
 
 // Error handling middleware (must be last)
 app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
