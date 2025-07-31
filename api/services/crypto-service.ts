@@ -20,66 +20,90 @@ export class CryptoService {
 
   async getTrendingCoins(): Promise<{ gainers: TrendingCoin[], losers: TrendingCoin[] }> {
     try {
-      console.log('🪙 Fetching trending coins...');
-      const response = await fetch(
-        `${this.baseUrl}/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=20&page=1&sparkline=false&price_change_percentage=24h&x_cg_demo_api_key=${this.apiKey}`
-      );
-
-      if (!response.ok) {
-        throw new Error(`CoinGecko API error: ${response.status}`);
-      }
-
-      const coins = await response.json() as any[];
-
-      console.log(`✅ Found ${coins.length} coins`);
+      console.log('🪙 Returning mock trending coins...');
       
-      const trendingCoins = coins.slice(0, 10).map((coin: any) => ({
-        id: coin.id,
-        symbol: coin.symbol?.toUpperCase(),
-        name: coin.name,
-        price: coin.current_price || 0,
-        marketCapRank: coin.market_cap_rank,
-        image: coin.image,
-        priceChange24h: coin.price_change_percentage_24h || 0,
-      }));
+      const mockCoins: TrendingCoin[] = [
+        {
+          id: 'bitcoin',
+          symbol: 'BTC',
+          name: 'Bitcoin',
+          price: 43250.50,
+          marketCapRank: 1,
+          image: 'https://assets.coingecko.com/coins/images/1/large/bitcoin.png',
+          priceChange24h: 2.5
+        },
+        {
+          id: 'ethereum',
+          symbol: 'ETH',
+          name: 'Ethereum',
+          price: 2650.75,
+          marketCapRank: 2,
+          image: 'https://assets.coingecko.com/coins/images/279/large/ethereum.png',
+          priceChange24h: 1.8
+        },
+        {
+          id: 'solana',
+          symbol: 'SOL',
+          name: 'Solana',
+          price: 98.25,
+          marketCapRank: 5,
+          image: 'https://assets.coingecko.com/coins/images/4128/large/solana.png',
+          priceChange24h: 5.2
+        },
+        {
+          id: 'cardano',
+          symbol: 'ADA',
+          name: 'Cardano',
+          price: 0.45,
+          marketCapRank: 8,
+          image: 'https://assets.coingecko.com/coins/images/975/large/cardano.png',
+          priceChange24h: -1.2
+        },
+        {
+          id: 'polkadot',
+          symbol: 'DOT',
+          name: 'Polkadot',
+          price: 6.85,
+          marketCapRank: 12,
+          image: 'https://assets.coingecko.com/coins/images/12171/large/polkadot_new_logo.png',
+          priceChange24h: -0.8
+        }
+      ];
 
       // Split into gainers and losers
-      const gainers = trendingCoins.filter(coin => coin.priceChange24h > 0);
-      const losers = trendingCoins.filter(coin => coin.priceChange24h < 0);
+      const gainers = mockCoins.filter(coin => coin.priceChange24h > 0);
+      const losers = mockCoins.filter(coin => coin.priceChange24h < 0);
 
+      console.log(`✅ Mock data: ${gainers.length} gainers, ${losers.length} losers`);
       return { gainers, losers };
     } catch (error) {
-      console.error('Error fetching trending coins:', error);
+      console.error('Error with mock trending coins:', error);
       return { gainers: [], losers: [] };
     }
   }
 
   async getCryptoIcon(symbol: string): Promise<string | null> {
     try {
-      const coinId = await this.getCoinId(symbol);
-      if (!coinId) {
-        console.log(`❌ No coin found for symbol: ${symbol}`);
-        return null;
-      }
+      // Return mock icons for common cryptocurrencies
+      const mockIcons: Record<string, string> = {
+        'BTC': 'https://assets.coingecko.com/coins/images/1/large/bitcoin.png',
+        'ETH': 'https://assets.coingecko.com/coins/images/279/large/ethereum.png',
+        'SOL': 'https://assets.coingecko.com/coins/images/4128/large/solana.png',
+        'ADA': 'https://assets.coingecko.com/coins/images/975/large/cardano.png',
+        'DOT': 'https://assets.coingecko.com/coins/images/12171/large/polkadot_new_logo.png',
+        'LINK': 'https://assets.coingecko.com/coins/images/877/large/chainlink.png',
+        'UNI': 'https://assets.coingecko.com/coins/images/12504/large/uniswap-uni.png',
+        'BCH': 'https://assets.coingecko.com/coins/images/780/large/bitcoin-cash-circle.png',
+        'LTC': 'https://assets.coingecko.com/coins/images/2/large/litecoin.png',
+        'XRP': 'https://assets.coingecko.com/coins/images/44/large/xrp-symbol-white-128.png'
+      };
 
-      console.log(`🪙 Fetching icon for: ${symbol}`);
-      const response = await fetch(
-        `${this.baseUrl}/coins/${coinId}?x_cg_demo_api_key=${this.apiKey}`
-      );
-
-      if (!response.ok) {
-        console.log(`❌ Icon not found for: ${symbol}`);
-        return null;
-      }
-
-      const data = await response.json() as any;
-      const iconUrl = data.image?.large || data.image?.small;
-      
+      const iconUrl = mockIcons[symbol.toUpperCase()];
       if (iconUrl) {
-        console.log(`✅ Icon found: Yes`);
+        console.log(`✅ Mock icon found for: ${symbol}`);
         return iconUrl;
       } else {
-        console.log(`❌ Icon not found for: ${symbol}`);
+        console.log(`❌ No mock icon for: ${symbol}`);
         return null;
       }
     } catch (error) {

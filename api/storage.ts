@@ -302,6 +302,55 @@ function initializeMockData() {
     publishedAt: new Date()
   });
 
+  storage.createNews({
+    title: 'Ethereum ETF Approval Expected Soon',
+    summary: 'SEC expected to approve Ethereum ETF applications',
+    content: 'The Securities and Exchange Commission is expected to approve...',
+    source: 'CryptoInsider',
+    sourceUrl: 'https://example.com/eth-etf',
+    category: 'crypto',
+    country: null,
+    impact: 'high',
+    sentiment: 'positive',
+    publishedAt: new Date(Date.now() - 2 * 60 * 60 * 1000)
+  });
+
+  storage.createNews({
+    title: 'Federal Reserve Maintains Interest Rates',
+    summary: 'Fed keeps rates unchanged at 5.25-5.50%',
+    content: 'The Federal Reserve maintained its benchmark interest rate...',
+    source: 'Reuters',
+    sourceUrl: 'https://example.com/fed-rates',
+    category: 'macro',
+    country: 'US',
+    impact: 'high',
+    sentiment: 'neutral',
+    publishedAt: new Date(Date.now() - 4 * 60 * 60 * 1000)
+  });
+
+  // Mock economic events
+  storage.createEconomicEvent({
+    title: 'US CPI Data Release',
+    description: 'Consumer Price Index for December',
+    eventDate: new Date(Date.now() + 24 * 60 * 60 * 1000),
+    previous: '3.1%',
+    actual: null,
+    currency: 'USD',
+    impact: 'high',
+    category: 'inflation'
+  });
+
+  storage.createEconomicEvent({
+    title: 'Fed Interest Rate Decision',
+    description: 'Federal Reserve FOMC Meeting',
+    eventDate: new Date(Date.now() + 48 * 60 * 60 * 1000),
+    previous: '5.50%',
+    actual: null,
+    currency: 'USD',
+    impact: 'high',
+    category: 'monetary'
+  });
+
   // Mock whale transactions
   storage.createWhaleTransaction({
     transactionHash: '0x1234567890abcdef',
@@ -314,6 +363,32 @@ function initializeMockData() {
     fromExchange: 'Binance',
     toExchange: null,
     timestamp: new Date(Date.now() - 12 * 60 * 1000)
+  });
+
+  storage.createWhaleTransaction({
+    transactionHash: '0xabcdef1234567890',
+    asset: 'ETH',
+    amount: '1250',
+    valueUsd: '3300000',
+    type: 'outflow',
+    fromAddress: '0x742d35Cc6637C0532e6C9b3e33f2B9c4C7d3A3E3',
+    toAddress: '0x742d35Cc6637C0532e6C9b3e33f2B9c4C7d3A3E4',
+    fromExchange: null,
+    toExchange: 'Coinbase',
+    timestamp: new Date(Date.now() - 24 * 60 * 1000)
+  });
+
+  storage.createWhaleTransaction({
+    transactionHash: '0x567890abcdef1234',
+    asset: 'SOL',
+    amount: '50000',
+    valueUsd: '4900000',
+    type: 'transfer',
+    fromAddress: '0x5041ed759dd4afc3a72b8192c143f72f4724081a',
+    toAddress: '0x876eabf441b2ee5b5b0554fd502a8e0600950cfa',
+    fromExchange: 'Binance',
+    toExchange: 'Kraken',
+    timestamp: new Date(Date.now() - 45 * 60 * 1000)
   });
 
   console.log('✅ Mock data initialized');
