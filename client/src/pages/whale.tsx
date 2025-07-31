@@ -104,7 +104,7 @@ export default function WhaleTracker() {
   };
 
   const formatAddress = (address: string | null) => {
-    if (!address) return 'Unknown';
+    if (!address || typeof address !== 'string') return 'Unknown';
     return `${address.slice(0, 6)}...${address.slice(-4)}`;
   };
 
@@ -350,7 +350,7 @@ export default function WhaleTracker() {
                     <div className="mt-3 pt-3 border-t border-border">
                       <div className="flex items-center justify-between">
                         <span className="text-xs text-muted-foreground">
-                          Hash: {tx.transactionHash.slice(0, 20)}...
+                          Hash: {(typeof tx.transactionHash === 'string' ? tx.transactionHash.slice(0, 20) : 'Unknown')}...
                         </span>
                         <Button variant="ghost" size="sm" className="h-6 px-2">
                           <ExternalLink className="w-3 h-3 mr-1" />

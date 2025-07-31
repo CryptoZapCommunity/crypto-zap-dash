@@ -154,10 +154,20 @@ export default function Dashboard() {
   const cryptoAssets: CryptoAsset[] = (marketData as any)?.cryptoAssets || [];
   const marketSummary: MarketSummary | null = (marketData as any)?.marketSummary || null;
   const trending: TrendingCoins | null = trendingCoins as TrendingCoins || null;
-  const news: News[] = (latestNews as News[]) || [];
+  
+  // Ensure news is always an array
+  const news: News[] = Array.isArray((latestNews as any)?.data) ? (latestNews as any).data : 
+                       Array.isArray(latestNews) ? latestNews : [];
+  
   const sentiment = marketSentiment as any;
-  const events: EconomicEvent[] = (economicEvents as EconomicEvent[]) || [];
-  const whales: WhaleTransaction[] = (whaleTransactions as WhaleTransaction[]) || [];
+  
+  // Ensure events is always an array
+  const events: EconomicEvent[] = Array.isArray((economicEvents as any)?.data) ? (economicEvents as any).data :
+                                 Array.isArray(economicEvents) ? economicEvents : [];
+  
+  // Ensure whales is always an array
+  const whales: WhaleTransaction[] = Array.isArray((whaleTransactions as any)?.data) ? (whaleTransactions as any).data :
+                                    Array.isArray(whaleTransactions) ? whaleTransactions : [];
 
   console.log('🔍 Processed data:', { 
     cryptoAssets: cryptoAssets.length, 

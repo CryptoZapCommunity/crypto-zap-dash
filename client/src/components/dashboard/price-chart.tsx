@@ -44,15 +44,15 @@ export function PriceChart({ chartData, isLoading }: PriceChartProps) {
     // Use real data but adjust for timeframe
     switch (timeframe) {
       case '1D':
-        return baseData.slice(-24);
+        return (Array.isArray(baseData) ? baseData : []).slice(-24);
       case '7D':
-        return baseData.slice(-7);
+        return (Array.isArray(baseData) ? baseData : []).slice(-7);
       case '1M':
-        return baseData.slice(-30);
+        return (Array.isArray(baseData) ? baseData : []).slice(-30);
       case '1Y':
-        return baseData; // Use all available data
+        return Array.isArray(baseData) ? baseData : []; // Use all available data
       default:
-        return baseData;
+        return Array.isArray(baseData) ? baseData : [];
     }
   };
 
@@ -116,7 +116,7 @@ export function PriceChart({ chartData, isLoading }: PriceChartProps) {
       const chart = new Chart(ctx, {
         type: 'line',
         data: {
-          labels: labels.slice(0, chartDataPoints.length),
+          labels: (Array.isArray(labels) ? labels : []).slice(0, chartDataPoints.length),
           datasets: [{
             label: `${chartData.symbol} Price`,
             data: chartDataPoints,

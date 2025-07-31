@@ -22,7 +22,7 @@ export function CryptoIcon({
   symbol, 
   size = 'md', 
   className = '',
-  fallback = symbol.slice(0, 2).toUpperCase()
+  fallback = (typeof symbol === 'string' ? symbol.slice(0, 2) : '??').toUpperCase()
 }: CryptoIconProps) {
   const [iconUrl, setIconUrl] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -157,7 +157,7 @@ export function CryptoIcons({ symbols, size = 'md', className = '' }: CryptoIcon
           key={symbol}
           symbol={symbol}
           size={size}
-          fallback={symbol.slice(0, 2).toUpperCase()}
+          fallback={(typeof symbol === 'string' ? symbol.slice(0, 2) : '??').toUpperCase()}
         />
       ))}
     </div>

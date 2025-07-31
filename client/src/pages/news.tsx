@@ -197,7 +197,7 @@ function NewsCard({ article }: { article: NewsArticle }) {
               )}
             </div>
             <div className="flex items-center space-x-1">
-              {article.tags.slice(0, 2).map((tag) => (
+              {(Array.isArray(article.tags) ? article.tags : []).slice(0, 2).map((tag) => (
                 <Badge key={tag} variant="outline" className="text-xs">
                   {tag}
                 </Badge>

@@ -29,7 +29,7 @@ function Sparkline({ data, isPositive, className }: SparklineProps) {
 
   return (
     <div className={cn('h-12 rounded-lg flex items-end space-x-1 px-2', className)}>
-      {data.slice(-20).map((value, index) => {
+      {(Array.isArray(data) ? data : []).slice(-20).map((value, index) => {
         const height = range > 0 ? ((value - min) / range) * 100 : 50;
         return (
           <div

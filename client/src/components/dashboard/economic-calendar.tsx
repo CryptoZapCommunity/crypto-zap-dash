@@ -165,7 +165,7 @@ export function EconomicCalendar({ events, isLoading }: EconomicCalendarProps) {
             </p>
           </div>
         ) : (
-          sortedEvents.slice(0, 5).map((event) => (
+          (Array.isArray(sortedEvents) ? sortedEvents : []).slice(0, 5).map((event) => (
             <EconomicEventItem key={event.id} event={event} />
           ))
         )}

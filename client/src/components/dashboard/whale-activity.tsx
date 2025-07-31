@@ -209,7 +209,7 @@ export function WhaleActivity({ whaleTransactions, isLoading }: WhaleActivityPro
             </p>
           </div>
         ) : (
-          sortedTransactions.slice(0, 5).map((transaction) => (
+          (Array.isArray(sortedTransactions) ? sortedTransactions : []).slice(0, 5).map((transaction) => (
             <WhaleTransactionItem key={transaction.id} transaction={transaction} />
           ))
         )}

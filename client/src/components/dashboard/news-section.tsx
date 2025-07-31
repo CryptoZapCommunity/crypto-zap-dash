@@ -169,7 +169,7 @@ export function NewsSection({ news, isLoading }: NewsSectionProps) {
             </p>
           </div>
         ) : (
-          news.slice(0, 5).map((article) => (
+          (Array.isArray(news) ? news : []).slice(0, 5).map((article) => (
             <NewsItem key={article.id} article={article} />
           ))
         )}

@@ -127,7 +127,7 @@ function SentimentIndicator({
 
   const formatValue = (val: string | number) => {
     if (typeof val === 'string') {
-      return val.charAt(0).toUpperCase() + val.slice(1);
+      return val.charAt(0).toUpperCase() + (typeof val === 'string' ? val.slice(1) : '');
     }
     if (val >= 1000000) {
       return `${(val / 1000000).toFixed(1)}M`;
