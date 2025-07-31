@@ -5,8 +5,8 @@
   "license": "MIT",
   "scripts": {
     "dev": "tsx api/index.ts",
-    "build": "vite build",
-    "preview": "vite preview",
+    "build": "cd client && npm run build",
+    "preview": "cd client && npm run preview",
     "check": "tsc",
     "db:push": "drizzle-kit push"
   },
