@@ -46,7 +46,14 @@ export class ApiClient {
       return await response.json();
     } catch (error) {
       // If API is not available, return mock data for development/demo
-      if (error instanceof Error && error.message.includes('Failed to fetch')) {
+      // Capture various network errors: Failed to fetch, 404, CORS, etc.
+      if (error instanceof Error && (
+        error.message.includes('Failed to fetch') ||
+        error.message.includes('NetworkError') ||
+        error.message.includes('404') ||
+        error.message.includes('CORS') ||
+        error.message.includes('fetch')
+      )) {
         console.warn(`API endpoint ${endpoint} not available, using mock data`);
         return this.getMockData(endpoint) as T;
       }
@@ -77,7 +84,9 @@ export class ApiClient {
         data: [
           { symbol: 'BTC', name: 'Bitcoin', price: 45000, change24h: 2.5 },
           { symbol: 'ETH', name: 'Ethereum', price: 2800, change24h: 1.8 },
-          { symbol: 'SOL', name: 'Solana', price: 120, change24h: 5.2 }
+          { symbol: 'SOL', name: 'Solana', price: 120, change24h: 5.2 },
+          { symbol: 'ADA', name: 'Cardano', price: 0.45, change24h: -1.2 },
+          { symbol: 'DOT', name: 'Polkadot', price: 6.8, change24h: 3.1 }
         ]
       },
       '/market-sentiment': {
@@ -92,9 +101,65 @@ export class ApiClient {
           {
             title: 'Bitcoin reaches new highs',
             summary: 'Bitcoin continues its upward trajectory...',
-            publishedAt: new Date().toISOString()
+            publishedAt: new Date().toISOString(),
+            source: 'CryptoNews'
+          },
+          {
+            title: 'Ethereum upgrade successful',
+            summary: 'Latest Ethereum upgrade brings improvements...',
+            publishedAt: new Date().toISOString(),
+            source: 'CoinDesk'
           }
         ]
+      },
+      '/economic-calendar': {
+        data: [
+          {
+            event: 'Fed Interest Rate Decision',
+            date: new Date().toISOString(),
+            impact: 'High',
+            currency: 'USD'
+          }
+        ]
+      },
+      '/whale-movements': {
+        data: [
+          {
+            symbol: 'BTC',
+            amount: 1000,
+            value: 45000000,
+            type: 'transfer',
+            timestamp: new Date().toISOString()
+          }
+        ]
+      },
+      '/airdrops': {
+        data: [
+          {
+            name: 'New Token Airdrop',
+            status: 'active',
+            deadline: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString()
+          }
+        ]
+      },
+      '/fed-updates': {
+        data: [
+          {
+            title: 'Fed maintains current rates',
+            summary: 'Federal Reserve keeps interest rates unchanged...',
+            date: new Date().toISOString()
+          }
+        ]
+      },
+      '/market-analysis': {
+        data: {
+          trend: 'bullish',
+          confidence: 0.8,
+          keyLevels: {
+            support: 44000,
+            resistance: 46000
+          }
+        }
       }
     };
 
