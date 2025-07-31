@@ -1,0 +1,37 @@
+import React from 'react';
+
+interface LogoProps {
+  className?: string;
+  width?: number;
+  height?: number;
+}
+
+export function Logo({ className = '', width = 200, height = 120 }: LogoProps) {
+  return (
+    <svg 
+      width={width} 
+      height={height} 
+      viewBox="0 0 200 120" 
+      xmlns="http://www.w3.org/2000/svg"
+      className={className}
+    >
+      {/* Círculo principal */}
+      <circle cx="100" cy="50" r="35" fill="#f5f5dc" stroke="none"/>
+      
+      {/* Símbolo Bitcoin */}
+      <text x="100" y="58" font-family="Arial, sans-serif" font-size="28" font-weight="bold" text-anchor="middle" fill="#ff6b35">₿</text>
+      
+      {/* Raio 1 - diagonal superior esquerda para inferior direita */}
+      <path d="M 65 35 L 135 65" stroke="#ff6b35" stroke-width="4" fill="none" opacity="0.8"/>
+      
+      {/* Raio 2 - diagonal inferior esquerda para superior direita */}
+      <path d="M 65 65 L 135 35" stroke="#ff6b35" stroke-width="4" fill="none" opacity="0.8"/>
+      
+      {/* Texto CRYPTO */}
+      <text x="100" y="95" font-family="Arial, sans-serif" font-size="16" font-weight="bold" text-anchor="middle" fill="#f5f5dc" letter-spacing="2">CRYPTO</text>
+      
+      {/* Texto ZAP */}
+      <text x="100" y="110" font-family="Arial, sans-serif" font-size="16" font-weight="bold" text-anchor="middle" fill="#f5f5dc" letter-spacing="2">ZAP</text>
+    </svg>
+  );
+} 

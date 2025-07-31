@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, useLocation } from 'wouter';
 import { Button } from '@/components/ui/button';
+import { LogoIcon } from '@/components/ui/logo-icon';
 import { cn } from '@/lib/utils';
 import { useTheme } from '@/hooks/use-theme';
 import { t, setLanguage, getLanguage } from '@/lib/i18n';
@@ -108,8 +109,8 @@ export function Sidebar({ collapsed, onToggle, className }: SidebarProps) {
       {/* Header */}
       <div className="p-6 border-b border-border">
         <div className="flex items-center space-x-3">
-          <div className="w-8 h-8 bg-gradient-to-r from-primary to-green-500 rounded-lg flex items-center justify-center flex-shrink-0">
-            <TrendingUp className="w-5 h-5 text-white" />
+          <div className="flex-shrink-0">
+            <LogoIcon size={32} />
           </div>
           {!collapsed && (
             <div className="min-w-0">

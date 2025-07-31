@@ -1,5 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Logo } from '@/components/ui/logo';
 import { t } from '@/lib/i18n';
 import {
   Search,
@@ -27,7 +28,15 @@ export function Header({ onSidebarToggle, onRefresh }: HeaderProps) {
             <Menu className="w-5 h-5" />
           </Button>
           
-          <div>
+          {/* Logo */}
+          <div className="flex items-center space-x-3">
+            <Logo width={120} height={72} className="hidden sm:block" />
+            <div className="sm:hidden">
+              <Logo width={80} height={48} />
+            </div>
+          </div>
+          
+          <div className="hidden md:block">
             <h2 className="text-xl font-bold text-foreground">
               {t('dashboard.title')}
             </h2>
