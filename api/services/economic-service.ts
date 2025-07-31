@@ -36,17 +36,17 @@ export class EconomicService {
       const events: TradingEconomicsEvent[] = await response.json();
 
       for (const event of events) {
-                 const economicEvent: EconomicEvent = {
-          title: event.title,
-          country: this.mapCountryCode(event.country),
-          currency: event.currency,
-          impact: this.mapImportanceToImpact(event.importance),
-          forecast: event.forecast,
-          previous: event.previous,
-          actual: event.actual || null,
-          eventDate: new Date(event.date),
-          sourceUrl: event.url || null,
-        };
+                          const economicEvent: any = {
+           title: event.title,
+           country: this.mapCountryCode(event.country),
+           currency: event.currency,
+           impact: this.mapImportanceToImpact(event.importance),
+           forecast: event.forecast,
+           previous: event.previous,
+           actual: event.actual || null,
+           eventDate: new Date(event.date),
+           sourceUrl: event.url || null,
+         };
 
         await storage.createEconomicEvent(economicEvent);
       }
