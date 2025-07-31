@@ -72,6 +72,7 @@ function WhaleTransactionItem({ transaction }: { transaction: WhaleTransaction }
 
   const formatAmount = (amount: string, asset: string) => {
     const num = parseFloat(amount);
+    if (isNaN(num)) return `0 ${asset}`;
     if (num >= 1000000) {
       return `${(num / 1000000).toFixed(1)}M ${asset}`;
     } else if (num >= 1000) {
@@ -84,6 +85,7 @@ function WhaleTransactionItem({ transaction }: { transaction: WhaleTransaction }
   const formatValue = (valueUsd: string | null) => {
     if (!valueUsd) return null;
     const num = parseFloat(valueUsd);
+    if (isNaN(num)) return '$0';
     if (num >= 1000000) {
       return `$${(num / 1000000).toFixed(1)}M`;
     } else if (num >= 1000) {

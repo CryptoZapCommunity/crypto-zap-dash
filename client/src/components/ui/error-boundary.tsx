@@ -47,7 +47,7 @@ export class ErrorBoundary extends Component<Props, State> {
               </summary>
               <div className="bg-red-100 dark:bg-red-900/30 p-4 rounded text-xs font-mono text-red-800 dark:text-red-200 overflow-auto max-h-60">
                 <div className="mb-2">
-                  <strong>Error:</strong> {this.state.error?.toString()}
+                  <strong>Error:</strong> {this.state.error ? this.state.error.toString() : 'Unknown error'}
                 </div>
                 <div className="mb-2">
                   <strong>Component Stack:</strong>

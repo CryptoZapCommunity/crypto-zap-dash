@@ -70,7 +70,7 @@ function CryptoAssetCard({ asset }: { asset: CryptoAsset }) {
               'text-sm font-medium',
               isPositive ? 'text-green-500' : 'text-red-500'
             )}>
-              {isPositive ? '+' : ''}{change.toFixed(2)}%
+              {isPositive ? '+' : ''}{(typeof change === 'number' ? change.toFixed(2) : '0.00')}%
             </p>
           </div>
         </div>
@@ -145,7 +145,7 @@ function MarketCapCard({ marketSummary }: { marketSummary: MarketSummary }) {
           </div>
           <div className="text-right">
             <p className="text-lg font-bold text-foreground">
-              ${(marketCap / 1e12).toFixed(2)}T
+              ${(typeof marketCap === 'number' ? (marketCap / 1e12).toFixed(2) : '0.00')}T
             </p>
             <p className={cn(
               'text-sm font-medium',

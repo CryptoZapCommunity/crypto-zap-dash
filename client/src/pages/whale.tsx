@@ -166,7 +166,7 @@ export default function WhaleTracker() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              ${(totalValue / 1e6).toFixed(2)}M
+              ${(typeof totalValue === 'number' ? (totalValue / 1e6).toFixed(2) : '0.00')}M
             </div>
             <p className="text-xs text-muted-foreground">
               {filteredTransactions.length} transactions
@@ -183,7 +183,7 @@ export default function WhaleTracker() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-green-500">
-              ${(inflowValue / 1e6).toFixed(2)}M
+              ${(typeof inflowValue === 'number' ? (inflowValue / 1e6).toFixed(2) : '0.00')}M
             </div>
             <p className="text-xs text-muted-foreground">
               {filteredTransactions.filter(tx => tx.type === 'inflow').length} transactions
@@ -200,7 +200,7 @@ export default function WhaleTracker() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-red-500">
-              ${(outflowValue / 1e6).toFixed(2)}M
+              ${(typeof outflowValue === 'number' ? (outflowValue / 1e6).toFixed(2) : '0.00')}M
             </div>
             <p className="text-xs text-muted-foreground">
               {filteredTransactions.filter(tx => tx.type === 'outflow').length} transactions

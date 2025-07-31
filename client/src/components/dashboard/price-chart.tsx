@@ -76,7 +76,8 @@ export function PriceChart({ chartData, isLoading }: PriceChartProps) {
       case '1M':
         for (let i = 29; i >= 0; i--) {
           const date = new Date(now.getTime() - i * 24 * 60 * 60 * 1000);
-          labels.push(date.getDate().toString());
+          const day = date.getDate();
+          labels.push(day ? day.toString() : '0');
         }
         break;
       case '1Y':

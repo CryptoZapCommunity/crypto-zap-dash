@@ -130,12 +130,12 @@ function SentimentIndicator({
       return val.charAt(0).toUpperCase() + (typeof val === 'string' ? val.slice(1) : '');
     }
     if (val >= 1000000) {
-      return `${(val / 1000000).toFixed(1)}M`;
+      return `${(typeof val === 'number' ? (val / 1000000).toFixed(1) : '0.0')}M`;
     }
     if (val >= 1000) {
-      return `${(val / 1000).toFixed(1)}K`;
+      return `${(typeof val === 'number' ? (val / 1000).toFixed(1) : '0.0')}K`;
     }
-    return val.toString();
+    return val ? val.toString() : '0';
   };
 
   return (

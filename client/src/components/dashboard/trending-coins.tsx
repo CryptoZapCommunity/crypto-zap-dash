@@ -67,7 +67,7 @@ function CoinList({ title, icon, coins, isGainers }: CoinListProps) {
                   'text-xs font-medium',
                   isGainers ? 'text-green-500' : 'text-red-500'
                 )}>
-                  {isGainers ? '+' : ''}{coin.priceChange24h.toFixed(2)}%
+                  {isGainers ? '+' : ''}{(typeof coin.priceChange24h === 'number' ? coin.priceChange24h.toFixed(2) : '0.00')}%
                 </p>
               </div>
             </div>
