@@ -1,4 +1,4 @@
-import { storage } from '../storage';
+import { storage } from '../storage.js';
 import type { InsertEconomicEvent, InsertFedUpdate } from '@shared/schema';
 
 interface TradingEconomicsEvent {

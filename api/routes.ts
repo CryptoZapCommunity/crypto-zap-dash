@@ -1,16 +1,16 @@
 import type { Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
-import { storage } from "./storage";
-import { CryptoService } from './services/crypto-service';
-import { NewsService } from './services/news-service';
-import { EconomicService } from './services/economic-service';
-import { WhaleService } from './services/whale-service';
-import { FredService } from './services/fred-service';
-import { AirdropService } from './services/airdrop-service';
+import { storage } from "./storage.js";
+import { CryptoService } from './services/crypto-service.js';
+import { NewsService } from './services/news-service.js';
+import { EconomicService } from './services/economic-service.js';
+import { WhaleService } from './services/whale-service.js';
+import { FredService } from './services/fred-service.js';
+import { AirdropService } from './services/airdrop-service.js';
 
-import { apiRateLimiter } from './rate-limiter';
-import { requestMonitor } from './monitoring';
-import { apiCache } from './api-cache';
+import { apiRateLimiter } from './rate-limiter.js';
+import { requestMonitor } from './monitoring.js';
+import { apiCache } from './api-cache.js';
 
 export async function registerRoutes(app: Express): Promise<Server> {
   const cryptoService = new CryptoService();

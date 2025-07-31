@@ -1,10 +1,10 @@
 import { WebSocketServer, WebSocket } from 'ws';
 import type { Server } from 'http';
-import { CryptoService } from './services/crypto-service';
-import { NewsService } from './services/news-service';
-import { WhaleService } from './services/whale-service';
-import { storage } from './storage';
-import { wsRateLimiter } from './rate-limiter';
+import { CryptoService } from './services/crypto-service.js';
+import { NewsService } from './services/news-service.js';
+import { WhaleService } from './services/whale-service.js';
+import { storage } from './storage.js';
+import { wsRateLimiter } from './rate-limiter.js';
 
 interface WebSocketMessage {
   type: string;
