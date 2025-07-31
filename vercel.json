@@ -1,7 +1,13 @@
 {
   "version": 2,
   "builds": [
-    { "src": "api/index.ts", "use": "@vercel/node" },
+    { 
+      "src": "api/index.ts", 
+      "use": "@vercel/node",
+      "config": {
+        "includeFiles": ["api/**", "shared/**"]
+      }
+    },
     { 
       "src": "client/package.json", 
       "use": "@vercel/static-build",
@@ -13,6 +19,11 @@
   "routes": [
     { "src": "/api/(.*)", "dest": "/api/index.ts" },
     { "src": "/(.*)", "dest": "/client/dist/$1" }
-  ]
+  ],
+  "functions": {
+    "api/index.ts": {
+      "maxDuration": 30
+    }
+  }
 }
   
