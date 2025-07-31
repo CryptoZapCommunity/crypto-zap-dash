@@ -46,18 +46,25 @@ export function CryptoIcon({
         setIsLoading(true);
         setHasError(false);
         
+        // Try to get icon from API
         const response = await apiClient.getCryptoIcon(symbol) as { iconUrl?: string };
         if (isMounted && response?.iconUrl) {
           setIconUrl(response.iconUrl);
           // Cache the icon
           iconCache.set(symbol, response.iconUrl);
         } else if (isMounted) {
-          setHasError(true);
+          // Fallback to CoinGecko CDN
+          const fallbackUrl = `https://assets.coingecko.com/coins/images/1/large/bitcoin.png?1696501400`;
+          setIconUrl(fallbackUrl);
+          iconCache.set(symbol, fallbackUrl);
         }
       } catch (error) {
         if (isMounted) {
-          console.error(`Error fetching icon for ${symbol}:`, error);
-          setHasError(true);
+          console.warn(`Icon API failed for ${symbol}, using fallback:`, error);
+          // Use fallback icon from CoinGecko CDN
+          const fallbackUrl = `https://assets.coingecko.com/coins/images/1/large/bitcoin.png?1696501400`;
+          setIconUrl(fallbackUrl);
+          iconCache.set(symbol, fallbackUrl);
         }
       } finally {
         if (isMounted) {
@@ -81,7 +88,7 @@ export function CryptoIcon({
     );
   }
 
-  if (hasError || !iconUrl) {
+  if (hasError) {
     return (
       <div 
         className={`
@@ -101,7 +108,7 @@ export function CryptoIcon({
 
   return (
     <img
-      src={iconUrl}
+      src={iconUrl || ''}
       alt={`${symbol} icon`}
       className={`${sizeClasses[size]} rounded-full object-cover ${className}`}
       onError={() => {

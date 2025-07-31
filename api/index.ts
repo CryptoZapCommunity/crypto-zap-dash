@@ -20,8 +20,30 @@ app.get("/api/health", (req, res) => {
     timestamp: new Date().toISOString(),
     environment: process.env.NODE_ENV || "development",
     cors: "enabled",
-    origin: req.headers.origin
+    origin: req.headers.origin,
+    host: req.headers.host,
+    userAgent: req.headers['user-agent']
   });
+});
+
+// CORS test endpoint
+app.get("/api/cors-test", (req, res) => {
+  res.json({
+    success: true,
+    message: "CORS is working correctly!",
+    origin: req.headers.origin,
+    timestamp: new Date().toISOString(),
+    headers: {
+      'access-control-allow-origin': res.getHeader('Access-Control-Allow-Origin'),
+      'access-control-allow-credentials': res.getHeader('Access-Control-Allow-Credentials'),
+      'access-control-allow-methods': res.getHeader('Access-Control-Allow-Methods')
+    }
+  });
+});
+
+// CORS preflight test
+app.options("/api/cors-test", (req, res) => {
+  res.status(200).json({ message: "Preflight successful" });
 });
 
 // Register all API routes synchronously

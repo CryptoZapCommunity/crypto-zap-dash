@@ -155,16 +155,32 @@ export function CandlestickChart({ symbol, data, isLoading }: CandlestickChartPr
         
         // Try to add a simple area series first (more compatible)
         console.log('📊 Adding line series...');
-        const lineSeries = (chart as any).addLineSeries({
-          color: '#10b981',
-          lineWidth: 2,
-        });
-        
-        console.log('📊 Setting line data...');
-        lineSeries.setData(chartData.map(d => ({
-          time: d.time as any,
-          value: d.close
-        })));
+        try {
+          const lineSeries = (chart as any).addLineSeries({
+            color: '#10b981',
+            lineWidth: 2,
+          });
+          
+          console.log('📊 Setting line data...');
+          lineSeries.setData(chartData.map(d => ({
+            time: d.time as any,
+            value: d.close
+          })));
+        } catch (seriesError) {
+          console.warn('⚠️ Line series failed, trying area series...');
+          const areaSeries = (chart as any).addAreaSeries({
+            color: '#10b981',
+            lineColor: '#10b981',
+            lineWidth: 2,
+            topColor: 'rgba(16, 185, 129, 0.3)',
+            bottomColor: 'rgba(16, 185, 129, 0.0)',
+          });
+          
+          areaSeries.setData(chartData.map(d => ({
+            time: d.time as any,
+            value: d.close
+          })));
+        }
         console.log('✅ Line data set');
 
         // Handle resize
