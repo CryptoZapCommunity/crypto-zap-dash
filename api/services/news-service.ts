@@ -78,7 +78,7 @@ export class NewsService {
       const articles = data.results || [];
 
       for (const article of articles) {
-                 const news: News = {
+                 const news: any = {
            title: article.title,
            summary: article.title, // CryptoPanic doesn't provide descriptions
            content: '',
@@ -113,7 +113,7 @@ export class NewsService {
       const articles: NewsAPIArticle[] = data.articles || [];
 
       for (const article of articles) {
-                 const news: News = {
+                 const news: any = {
            title: article.title,
            summary: article.description || '',
            content: article.content || '',

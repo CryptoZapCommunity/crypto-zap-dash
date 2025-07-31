@@ -42,7 +42,7 @@ export class WhaleService {
       const transactions: WhaleAlertTransaction[] = data.transactions || [];
 
       for (const tx of transactions) {
-                 const whaleTransaction: WhaleTransaction = {
+                 const whaleTransaction: any = {
           transactionHash: tx.hash,
           asset: tx.symbol.toUpperCase(),
           amount: tx.amount.toString(),
@@ -50,8 +50,8 @@ export class WhaleService {
           type: this.mapTransactionType(tx),
           fromAddress: tx.from.address,
           toAddress: tx.to.address,
-          fromExchange: tx.from.owner_type === 'exchange' ? tx.from.owner : null,
-          toExchange: tx.to.owner_type === 'exchange' ? tx.to.owner : null,
+          fromExchange: tx.from.owner_type === 'exchange' ? tx.from.owner || null : null,
+          toExchange: tx.to.owner_type === 'exchange' ? tx.to.owner || null : null,
           timestamp: new Date(tx.timestamp * 1000),
         };
 

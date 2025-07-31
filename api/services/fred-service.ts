@@ -41,7 +41,7 @@ export class FredService {
         return 5.50; // Mock current rate
       }
 
-      const data: FredResponse = await response.json();
+      const data = await response.json() as FredResponse;
       const latestObservation = data.observations[0];
       
       return parseFloat(latestObservation.value);
@@ -63,7 +63,7 @@ export class FredService {
         return 3.1; // Mock inflation rate
       }
 
-      const data: FredResponse = await response.json();
+      const data = await response.json() as FredResponse;
       const current = parseFloat(data.observations[0].value);
       const previous = parseFloat(data.observations[1].value);
       
@@ -88,7 +88,7 @@ export class FredService {
         return 3.7; // Mock unemployment rate
       }
 
-      const data: FredResponse = await response.json();
+      const data = await response.json() as FredResponse;
       const latestObservation = data.observations[0];
       
       return parseFloat(latestObservation.value);
@@ -110,7 +110,7 @@ export class FredService {
         return 2.1; // Mock GDP growth
       }
 
-      const data: FredResponse = await response.json();
+      const data = await response.json() as FredResponse;
       const current = parseFloat(data.observations[0].value);
       const previous = parseFloat(data.observations[1].value);
       
@@ -135,7 +135,7 @@ export class FredService {
         return this.getMockRateHistory();
       }
 
-      const data: FredResponse = await response.json();
+      const data = await response.json() as FredResponse;
       
       return data.observations
         .reverse() // Chronological order
