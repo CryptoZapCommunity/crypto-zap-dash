@@ -2,7 +2,7 @@
 Write-Host "🚀 Iniciando Crypto Zap Dashboard..." -ForegroundColor Green
 
 # Definir variáveis de ambiente
-$env:PORT = "3001"
+$env:PORT = "5000"
 $env:NODE_ENV = "development"
 
 # Iniciar API em background
