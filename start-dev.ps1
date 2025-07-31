@@ -7,7 +7,7 @@ $env:NODE_ENV = "development"
 
 # Iniciar API em background
 Write-Host "📡 Iniciando API..." -ForegroundColor Yellow
-Start-Process -NoNewWindow -FilePath "npx" -ArgumentList "tsx server/index.ts"
+Start-Process -NoNewWindow -FilePath "npx" -ArgumentList "tsx api/index.ts"
 
 # Aguardar um pouco
 Start-Sleep -Seconds 5
