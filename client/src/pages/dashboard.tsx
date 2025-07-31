@@ -10,6 +10,7 @@ import { WhaleActivity } from '@/components/dashboard/whale-activity';
 import { AlertsPanel } from '@/components/dashboard/alerts-panel';
 import { MarketSentiment } from '@/components/dashboard/market-sentiment';
 import { PortfolioTracker } from '@/components/dashboard/portfolio-tracker';
+import { LoadingError } from '@/components/ui/loading-error';
 import { t } from '@/lib/i18n';
 import type { CryptoAsset, MarketSummary, TrendingCoins, News, EconomicEvent, WhaleTransaction } from '@/types';
 
@@ -17,54 +18,94 @@ export default function Dashboard() {
   console.log('🚀 Dashboard component rendering...');
 
   // Market data queries - OPTIMIZED for performance
-  const { data: marketData, isLoading: marketLoading, error: marketError } = useQuery({
+  const { 
+    data: marketData, 
+    isLoading: marketLoading, 
+    error: marketError,
+    refetch: refetchMarket
+  } = useQuery({
     queryKey: ['/api/market-summary'],
     queryFn: () => apiClient.getMarketSummary(),
     refetchInterval: 5 * 60 * 1000, // Poll every 5 minutes
     staleTime: 15 * 60 * 1000, // 15 minutes
     gcTime: 30 * 60 * 1000, // 30 minutes garbage collection
+    retry: 3, // Retry 3 times
+    retryDelay: 1000, // Wait 1 second between retries
   });
 
   console.log('📊 Market data:', { marketData, marketLoading, marketError });
 
-  const { data: trendingCoins, isLoading: trendingLoading } = useQuery({
+  const { 
+    data: trendingCoins, 
+    isLoading: trendingLoading,
+    error: trendingError,
+    refetch: refetchTrending
+  } = useQuery({
     queryKey: ['/api/trending-coins'],
     queryFn: () => apiClient.getTrendingCoins(),
     refetchInterval: 5 * 60 * 1000, // Poll every 5 minutes
     staleTime: 10 * 60 * 1000, // 10 minutes
     gcTime: 20 * 60 * 1000, // 20 minutes garbage collection
+    retry: 3,
+    retryDelay: 1000,
   });
 
-  console.log('📈 Trending coins:', { trendingCoins, trendingLoading });
+  console.log('📈 Trending coins:', { trendingCoins, trendingLoading, trendingError });
 
-  const { data: btcChart, isLoading: chartLoading } = useQuery({
+  const { 
+    data: btcChart, 
+    isLoading: chartLoading,
+    error: chartError,
+    refetch: refetchChart
+  } = useQuery({
     queryKey: ['/api/charts', 'bitcoin'],
     queryFn: () => apiClient.getChartData('bitcoin'),
     refetchInterval: 5 * 60 * 1000, // Poll every 5 minutes
     staleTime: 10 * 60 * 1000, // 10 minutes
     gcTime: 20 * 60 * 1000, // 20 minutes garbage collection
+    retry: 3,
+    retryDelay: 1000,
   });
 
   // Candlestick data query
-  const { data: candlestickData, isLoading: candlestickLoading } = useQuery({
+  const { 
+    data: candlestickData, 
+    isLoading: candlestickLoading,
+    error: candlestickError,
+    refetch: refetchCandlestick
+  } = useQuery({
     queryKey: ['/api/candlestick', 'bitcoin'],
     queryFn: () => apiClient.getCandlestickData('bitcoin', '1D', 100),
     refetchInterval: 5 * 60 * 1000, // Poll every 5 minutes
     staleTime: 10 * 60 * 1000, // 10 minutes
     gcTime: 20 * 60 * 1000, // 20 minutes garbage collection
-  }) as { data: { data: any[] } | undefined, isLoading: boolean };
+    retry: 3,
+    retryDelay: 1000,
+  }) as { data: { data: any[] } | undefined, isLoading: boolean, error: Error | null, refetch: () => void };
 
   // News queries - Much less frequent updates
-  const { data: latestNews, isLoading: newsLoading } = useQuery({
+  const { 
+    data: latestNews, 
+    isLoading: newsLoading,
+    error: newsError,
+    refetch: refetchNews
+  } = useQuery({
     queryKey: ['/api/news'],
     queryFn: () => apiClient.getNews(undefined, 5), // Reduced from 10 to 5
     refetchInterval: 10 * 60 * 1000, // Poll every 10 minutes
     staleTime: 30 * 60 * 1000, // 30 minutes
     gcTime: 60 * 60 * 1000, // 1 hour garbage collection
+    retry: 3,
+    retryDelay: 1000,
   });
 
   // Economic calendar query - Very infrequent
-  const { data: economicEvents, isLoading: economicLoading } = useQuery({
+  const { 
+    data: economicEvents, 
+    isLoading: economicLoading,
+    error: economicError,
+    refetch: refetchEconomic
+  } = useQuery({
     queryKey: ['/api/economic-calendar'],
     queryFn: () => {
       const today = new Date();
@@ -74,30 +115,47 @@ export default function Dashboard() {
     refetchInterval: 2 * 60 * 60 * 1000, // Refetch every 2 hours (increased)
     staleTime: 60 * 60 * 1000, // 1 hour (increased)
     gcTime: 2 * 60 * 60 * 1000, // 2 hours garbage collection
+    retry: 3,
+    retryDelay: 1000,
   });
 
   // Whale activity query - Much less frequent
-  const { data: whaleTransactions, isLoading: whaleLoading } = useQuery({
+  const { 
+    data: whaleTransactions, 
+    isLoading: whaleLoading,
+    error: whaleError,
+    refetch: refetchWhale
+  } = useQuery({
     queryKey: ['/api/whale-movements'],
     queryFn: () => apiClient.getWhaleMovements(5), // Reduced from 10 to 5
     refetchInterval: 15 * 60 * 1000, // Poll every 15 minutes
     staleTime: 15 * 60 * 1000, // 15 minutes
     gcTime: 30 * 60 * 1000, // 30 minutes garbage collection
+    retry: 3,
+    retryDelay: 1000,
   });
 
   // Market sentiment query
-  const { data: marketSentiment, isLoading: sentimentLoading } = useQuery({
+  const { 
+    data: marketSentiment, 
+    isLoading: sentimentLoading,
+    error: sentimentError,
+    refetch: refetchSentiment
+  } = useQuery({
     queryKey: ['/api/market-sentiment'],
     queryFn: () => apiClient.getMarketSentiment(),
     refetchInterval: 10 * 60 * 1000, // Poll every 10 minutes
     staleTime: 10 * 60 * 1000, // 10 minutes
     gcTime: 20 * 60 * 1000, // 20 minutes garbage collection
+    retry: 3,
+    retryDelay: 1000,
   });
 
   const cryptoAssets: CryptoAsset[] = (marketData as any)?.cryptoAssets || [];
   const marketSummary: MarketSummary | null = (marketData as any)?.marketSummary || null;
   const trending: TrendingCoins | null = trendingCoins as TrendingCoins || null;
   const news: News[] = (latestNews as News[]) || [];
+  const sentiment = marketSentiment as any;
   const events: EconomicEvent[] = (economicEvents as EconomicEvent[]) || [];
   const whales: WhaleTransaction[] = (whaleTransactions as WhaleTransaction[]) || [];
 
@@ -179,7 +237,7 @@ export default function Dashboard() {
           {/* Market Sentiment */}
           <section>
             <MarketSentiment
-              sentiment={marketSentiment}
+              sentiment={marketSentiment as any}
               isLoading={sentimentLoading}
             />
           </section>

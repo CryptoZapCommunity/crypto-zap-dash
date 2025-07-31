@@ -26,6 +26,8 @@ export class ApiClient {
   private async request<T>(endpoint: string, options?: RequestInit): Promise<T> {
     const url = `${this.baseUrl}${endpoint}`;
     
+    console.log(`🌐 API Request: ${url}`);
+    
     try {
       const response = await fetch(url, {
         ...options,
@@ -45,6 +47,8 @@ export class ApiClient {
 
       return await response.json();
     } catch (error) {
+      console.log(`❌ API Error for ${endpoint}:`, error);
+      
       // If API is not available, return mock data for development/demo
       // Capture various network errors: Failed to fetch, 404, CORS, etc.
       if (error instanceof Error && (
@@ -52,10 +56,14 @@ export class ApiClient {
         error.message.includes('NetworkError') ||
         error.message.includes('404') ||
         error.message.includes('CORS') ||
-        error.message.includes('fetch')
+        error.message.includes('fetch') ||
+        error.message.includes('ERR_NETWORK') ||
+        error.message.includes('ERR_INTERNET_DISCONNECTED')
       )) {
-        console.warn(`API endpoint ${endpoint} not available, using mock data`);
-        return this.getMockData(endpoint) as T;
+        console.warn(`🔄 API endpoint ${endpoint} not available, using mock data`);
+        const mockData = this.getMockData(endpoint);
+        console.log(`✅ Mock data for ${endpoint}:`, mockData);
+        return mockData as T;
       }
       
       if (error instanceof ApiError) {
