@@ -63,7 +63,7 @@
 
 @layer base {
   * {
-    @apply border-border;
+    border-color: var(--border);
   }
 
   body {
@@ -116,7 +116,8 @@
   }
   
   .sentiment-neutral {
-    @apply text-muted-foreground bg-muted border-border;
+    @apply text-muted-foreground bg-muted;
+    border-color: var(--border);
   }
 }
 
