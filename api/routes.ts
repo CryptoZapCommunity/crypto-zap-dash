@@ -1,5 +1,4 @@
 import type { Express, Request, Response, NextFunction } from "express";
-import { createServer, type Server } from "http";
 import { storage } from "./storage.js";
 import { CryptoService } from './services/crypto-service.js';
 import { NewsService } from './services/news-service.js';
@@ -12,7 +11,7 @@ import { apiRateLimiter } from './rate-limiter.js';
 import { requestMonitor } from './monitoring.js';
 import { apiCache } from './api-cache.js';
 
-export async function registerRoutes(app: Express): Promise<Server> {
+export async function registerRoutes(app: Express): Promise<void> {
   const cryptoService = new CryptoService();
   const newsService = new NewsService();
   const economicService = new EconomicService();
@@ -556,10 +555,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  const httpServer = createServer(app);
-
-  // Initialize WebSocket server (removed for Vercel)
-
   // Initialize data on startup (optimized for Vercel)
   setTimeout(async () => {
     try {
@@ -584,6 +579,4 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.error('Error loading initial data:', error);
     }
   }, 1000);
-
-  return httpServer;
 }

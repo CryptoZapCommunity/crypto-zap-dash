@@ -54,3 +54,5 @@ app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
     error: process.env.NODE_ENV === "development" ? err.stack : undefined
   });
 });
+
+export default app;
