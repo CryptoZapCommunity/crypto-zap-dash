@@ -41,7 +41,7 @@ export class NewsService {
       const articles: NewsAPIArticle[] = data.articles || [];
 
       for (const article of articles) {
-                 const news: News = {
+                 const news: any = {
            title: article.title,
            summary: article.description || '',
            content: article.content || '',
@@ -78,18 +78,18 @@ export class NewsService {
       const articles = data.results || [];
 
       for (const article of articles) {
-        const news: NewsArticle = {
-          title: article.title,
-          summary: article.title, // CryptoPanic doesn't provide descriptions
-          content: '',
-          source: article.source?.title || 'CryptoPanic',
-          sourceUrl: article.url,
-          category: 'crypto',
-          country: null,
-          impact: this.mapCryptoPanicVotes(article.votes),
-          sentiment: article.kind === 'positive' ? 'positive' : article.kind === 'negative' ? 'negative' : 'neutral',
-          publishedAt: new Date(article.published_at),
-        };
+                 const news: News = {
+           title: article.title,
+           summary: article.title, // CryptoPanic doesn't provide descriptions
+           content: '',
+           source: article.source?.title || 'CryptoPanic',
+           sourceUrl: article.url,
+           category: 'crypto',
+           country: null,
+           impact: this.mapCryptoPanicVotes(article.votes),
+           sentiment: article.kind === 'positive' ? 'positive' : article.kind === 'negative' ? 'negative' : 'neutral',
+           publishedAt: new Date(article.published_at),
+         };
 
         await storage.createNews(news);
       }
@@ -113,18 +113,18 @@ export class NewsService {
       const articles: NewsAPIArticle[] = data.articles || [];
 
       for (const article of articles) {
-        const news: NewsArticle = {
-          title: article.title,
-          summary: article.description || '',
-          content: article.content || '',
-          source: article.source.name,
-          sourceUrl: article.url,
-          category: 'macro',
-          country: this.extractCountryFromContent(article.title + ' ' + article.description),
-          impact: this.determineMacroImpact(article.title + ' ' + article.description),
-          sentiment: this.analyzeSentiment(article.title + ' ' + article.description),
-          publishedAt: new Date(article.publishedAt),
-        };
+                 const news: News = {
+           title: article.title,
+           summary: article.description || '',
+           content: article.content || '',
+           source: article.source.name,
+           sourceUrl: article.url,
+           category: 'macro',
+           country: this.extractCountryFromContent(article.title + ' ' + article.description),
+           impact: this.determineMacroImpact(article.title + ' ' + article.description),
+           sentiment: this.analyzeSentiment(article.title + ' ' + article.description),
+           publishedAt: new Date(article.publishedAt),
+         };
 
         await storage.createNews(news);
       }
