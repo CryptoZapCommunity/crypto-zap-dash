@@ -35,8 +35,8 @@ app.get("/api/health", (req, res) => {
   }
 })();
 
-// Serve static files for production
-if (process.env.NODE_ENV === "production") {
+// Serve static files for production (only in local development)
+if (process.env.NODE_ENV === "production" && !process.env.VERCEL) {
   app.use(express.static("dist"));
   app.get("*", (req, res) => {
     res.sendFile(path.join(process.cwd(), "dist/index.html"));
