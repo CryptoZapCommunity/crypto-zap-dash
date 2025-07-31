@@ -43,6 +43,7 @@ export class ApiClient {
     const url = `${this.baseUrl}${endpoint}`;
     
     console.log(`🌐 API Request: ${url}`);
+    console.log(`🔧 Request options:`, options);
     
     try {
       const response = await fetch(url, {
@@ -53,30 +54,55 @@ export class ApiClient {
         },
       });
 
+      console.log(`📡 Response status: ${response.status} ${response.statusText}`);
+      console.log(`📡 Response headers:`, Object.fromEntries(response.headers.entries()));
+
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
+        console.error(`❌ HTTP Error ${response.status}:`, errorData);
         throw new ApiError(
           errorData.message || `HTTP ${response.status}: ${response.statusText}`,
           response.status
         );
       }
 
-      return await response.json();
+      const data = await response.json();
+      console.log(`✅ API Response for ${endpoint}:`, data);
+      return data;
     } catch (error) {
-      console.log(`❌ API Error for ${endpoint}:`, error);
+      console.error(`❌ API Error for ${endpoint}:`, error);
+      console.error(`❌ Error type:`, error instanceof Error ? error.constructor.name : typeof error);
+      console.error(`❌ Error message:`, error instanceof Error ? error.message : String(error));
       
-      // If API is not available, return mock data for development/demo
-      // Capture various network errors: Failed to fetch, 404, CORS, etc.
-      if (error instanceof Error && (
-        error.message.includes('Failed to fetch') ||
-        error.message.includes('NetworkError') ||
-        error.message.includes('404') ||
-        error.message.includes('CORS') ||
-        error.message.includes('fetch') ||
-        error.message.includes('ERR_NETWORK') ||
-        error.message.includes('ERR_INTERNET_DISCONNECTED')
-      )) {
+      // Enhanced error detection for mock data fallback
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      const shouldUseMock = (
+        errorMessage.includes('Failed to fetch') ||
+        errorMessage.includes('NetworkError') ||
+        errorMessage.includes('404') ||
+        errorMessage.includes('CORS') ||
+        errorMessage.includes('fetch') ||
+        errorMessage.includes('ERR_NETWORK') ||
+        errorMessage.includes('ERR_INTERNET_DISCONNECTED') ||
+        errorMessage.includes('TypeError') ||
+        errorMessage.includes('Network request failed') ||
+        errorMessage.includes('Connection refused') ||
+        errorMessage.includes('ENOTFOUND') ||
+        errorMessage.includes('ECONNREFUSED') ||
+        errorMessage.includes('timeout') ||
+        errorMessage.includes('aborted') ||
+        errorMessage.includes('cancelled') ||
+        errorMessage.includes('blocked') ||
+        errorMessage.includes('forbidden') ||
+        errorMessage.includes('unauthorized') ||
+        errorMessage.includes('not found') ||
+        errorMessage.includes('server error') ||
+        errorMessage.includes('internal server error')
+      );
+      
+      if (shouldUseMock) {
         console.warn(`🔄 API endpoint ${endpoint} not available, using mock data`);
+        console.warn(`🔄 Error that triggered mock: ${errorMessage}`);
         const mockData = this.getMockData(endpoint);
         console.log(`✅ Mock data for ${endpoint}:`, mockData);
         return mockData as T;

@@ -5,16 +5,26 @@ export function corsMiddleware(req: Request, res: Response, next: NextFunction) 
   const allowedOrigins = [
     'https://cryptozapdash.netlify.app',
     'https://crypto-zap-dash.vercel.app',
+    'https://crypto-zap-dash.netlify.app',
+    'https://cryptozapdash.vercel.app',
     'http://localhost:3000',
-    'http://localhost:5000'
+    'http://localhost:5000',
+    'http://localhost:5173',
+    'http://127.0.0.1:3000',
+    'http://127.0.0.1:5000',
+    'http://127.0.0.1:5173'
   ];
   
   const origin = req.headers.origin;
-  const isAllowedOrigin = allowedOrigins.includes(origin) || process.env.NODE_ENV === 'development';
+  
+  // In development, allow all origins
+  const isDevelopment = process.env.NODE_ENV === 'development' || !process.env.NODE_ENV;
+  const isAllowedOrigin = allowedOrigins.includes(origin) || isDevelopment;
   
   if (isAllowedOrigin) {
     res.header("Access-Control-Allow-Origin", origin);
   } else {
+    // Fallback to allow all for unknown origins (helps with debugging)
     res.header("Access-Control-Allow-Origin", "*");
   }
   
@@ -36,12 +46,19 @@ export function setCorsHeaders(res: Response, origin?: string) {
   const allowedOrigins = [
     'https://cryptozapdash.netlify.app',
     'https://crypto-zap-dash.vercel.app',
+    'https://crypto-zap-dash.netlify.app',
+    'https://cryptozapdash.vercel.app',
     'http://localhost:3000',
-    'http://localhost:5000'
+    'http://localhost:5000',
+    'http://localhost:5173',
+    'http://127.0.0.1:3000',
+    'http://127.0.0.1:5000',
+    'http://127.0.0.1:5173'
   ];
   
   const requestOrigin = origin || '*';
-  const isAllowedOrigin = allowedOrigins.includes(requestOrigin) || process.env.NODE_ENV === 'development';
+  const isDevelopment = process.env.NODE_ENV === 'development' || !process.env.NODE_ENV;
+  const isAllowedOrigin = allowedOrigins.includes(requestOrigin) || isDevelopment;
   
   if (isAllowedOrigin) {
     res.setHeader("Access-Control-Allow-Origin", requestOrigin);
