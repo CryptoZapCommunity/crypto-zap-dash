@@ -24,6 +24,21 @@ import FedMonitor from "@/pages/fed";
 import CryptoIconsDemo from "@/pages/crypto-icons-demo";
 import NotFound from "@/pages/not-found";
 
+// Simple fallback component to ensure something is always rendered
+function FallbackComponent() {
+  return (
+    <div className="flex items-center justify-center min-h-screen bg-background">
+      <div className="text-center p-8">
+        <h1 className="text-2xl font-bold text-foreground mb-4">
+          Crypto Zap Dashboard
+        </h1>
+        <p className="text-muted-foreground">
+          Loading application...
+        </p>
+      </div>
+    </div>
+  );
+}
 
 function Layout({ children }: { children: React.ReactNode }) {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
