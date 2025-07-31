@@ -1,5 +1,5 @@
 import { storage } from '../storage.js';
-import type { WhaleActivity } from '../shared/schema.js';
+import type { WhaleTransaction } from '../../shared/schema.js';
 
 interface WhaleAlertTransaction {
   id: string;
@@ -38,7 +38,7 @@ export class WhaleService {
         return;
       }
 
-      const data = await response.json();
+      const data = await response.json() as any;
       const transactions: WhaleAlertTransaction[] = data.transactions || [];
 
       for (const tx of transactions) {

@@ -1,5 +1,15 @@
 import fetch from 'node-fetch';
-import type { CryptoAsset, TrendingCoin } from '../shared/schema.js';
+import type { CryptoAsset } from '../../shared/schema.js';
+
+interface TrendingCoin {
+  id: string;
+  symbol: string;
+  name: string;
+  price: number;
+  marketCapRank: number;
+  image: string;
+  priceChange24h: number;
+}
 
 export class CryptoService {
   private baseUrl = 'https://api.coingecko.com/api/v3';
@@ -19,7 +29,7 @@ export class CryptoService {
         throw new Error(`CoinGecko API error: ${response.status}`);
       }
 
-      const coins = await response.json();
+      const coins = await response.json() as any[];
 
       console.log(`✅ Found ${coins.length} coins`);
       
@@ -62,7 +72,7 @@ export class CryptoService {
         return null;
       }
 
-      const data = await response.json();
+      const data = await response.json() as any;
       const iconUrl = data.image?.large || data.image?.small;
       
       if (iconUrl) {
@@ -236,7 +246,7 @@ export class CryptoService {
         throw new Error(`CoinGecko API error: ${response.status}`);
       }
 
-      const coins = await response.json();
+      const coins = await response.json() as any[];
       
       // Import storage here to avoid circular dependency
       const { storage } = await import('../storage');
@@ -281,7 +291,7 @@ export class CryptoService {
         throw new Error(`CoinGecko API error: ${response.status}`);
       }
 
-      const data = await response.json();
+      const data = await response.json() as any;
       const globalData = data.data;
 
       // Import storage here to avoid circular dependency

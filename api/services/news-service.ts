@@ -1,5 +1,5 @@
 import { storage } from '../storage.js';
-import type { NewsArticle } from '../shared/schema.js';
+import type { News } from '../../shared/schema.js';
 
 interface NewsAPIArticle {
   title: string;
@@ -35,7 +35,7 @@ export class NewsService {
         throw new Error(`NewsAPI error: ${response.status} - ${errorText}`);
       }
 
-      const data = await response.json();
+      const data = await response.json() as any;
       console.log('📰 Articles received:', data.articles?.length || 0);
       
       const articles: NewsAPIArticle[] = data.articles || [];
@@ -74,7 +74,7 @@ export class NewsService {
         throw new Error(`CryptoPanic API error: ${response.status}`);
       }
 
-      const data = await response.json();
+      const data = await response.json() as any;
       const articles = data.results || [];
 
       for (const article of articles) {
@@ -109,7 +109,7 @@ export class NewsService {
         throw new Error(`NewsAPI error: ${response.status}`);
       }
 
-      const data = await response.json();
+      const data = await response.json() as any;
       const articles: NewsAPIArticle[] = data.articles || [];
 
       for (const article of articles) {
