@@ -67,6 +67,10 @@ export class ApiClient {
     return this.request(`/charts/${symbol}`);
   }
 
+  async getMarketSentiment() {
+    return this.request('/market-sentiment');
+  }
+
   // News endpoints
   async getNews(category?: string, limit?: number) {
     const params = new URLSearchParams();

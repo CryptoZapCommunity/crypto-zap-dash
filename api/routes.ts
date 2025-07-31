@@ -326,14 +326,44 @@ export async function registerRoutes(app: Express): Promise<void> {
     }
   });
 
+  // Debug endpoint to see all assets
+  app.get("/api/debug/assets", async (req, res) => {
+    try {
+      const allAssets = await storage.getCryptoAssets();
+      res.json({
+        count: allAssets.length,
+        assets: allAssets.slice(0, 20).map(a => ({
+          id: a.id,
+          symbol: a.symbol,
+          name: a.name,
+          price: a.price
+        }))
+      });
+    } catch (error) {
+      console.error('Error fetching debug assets:', error);
+      res.status(500).json({ message: 'Failed to fetch debug assets' });
+    }
+  });
+
   // Charts endpoint
   app.get("/api/charts/:symbol", async (req, res) => {
+    const { symbol } = req.params;
+    
     try {
-      const { symbol } = req.params;
-      const asset = await storage.getCryptoAsset(symbol.toUpperCase());
+      // Get all assets to search by symbol
+      const allAssets = await storage.getCryptoAssets();
+      
+      // Try to find by symbol (case insensitive)
+      let asset = allAssets.find(a => 
+        a.symbol.toLowerCase() === symbol.toLowerCase() ||
+        a.id.toLowerCase() === symbol.toLowerCase()
+      );
       
       if (!asset) {
-        return res.status(404).json({ message: 'Asset not found' });
+        return res.status(404).json({ 
+          message: 'Asset not found',
+          availableSymbols: allAssets.slice(0, 10).map(a => a.symbol) // Show first 10 available symbols
+        });
       }
 
       res.json({
@@ -351,8 +381,9 @@ export async function registerRoutes(app: Express): Promise<void> {
   // Candlestick data endpoint
   app.get("/api/candlestick/:symbol", async (req, res) => {
     const startTime = Date.now();
+    const { symbol } = req.params;
+    
     try {
-      const { symbol } = req.params;
       const { timeframe = '1D', limit = 100 } = req.query;
       
       // Generate mock candlestick data
@@ -407,6 +438,41 @@ export async function registerRoutes(app: Express): Promise<void> {
         console.error('Monitoring error:', monitorError);
       }
       res.status(500).json({ message: 'Failed to fetch candlestick data' });
+    }
+  });
+
+  // Market sentiment endpoint
+  app.get("/api/market-sentiment", async (req, res) => {
+    const startTime = Date.now();
+    try {
+      // Generate mock sentiment data
+      const sentiment = {
+        overall: 68,
+        fear_greed_index: 72,
+        social_mentions: 15420,
+        news_sentiment: 65,
+        whale_activity: 'bullish' as const,
+        technical_indicators: 'neutral' as const,
+        updated_at: new Date().toISOString(),
+      };
+      
+      const duration = Date.now() - startTime;
+      try {
+        requestMonitor.logRequest('/api/market-sentiment', 'GET', duration, 200);
+      } catch (monitorError) {
+        console.error('Monitoring error:', monitorError);
+      }
+      
+      res.json(sentiment);
+    } catch (error) {
+      console.error('Error fetching market sentiment:', error);
+      const duration = Date.now() - startTime;
+      try {
+        requestMonitor.logRequest('/api/market-sentiment', 'GET', duration, 500);
+      } catch (monitorError) {
+        console.error('Monitoring error:', monitorError);
+      }
+      res.status(500).json({ message: 'Failed to fetch market sentiment' });
     }
   });
 

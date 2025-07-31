@@ -79,19 +79,44 @@ export function CandlestickChart({ symbol, data, isLoading }: CandlestickChartPr
       try {
         console.log('📊 Loading candlestick chart...');
         console.log('📊 Chart container:', chartContainerRef.current);
+        console.log('📊 Data received:', data);
+        console.log('📊 Selected timeframe:', selectedTimeframe);
         
         if (!chartContainerRef.current) {
           console.error('❌ Chart container not found');
           return;
         }
         
+        // Test if container has dimensions
+        console.log('📊 Container dimensions:', {
+          width: chartContainerRef.current.clientWidth,
+          height: chartContainerRef.current.clientHeight,
+          offsetWidth: chartContainerRef.current.offsetWidth,
+          offsetHeight: chartContainerRef.current.offsetHeight
+        });
+        
+        // If container has no width, wait a bit and try again
+        if (chartContainerRef.current.clientWidth === 0) {
+          console.log('📊 Container has no width, waiting...');
+          setTimeout(() => {
+            loadChart();
+          }, 100);
+          return;
+        }
+        
+        console.log('📊 Importing lightweight-charts...');
         const { createChart } = await import('lightweight-charts');
+        console.log('✅ lightweight-charts imported successfully');
         
         // Destroy existing chart
         if (chartRef.current) {
+          console.log('📊 Destroying existing chart...');
           chartRef.current.remove();
         }
 
+        console.log('📊 Creating chart with container:', chartContainerRef.current.clientWidth, 'x', 320);
+        
+        // Create a simple chart first to test
         const chart = createChart(chartContainerRef.current, {
           width: chartContainerRef.current.clientWidth,
           height: 320,
@@ -115,27 +140,8 @@ export function CandlestickChart({ symbol, data, isLoading }: CandlestickChartPr
             secondsVisible: false,
           },
         });
-
-        const candlestickSeries = chart.addCandlestickSeries({
-          upColor: '#10b981',
-          downColor: '#ef4444',
-          borderDownColor: '#ef4444',
-          borderUpColor: '#10b981',
-          wickDownColor: '#ef4444',
-          wickUpColor: '#10b981',
-        });
-
-        const volumeSeries = chart.addHistogramSeries({
-          color: '#6b7280',
-          priceFormat: {
-            type: 'volume',
-          },
-          priceScaleId: '',
-          scaleMargins: {
-            top: 0.8,
-            bottom: 0,
-          },
-        });
+        
+        console.log('✅ Chart created successfully');
 
         // Use real data or generate mock data
         const chartData = data || generateMockData(selectedTimeframe);
@@ -143,15 +149,23 @@ export function CandlestickChart({ symbol, data, isLoading }: CandlestickChartPr
         console.log('📈 Chart data:', { 
           dataLength: data?.length, 
           chartDataLength: chartData.length,
-          firstDataPoint: chartData[0]
+          firstDataPoint: chartData[0],
+          lastDataPoint: chartData[chartData.length - 1]
         });
         
-        candlestickSeries.setData(chartData);
-        volumeSeries.setData(chartData.map(d => ({
+        // Try to add a simple area series first (more compatible)
+        console.log('📊 Adding line series...');
+        const lineSeries = chart.addSeries('line', {
+          color: '#10b981',
+          lineWidth: 2,
+        });
+        
+        console.log('📊 Setting line data...');
+        lineSeries.setData(chartData.map(d => ({
           time: d.time,
-          value: d.volume || 0,
-          color: d.close >= d.open ? '#10b981' : '#ef4444'
+          value: d.close
         })));
+        console.log('✅ Line data set');
 
         // Handle resize
         const handleResize = () => {
@@ -165,7 +179,7 @@ export function CandlestickChart({ symbol, data, isLoading }: CandlestickChartPr
         window.addEventListener('resize', handleResize);
         chartRef.current = chart;
         setIsChartLoaded(true);
-        console.log('✅ Candlestick chart loaded successfully');
+        console.log('✅ Simple chart loaded successfully');
 
         return () => {
           window.removeEventListener('resize', handleResize);
@@ -175,6 +189,20 @@ export function CandlestickChart({ symbol, data, isLoading }: CandlestickChartPr
         };
       } catch (error) {
         console.error('❌ Error loading candlestick chart:', error);
+        console.error('❌ Error details:', error instanceof Error ? error.message : 'Unknown error');
+        console.error('❌ Error stack:', error instanceof Error ? error.stack : 'No stack trace');
+        
+        // Fallback: show error message in container
+        if (chartContainerRef.current) {
+          chartContainerRef.current.innerHTML = `
+            <div class="flex items-center justify-center h-full text-red-500">
+              <div class="text-center">
+                <p class="font-semibold">Erro ao carregar gráfico</p>
+                <p class="text-sm">${error instanceof Error ? error.message : 'Erro desconhecido'}</p>
+              </div>
+            </div>
+          `;
+        }
       }
     };
 

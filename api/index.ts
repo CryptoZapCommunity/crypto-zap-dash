@@ -26,22 +26,18 @@ app.get("/api/health", (req, res) => {
   });
 });
 
-// Register all API routes
-(async () => {
-  try {
-    await registerRoutes(app);
-  } catch (error) {
-    console.error("Failed to register routes:", error);
-  }
-})();
+// Register all API routes synchronously
+registerRoutes(app).catch(error => {
+  console.error("Failed to register routes:", error);
+});
 
-// Serve static files for production (only in local development)
-if (process.env.NODE_ENV === "production" && !process.env.VERCEL) {
-  app.use(express.static("dist"));
-  app.get("*", (req, res) => {
-    res.sendFile(path.join(process.cwd(), "dist/index.html"));
-  });
-}
+// Serve static files from client/dist
+app.use(express.static("client/dist"));
+
+// Serve frontend for all non-API routes
+app.get("*", (req, res) => {
+  res.sendFile(path.join(process.cwd(), "client/dist/index.html"));
+});
 
 // Error handling middleware (must be last)
 app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
@@ -53,6 +49,15 @@ app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
     message,
     error: process.env.NODE_ENV === "development" ? err.stack : undefined
   });
+});
+
+// Start server
+const PORT = process.env.PORT || 5000;
+
+app.listen(PORT, () => {
+  console.log(`🚀 Server running on http://localhost:${PORT}`);
+  console.log(`🏥 Health check: http://localhost:${PORT}/api/health`);
+  console.log(`🖥️ Frontend: http://localhost:${PORT}`);
 });
 
 export default app;

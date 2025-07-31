@@ -227,9 +227,9 @@ export class CryptoService {
     try {
       console.log('🔄 Updating crypto prices...');
       
-      // Fetch top cryptocurrencies from CoinGecko
+      // Fetch top cryptocurrencies from CoinGecko with sparkline data
       const response = await fetch(
-        `${this.baseUrl}/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=50&page=1&sparkline=false&x_cg_demo_api_key=${this.apiKey}`
+        `${this.baseUrl}/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=50&page=1&sparkline=true&price_change_percentage=24h&x_cg_demo_api_key=${this.apiKey}`
       );
 
       if (!response.ok) {
@@ -253,10 +253,10 @@ export class CryptoService {
             priceChange24h: coin.price_change_percentage_24h?.toString() || null,
             marketCap: coin.market_cap?.toString() || null,
             volume24h: coin.total_volume?.toString() || null,
-            sparklineData: null,
+            sparklineData: coin.sparkline_in_7d?.price || null,
             lastUpdated: new Date().toISOString(),
           });
-          console.log(`✅ Saved: ${asset.symbol} - $${asset.price}`);
+          console.log(`✅ Saved: ${asset.symbol} - $${asset.price} - Sparkline: ${asset.sparklineData?.length || 0} points`);
         } catch (error) {
           console.error(`❌ Error saving ${coin.symbol}:`, error);
         }

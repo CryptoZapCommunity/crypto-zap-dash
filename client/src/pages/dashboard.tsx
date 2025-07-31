@@ -85,6 +85,15 @@ export default function Dashboard() {
     gcTime: 30 * 60 * 1000, // 30 minutes garbage collection
   });
 
+  // Market sentiment query
+  const { data: marketSentiment, isLoading: sentimentLoading } = useQuery({
+    queryKey: ['/api/market-sentiment'],
+    queryFn: () => apiClient.getMarketSentiment(),
+    refetchInterval: 10 * 60 * 1000, // Poll every 10 minutes
+    staleTime: 10 * 60 * 1000, // 10 minutes
+    gcTime: 20 * 60 * 1000, // 20 minutes garbage collection
+  });
+
   const cryptoAssets: CryptoAsset[] = (marketData as any)?.cryptoAssets || [];
   const marketSummary: MarketSummary | null = (marketData as any)?.marketSummary || null;
   const trending: TrendingCoins | null = trendingCoins as TrendingCoins || null;
@@ -165,6 +174,14 @@ export default function Dashboard() {
           {/* Alerts Panel */}
           <section>
             <AlertsPanel />
+          </section>
+
+          {/* Market Sentiment */}
+          <section>
+            <MarketSentiment
+              sentiment={marketSentiment}
+              isLoading={sentimentLoading}
+            />
           </section>
 
           {/* Latest News - REDUCED */}
