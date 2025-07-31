@@ -1,5 +1,5 @@
 import fetch from 'node-fetch';
-import type { Airdrop } from '../shared/schema.js';
+import type { Airdrop } from '../../shared/schema.js';
 
 export class AirdropService {
   private baseUrl = 'https://api.coingecko.com/api/v3';
@@ -46,7 +46,7 @@ export class AirdropService {
         throw new Error(`CoinGecko API error: ${response.status}`);
       }
 
-      const data = await response.json();
+      const data = await response.json() as any;
       const coins = data.coins || [];
 
       return coins.slice(0, 10).map((coin: any, index: number) => ({
@@ -76,7 +76,7 @@ export class AirdropService {
         throw new Error(`DeFi Llama API error: ${response.status}`);
       }
 
-      const data = await response.json();
+      const data = await response.json() as any;
       const airdrops = data.airdrops || [];
 
       return airdrops.slice(0, 10).map((airdrop: any) => ({
