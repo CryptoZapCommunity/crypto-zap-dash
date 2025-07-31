@@ -1,5 +1,5 @@
 import { storage } from '../storage.js';
-import type { InsertWhaleTransaction } from '@shared/schema';
+import type { WhaleActivity } from '../shared/schema.js';
 
 interface WhaleAlertTransaction {
   id: string;
@@ -42,7 +42,7 @@ export class WhaleService {
       const transactions: WhaleAlertTransaction[] = data.transactions || [];
 
       for (const tx of transactions) {
-        const whaleTransaction: InsertWhaleTransaction = {
+        const whaleTransaction: WhaleActivity = {
           transactionHash: tx.hash,
           asset: tx.symbol.toUpperCase(),
           amount: tx.amount.toString(),

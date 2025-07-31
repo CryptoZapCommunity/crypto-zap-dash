@@ -1,5 +1,5 @@
 import fetch from 'node-fetch';
-import type { CryptoAsset, TrendingCoin } from '@/types';
+import type { CryptoAsset, TrendingCoin } from '../shared/schema.js';
 
 export class CryptoService {
   private baseUrl = 'https://api.coingecko.com/api/v3';

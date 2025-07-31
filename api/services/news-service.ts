@@ -1,5 +1,5 @@
 import { storage } from '../storage.js';
-import type { InsertNews } from '@shared/schema';
+import type { NewsArticle } from '../shared/schema.js';
 
 interface NewsAPIArticle {
   title: string;
@@ -41,7 +41,7 @@ export class NewsService {
       const articles: NewsAPIArticle[] = data.articles || [];
 
       for (const article of articles) {
-        const news: InsertNews = {
+        const news: NewsArticle = {
           title: article.title,
           summary: article.description || '',
           content: article.content || '',
@@ -78,7 +78,7 @@ export class NewsService {
       const articles = data.results || [];
 
       for (const article of articles) {
-        const news: InsertNews = {
+        const news: NewsArticle = {
           title: article.title,
           summary: article.title, // CryptoPanic doesn't provide descriptions
           content: '',
@@ -113,7 +113,7 @@ export class NewsService {
       const articles: NewsAPIArticle[] = data.articles || [];
 
       for (const article of articles) {
-        const news: InsertNews = {
+        const news: NewsArticle = {
           title: article.title,
           summary: article.description || '',
           content: article.content || '',

@@ -1,5 +1,5 @@
 import { storage } from '../storage.js';
-import type { InsertEconomicEvent, InsertFedUpdate } from '@shared/schema';
+import type { EconomicData } from '../shared/schema.js';
 
 interface TradingEconomicsEvent {
   title: string;
@@ -36,7 +36,7 @@ export class EconomicService {
       const events: TradingEconomicsEvent[] = await response.json();
 
       for (const event of events) {
-        const economicEvent: InsertEconomicEvent = {
+        const economicEvent: EconomicData = {
           title: event.title,
           country: this.mapCountryCode(event.country),
           currency: event.currency,
@@ -78,7 +78,7 @@ export class EconomicService {
       console.log(`📊 Found ${releases.length} FED releases`);
 
       for (const release of releases) {
-        const fedUpdate: InsertFedUpdate = {
+        const fedUpdate: EconomicData = {
           title: release.name,
           type: this.classifyFedUpdateType(release.name),
           content: release.notes || '',

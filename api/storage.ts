@@ -13,7 +13,7 @@ import {
   type InsertFedUpdate,
   type MarketSummary,
   type InsertMarketSummary
-} from "@shared/schema";
+} from "../shared/schema.js";
 import { randomUUID } from "crypto";
 
 export interface IStorage {

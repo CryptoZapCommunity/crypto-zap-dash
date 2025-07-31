@@ -1,3 +1,6 @@
+import fetch from 'node-fetch';
+import type { FedData } from '../shared/schema.js';
+
 interface FredSeries {
   id: string;
   title: string;

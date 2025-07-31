@@ -1,5 +1,5 @@
 import fetch from 'node-fetch';
-import type { Airdrop } from '@/types';
+import type { Airdrop } from '../shared/schema.js';
 
 export class AirdropService {
   private baseUrl = 'https://api.coingecko.com/api/v3';
