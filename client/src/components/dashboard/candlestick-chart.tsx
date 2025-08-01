@@ -23,7 +23,9 @@ interface CandlestickChartProps {
 type Timeframe = '1H' | '4H' | '1D' | '1W' | '1M';
 
 export function CandlestickChart({ symbol, data, isLoading }: CandlestickChartProps) {
-  console.log('🕯️ CandlestickChart rendering:', { symbol, data: data?.length, isLoading });
+  if (typeof console !== 'undefined' && typeof console.log === 'function') {
+    console.log('🕯️ CandlestickChart rendering:', { symbol, data: Array.isArray(data) ? data.length : 0, isLoading });
+  }
   
   const chartContainerRef = useRef<HTMLDivElement>(null);
   const chartRef = useRef<any>(null);
@@ -77,48 +79,75 @@ export function CandlestickChart({ symbol, data, isLoading }: CandlestickChartPr
 
     const loadChart = async () => {
       try {
-        console.log('📊 Loading candlestick chart...');
-        console.log('📊 Chart container:', chartContainerRef.current);
-        console.log('📊 Data received:', data);
-        console.log('📊 Selected timeframe:', selectedTimeframe);
+        if (typeof console !== 'undefined' && typeof console.log === 'function') {
+          console.log('📊 Loading candlestick chart...');
+          console.log('📊 Chart container:', chartContainerRef.current ? 'exists' : 'null');
+          console.log('📊 Data received:', data);
+          console.log('📊 Selected timeframe:', selectedTimeframe);
+        }
         
         if (!chartContainerRef.current) {
-          console.error('❌ Chart container not found');
+          if (typeof console !== 'undefined' && typeof console.error === 'function') {
+            console.error('❌ Chart container not found');
+          }
           return;
         }
         
         // Test if container has dimensions
-        console.log('📊 Container dimensions:', {
-          width: chartContainerRef.current.clientWidth,
-          height: chartContainerRef.current.clientHeight,
-          offsetWidth: chartContainerRef.current.offsetWidth,
-          offsetHeight: chartContainerRef.current.offsetHeight
-        });
+                          if (typeof console !== 'undefined' && typeof console.log === 'function') {
+          console.log('📊 Container dimensions:', {
+            width: chartContainerRef.current && typeof chartContainerRef.current.clientWidth === 'number' ? chartContainerRef.current.clientWidth : 0,
+            height: chartContainerRef.current && typeof chartContainerRef.current.clientHeight === 'number' ? chartContainerRef.current.clientHeight : 0,
+            offsetWidth: chartContainerRef.current && typeof chartContainerRef.current.offsetWidth === 'number' ? chartContainerRef.current.offsetWidth : 0,
+            offsetHeight: chartContainerRef.current && typeof chartContainerRef.current.offsetHeight === 'number' ? chartContainerRef.current.offsetHeight : 0
+          });
+        }
         
         // If container has no width, wait a bit and try again
-        if (chartContainerRef.current.clientWidth === 0) {
-          console.log('📊 Container has no width, waiting...');
-          setTimeout(() => {
-            loadChart();
-          }, 100);
+                  if (chartContainerRef.current && typeof chartContainerRef.current.clientWidth === 'number' && chartContainerRef.current.clientWidth === 0) {
+          if (typeof console !== 'undefined' && typeof console.log === 'function') {
+            console.log('📊 Container has no width, waiting...');
+          }
+          if (typeof setTimeout === 'function') {
+            setTimeout(() => {
+              loadChart();
+            }, 100);
+          }
           return;
         }
         
-        console.log('📊 Importing lightweight-charts...');
-        const { createChart } = await import('lightweight-charts');
-        console.log('✅ lightweight-charts imported successfully');
+        if (typeof console !== 'undefined' && typeof console.log === 'function') {
+          console.log('📊 Importing lightweight-charts...');
+        }
+        const lightweightCharts = await import('lightweight-charts');
+        const { createChart } = lightweightCharts;
+        
+        if (!createChart || typeof createChart !== 'function') {
+          throw new Error('createChart function not available from lightweight-charts');
+        }
+        
+        if (typeof console !== 'undefined' && typeof console.log === 'function') {
+          console.log('✅ lightweight-charts imported successfully');
+        }
         
         // Destroy existing chart
-        if (chartRef.current) {
-          console.log('📊 Destroying existing chart...');
+        if (chartRef.current && typeof chartRef.current.remove === 'function') {
+          if (typeof console !== 'undefined' && typeof console.log === 'function') {
+            console.log('📊 Destroying existing chart...');
+          }
           chartRef.current.remove();
         }
 
-        console.log('📊 Creating chart with container:', chartContainerRef.current.clientWidth, 'x', 320);
+        if (typeof console !== 'undefined' && typeof console.log === 'function') {
+          console.log('📊 Creating chart with container:', chartContainerRef.current && typeof chartContainerRef.current.clientWidth === 'number' ? chartContainerRef.current.clientWidth : 0, 'x', 320);
+        }
         
         // Create a simple chart first to test
-        const chart = createChart(chartContainerRef.current, {
-          width: chartContainerRef.current.clientWidth,
+        if (!chartContainerRef.current) {
+          throw new Error('Chart container not available');
+        }
+        const chart = typeof createChart === 'function' ? createChart(chartContainerRef.current, {
+          width: chartContainerRef.current && typeof chartContainerRef.current.clientWidth === 'number' ? chartContainerRef.current.clientWidth : 800,
           height: 320,
           layout: {
             background: { color: 'transparent' },
@@ -139,77 +168,124 @@ export function CandlestickChart({ symbol, data, isLoading }: CandlestickChartPr
             timeVisible: true,
             secondsVisible: false,
           },
-        });
+        }) : null;
         
-        console.log('✅ Chart created successfully');
+        if (!chart) {
+          throw new Error('Failed to create chart');
+        }
+        
+        if (typeof console !== 'undefined' && typeof console.log === 'function') {
+          console.log('✅ Chart created successfully');
+        }
 
         // Use real data or generate mock data
-        const chartData = data || generateMockData(selectedTimeframe);
+        const chartData = (Array.isArray(data) && data.length > 0) ? data : (typeof generateMockData === 'function' && selectedTimeframe ? generateMockData(selectedTimeframe) : []);
         
-        console.log('📈 Chart data:', { 
-          dataLength: data?.length, 
-          chartDataLength: chartData.length,
-          firstDataPoint: chartData[0],
-          lastDataPoint: chartData[chartData.length - 1]
-        });
+                if (typeof console !== 'undefined' && typeof console.log === 'function') {
+          console.log('📈 Chart data:', {
+            dataLength: Array.isArray(data) ? data.length : 0, 
+            chartDataLength: Array.isArray(chartData) ? chartData.length : 0,
+            firstDataPoint: Array.isArray(chartData) && chartData.length > 0 ? chartData[0] : null,
+            lastDataPoint: Array.isArray(chartData) && chartData.length > 0 ? chartData[chartData.length - 1] : null
+          });
+        }
         
         // Try to add a simple area series first (more compatible)
-        console.log('📊 Adding line series...');
-        try {
-          const lineSeries = (chart as any).addLineSeries({
-            color: '#10b981',
-            lineWidth: 2,
-          });
-          
-          console.log('📊 Setting line data...');
-          lineSeries.setData(chartData.map(d => ({
-            time: d.time as any,
-            value: d.close
-          })));
-        } catch (seriesError) {
-          console.warn('⚠️ Line series failed, trying area series...');
-          const areaSeries = (chart as any).addAreaSeries({
-            color: '#10b981',
-            lineColor: '#10b981',
-            lineWidth: 2,
-            topColor: 'rgba(16, 185, 129, 0.3)',
-            bottomColor: 'rgba(16, 185, 129, 0.0)',
-          });
-          
-          areaSeries.setData(chartData.map(d => ({
-            time: d.time as any,
-            value: d.close
-          })));
+        if (typeof console !== 'undefined' && typeof console.log === 'function') {
+          console.log('📊 Adding line series...');
         }
-        console.log('✅ Line data set');
+        try {
+          if (chart && typeof chart.addLineSeries === 'function') {
+            const lineSeries = chart.addLineSeries({
+              color: '#10b981',
+              lineWidth: 2,
+            });
+            
+            if (typeof console !== 'undefined' && typeof console.log === 'function') {
+              console.log('📊 Setting line data...');
+            }
+            if (lineSeries && typeof lineSeries.setData === 'function') {
+              lineSeries.setData((Array.isArray(chartData) ? chartData : []).map(d => ({
+                time: d.time as any,
+                value: d.close
+              })));
+            } else {
+              throw new Error('setData method not available on lineSeries');
+            }
+          } else {
+            throw new Error('addLineSeries method not available');
+          }
+        } catch (seriesError) {
+          if (typeof console !== 'undefined' && typeof console.warn === 'function') {
+            console.warn('⚠️ Line series failed, trying area series...');
+          }
+          if (chart && typeof chart.addAreaSeries === 'function') {
+            const areaSeries = chart.addAreaSeries({
+              color: '#10b981',
+              lineColor: '#10b981',
+              lineWidth: 2,
+              topColor: 'rgba(16, 185, 129, 0.3)',
+              bottomColor: 'rgba(16, 185, 129, 0.0)',
+            });
+            
+            if (areaSeries && typeof areaSeries.setData === 'function') {
+              areaSeries.setData((Array.isArray(chartData) ? chartData : []).map(d => ({
+                time: d.time as any,
+                value: d.close
+              })));
+            } else {
+              throw new Error('setData method not available on areaSeries');
+            }
+          } else {
+            if (typeof console !== 'undefined' && typeof console.error === 'function') {
+              console.error('❌ Neither addLineSeries nor addAreaSeries methods are available');
+            }
+            throw new Error('Chart series methods not available');
+          }
+        }
+        if (typeof console !== 'undefined' && typeof console.log === 'function') {
+          console.log('✅ Line data set');
+        }
 
         // Handle resize
         const handleResize = () => {
-          if (chartContainerRef.current) {
+          if (chartContainerRef.current && chart && typeof chart.applyOptions === 'function' && typeof chartContainerRef.current.clientWidth === 'number') {
             chart.applyOptions({
               width: chartContainerRef.current.clientWidth
             });
           }
         };
 
-        window.addEventListener('resize', handleResize);
-        chartRef.current = chart;
-        setIsChartLoaded(true);
-        console.log('✅ Simple chart loaded successfully');
+        if (typeof window !== 'undefined' && typeof window.addEventListener === 'function') {
+          window.addEventListener('resize', handleResize);
+        }
+        if (chart) {
+          chartRef.current = chart;
+        }
+        if (typeof setIsChartLoaded === 'function') {
+          setIsChartLoaded(true);
+        }
+        if (typeof console !== 'undefined' && typeof console.log === 'function') {
+          console.log('✅ Simple chart loaded successfully');
+        }
 
         return () => {
-          window.removeEventListener('resize', handleResize);
-          if (chart) {
+          if (typeof window !== 'undefined' && typeof window.removeEventListener === 'function') {
+            window.removeEventListener('resize', handleResize);
+          }
+          if (chart && typeof chart.remove === 'function') {
             chart.remove();
           }
         };
       } catch (error) {
-        console.error('❌ Error loading candlestick chart:', error);
-        console.error('❌ Error details:', error instanceof Error ? error.message : 'Unknown error');
-        console.error('❌ Error stack:', error instanceof Error ? error.stack : 'No stack trace');
+        if (typeof console !== 'undefined' && typeof console.error === 'function') {
+          console.error('❌ Error loading candlestick chart:', error);
+          console.error('❌ Error details:', error instanceof Error ? error.message : 'Unknown error');
+          console.error('❌ Error stack:', error instanceof Error ? error.stack : 'No stack trace');
+        }
         
         // Fallback: show error message in container
-        if (chartContainerRef.current) {
+        if (chartContainerRef.current && typeof chartContainerRef.current.innerHTML !== 'undefined') {
           chartContainerRef.current.innerHTML = `
             <div class="flex items-center justify-center h-full text-red-500">
               <div class="text-center">
@@ -235,7 +311,7 @@ export function CandlestickChart({ symbol, data, isLoading }: CandlestickChartPr
               <Skeleton className="w-32 h-4" />
             </div>
             <div className="flex items-center space-x-2">
-              {timeframes.map((tf) => (
+              {(Array.isArray(timeframes) ? timeframes : []).map((tf) => (
                 <Skeleton key={tf} className="w-10 h-6 rounded-lg" />
               ))}
             </div>
@@ -254,23 +330,23 @@ export function CandlestickChart({ symbol, data, isLoading }: CandlestickChartPr
         <div className="flex items-center justify-between">
           <div>
             <CardTitle className="text-lg font-semibold text-foreground">
-              {symbol}/USD
+              {symbol || 'BTC'}/USD
             </CardTitle>
             <p className="text-sm text-muted-foreground">
-              {t('dashboard.candlestickChart')}
+              {typeof t === 'function' ? t('dashboard.candlestickChart') : 'Candlestick Chart'}
             </p>
           </div>
           <div className="flex items-center space-x-2">
-            {timeframes.map((timeframe) => (
+            {(Array.isArray(timeframes) ? timeframes : []).map((timeframe) => (
               <Button
                 key={timeframe}
                 variant={selectedTimeframe === timeframe ? 'default' : 'ghost'}
                 size="sm"
-                onClick={() => setSelectedTimeframe(timeframe)}
-                className={cn(
+                onClick={() => typeof setSelectedTimeframe === 'function' && setSelectedTimeframe(timeframe)}
+                className={typeof cn === 'function' ? cn(
                   'px-3 py-1 text-xs font-medium',
                   selectedTimeframe === timeframe && 'bg-primary text-primary-foreground'
-                )}
+                ) : 'px-3 py-1 text-xs font-medium'}
               >
                 {timeframe}
               </Button>
