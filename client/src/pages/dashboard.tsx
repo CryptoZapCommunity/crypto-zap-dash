@@ -3,7 +3,6 @@ import { apiClient } from '@/lib/api';
 import { MarketOverview } from '@/components/dashboard/market-overview';
 import { TrendingCoins as TrendingCoinsComponent } from '@/components/dashboard/trending-coins';
 import { PriceChart } from '@/components/dashboard/price-chart';
-import { CandlestickChart } from '@/components/dashboard/candlestick-chart';
 import { NewsSection } from '@/components/dashboard/news-section';
 import { EconomicCalendar } from '@/components/dashboard/economic-calendar';
 import { WhaleActivity } from '@/components/dashboard/whale-activity';
@@ -66,22 +65,6 @@ export default function Dashboard() {
     retry: 3,
     retryDelay: 1000,
   });
-
-  // Candlestick data query
-  const { 
-    data: candlestickData, 
-    isLoading: candlestickLoading,
-    error: candlestickError,
-    refetch: refetchCandlestick
-  } = useQuery({
-    queryKey: ['/api/candlestick', 'bitcoin'],
-    queryFn: () => apiClient.getCandlestickData('bitcoin', '1D', 100),
-    refetchInterval: 5 * 60 * 1000, // Poll every 5 minutes
-    staleTime: 10 * 60 * 1000, // 10 minutes
-    gcTime: 20 * 60 * 1000, // 20 minutes garbage collection
-    retry: 3,
-    retryDelay: 1000,
-  }) as { data: { data: any[] } | undefined, isLoading: boolean, error: Error | null, refetch: () => void };
 
   // News queries - Much less frequent updates
   const { 
@@ -216,15 +199,6 @@ export default function Dashboard() {
             <PriceChart
               chartData={btcChart as any}
               isLoading={chartLoading}
-            />
-          </section>
-
-          {/* Candlestick Chart */}
-          <section>
-            <CandlestickChart
-              symbol="BTC"
-              data={candlestickData?.data || null}
-              isLoading={candlestickLoading}
             />
           </section>
 
