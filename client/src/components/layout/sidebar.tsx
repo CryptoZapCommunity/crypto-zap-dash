@@ -129,7 +129,7 @@ export function Sidebar({ collapsed, onToggle, className }: SidebarProps) {
       <nav className="flex-1 p-4 space-y-4">
         {/* Main Dashboard */}
         <div className="space-y-2">
-          {navigationItems.slice(0, 1).map((item) => {
+          {(Array.isArray(navigationItems) ? navigationItems : []).slice(0, 1).map((item) => {
             const Icon = item.icon;
             const isActive = location === item.href;
 
@@ -162,7 +162,7 @@ export function Sidebar({ collapsed, onToggle, className }: SidebarProps) {
           </div>
         )}
         <div className="space-y-2">
-          {navigationItems.slice(1, 5).map((item) => {
+          {(Array.isArray(navigationItems) ? navigationItems : []).slice(1, 5).map((item) => {
             const Icon = item.icon;
             const isActive = location === item.href;
 
@@ -195,7 +195,7 @@ export function Sidebar({ collapsed, onToggle, className }: SidebarProps) {
           </div>
         )}
         <div className="space-y-2">
-          {navigationItems.slice(5, 7).map((item) => {
+          {(Array.isArray(navigationItems) ? navigationItems : []).slice(5, 7).map((item) => {
             const Icon = item.icon;
             const isActive = location === item.href;
 
@@ -221,7 +221,7 @@ export function Sidebar({ collapsed, onToggle, className }: SidebarProps) {
 
         {/* Settings */}
         <div className="space-y-2">
-          {navigationItems.slice(7).map((item) => {
+          {(Array.isArray(navigationItems) ? navigationItems : []).slice(7).map((item) => {
             const Icon = item.icon;
             const isActive = location === item.href;
 

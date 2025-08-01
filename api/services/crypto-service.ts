@@ -1,5 +1,5 @@
 import fetch from 'node-fetch';
-import type { CryptoAsset } from '../../shared/schema.js';
+import type { CryptoAsset } from '@shared/schema.js';
 
 interface TrendingCoin {
   id: string;

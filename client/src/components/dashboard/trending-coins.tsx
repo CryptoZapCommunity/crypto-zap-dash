@@ -40,7 +40,7 @@ function CoinList({ title, icon, coins, isGainers }: CoinListProps) {
             {t('common.loading')}
           </p>
         ) : (
-          coins.map((coin, index) => (
+          (Array.isArray(coins) ? coins : []).map((coin, index) => (
             <div
               key={coin.id}
               className="flex items-center justify-between p-3 rounded-lg hover:bg-muted/50 transition-colors cursor-pointer"

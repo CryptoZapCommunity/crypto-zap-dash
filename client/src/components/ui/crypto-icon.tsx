@@ -150,7 +150,7 @@ export function CryptoIcons({ symbols, size = 'md', className = '' }: CryptoIcon
   if (isLoading) {
     return (
       <div className={`flex gap-2 ${className}`}>
-        {symbols.map((symbol, index) => (
+        {(Array.isArray(symbols) ? symbols : []).map((symbol, index) => (
           <Skeleton key={index} className={`${sizeClasses[size]} rounded-full`} />
         ))}
       </div>
@@ -159,7 +159,7 @@ export function CryptoIcons({ symbols, size = 'md', className = '' }: CryptoIcon
 
   return (
     <div className={`flex gap-2 ${className}`}>
-      {symbols.map((symbol) => (
+              {(Array.isArray(symbols) ? symbols : []).map((symbol) => (
         <CryptoIcon
           key={symbol}
           symbol={symbol}

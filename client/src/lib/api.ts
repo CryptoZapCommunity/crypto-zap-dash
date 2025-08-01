@@ -19,24 +19,16 @@ export class ApiClient {
   private baseUrl: string;
 
   constructor(baseUrl?: string) {
-    // Use environment variable for production API URL, fallback to /api for development
-    this.baseUrl = baseUrl || import.meta.env.VITE_API_URL || '/api';
+    // Use relative API routes for fullstack Vercel deployment
+    this.baseUrl = baseUrl || '/api';
     
     // Debug logging for API URL
     console.log('🔧 ApiClient initialized with:', {
       providedBaseUrl: baseUrl,
-      envApiUrl: import.meta.env.VITE_API_URL,
       finalBaseUrl: this.baseUrl,
       isProduction: import.meta.env.PROD,
       isDevelopment: import.meta.env.DEV
     });
-    
-    // Warning if using /api in production
-    if (import.meta.env.PROD && this.baseUrl === '/api') {
-      console.warn('⚠️  WARNING: Using /api in production!');
-      console.warn('   This will cause API calls to fail.');
-      console.warn('   Please set VITE_API_URL environment variable in Netlify.');
-    }
   }
 
   private async request<T>(endpoint: string, options?: RequestInit): Promise<T> {

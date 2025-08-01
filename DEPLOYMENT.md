@@ -1,60 +1,64 @@
 # Deployment Guide
 
-## Current Issue
-The front-end is deployed on Netlify but the API is not available, causing "Failed to load market data" errors.
+This guide covers deploying the Crypto Zap Dashboard to Vercel as a fullstack application.
 
-## Solutions
+## Prerequisites
 
-### Option 1: Deploy API to Vercel (Recommended)
+- Node.js 18+ installed
+- Vercel account
+- Database (PostgreSQL recommended)
+- API keys for external services
 
-1. **Deploy API to Vercel:**
-   ```bash
-   # The API is already configured for Vercel deployment
-   # Just connect your GitHub repo to Vercel and deploy
-   ```
+## Environment Variables
 
-2. **Set Environment Variables in Netlify:**
-   - Go to Netlify Dashboard > Site Settings > Environment Variables
-   - Add: `VITE_API_URL=https://your-api.vercel.app`
+Set these environment variables in your Vercel project:
 
-3. **Update front-end to use the deployed API**
+### Database
+- `DATABASE_URL` - Your PostgreSQL connection string
 
-### Option 2: Use Mock Data (Temporary)
+### API Keys
+- `COINGECKO_API_KEY` - CoinGecko API key
+- `FRED_API_KEY` - Federal Reserve Economic Data API key
+- `NEWS_API_KEY` - News API key
+- `CRYPTO_PANIC_API_KEY` - CryptoPanic API key
+- `TRADING_ECONOMICS_API_KEY` - Trading Economics API key
+- `WHALE_ALERT_API_KEY` - Whale Alert API key
 
-The front-end now includes mock data that will be used when the API is not available. This allows the site to function while you set up the API deployment.
+### Server Configuration
+- `NODE_ENV=production`
 
-### Option 3: Deploy Full Stack to Vercel
+## Deployment Steps
 
-1. **Deploy both front-end and API to Vercel:**
+1. **Connect your repository to Vercel**
+   - Go to [vercel.com](https://vercel.com)
+   - Import your GitHub repository
    - The `vercel.json` is already configured for this
-   - This will serve both the API and front-end from the same domain
 
-## Current Configuration
+2. **Set environment variables in Vercel dashboard**
+   - Go to your project settings
+   - Add all required environment variables
 
-- **Front-end:** Netlify (static files only)
-- **API:** Not deployed (causing the error)
-- **Mock Data:** Available as fallback
+3. **Deploy**
+   - Vercel will automatically build and deploy your application
+   - The monorepo structure is handled by the `vercel.json` configuration
 
-## Next Steps
+## Architecture
 
-1. Deploy the API to Vercel
-2. Set the `VITE_API_URL` environment variable in Netlify
-3. Test the integration
+- **Frontend**: React + Vite (deployed to Vercel)
+- **Backend**: Node.js + Express (deployed as Vercel serverless functions)
+- **Database**: PostgreSQL (external service)
+- **Fullstack**: Single deployment with API routes at `/api/*`
 
-## Environment Variables Needed
+## Local Development
 
-### For API (Vercel):
-```
-DATABASE_URL=your_database_url
-COINGECKO_API_KEY=your_key
-FRED_API_KEY=your_key
-NEWS_API_KEY=your_key
-CRYPTO_PANIC_API_KEY=your_key
-TRADING_ECONOMICS_API_KEY=your_key
-WHALE_ALERT_API_KEY=your_key
-```
+1. Clone the repository
+2. Install dependencies: `npm install`
+3. Copy `env.example` to `.env` and configure
+4. Start development: `npm run dev`
 
-### For Front-end (Netlify):
-```
-VITE_API_URL=https://your-api.vercel.app
-``` 
+## Troubleshooting
+
+- Check Vercel build logs for any errors
+- Verify environment variables are set correctly
+- Ensure database connection is working
+- Monitor API rate limits for external services 

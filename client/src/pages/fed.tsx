@@ -339,7 +339,7 @@ export default function FedMonitor() {
           </div>
         ) : (
           <div className="space-y-4">
-            {updates.map((update) => (
+            {(Array.isArray(updates) ? updates : []).map((update) => (
               <Card key={update.id} className="hover:shadow-lg transition-shadow">
                 <CardContent className="p-4">
                   <div className="flex items-start justify-between">

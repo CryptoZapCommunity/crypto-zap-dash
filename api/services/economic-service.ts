@@ -1,5 +1,5 @@
 import { storage } from '../storage.js';
-import type { EconomicEvent } from '../../shared/schema.js';
+import type { EconomicEvent } from '@shared/schema.js';
 
 interface TradingEconomicsEvent {
   title: string;

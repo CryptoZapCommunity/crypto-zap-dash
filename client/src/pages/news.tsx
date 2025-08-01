@@ -174,7 +174,7 @@ function NewsCard({ article }: { article: NewsArticle }) {
             <div className="flex items-center space-x-2">
               <span className="text-xs text-muted-foreground">Ativos relacionados:</span>
               <div className="flex items-center space-x-1">
-                {article.relatedAssets.map((asset) => (
+                {(Array.isArray(article.relatedAssets) ? article.relatedAssets : []).map((asset) => (
                   <div key={asset} className="flex items-center space-x-1 px-2 py-1 rounded-full bg-muted/50">
                     <CryptoIcon symbol={asset} size="sm" />
                     <span className="text-xs font-medium">{asset}</span>
@@ -278,7 +278,7 @@ export default function NewsPage() {
       {/* Category Tabs */}
       <Tabs value={selectedCategory} onValueChange={setSelectedCategory}>
         <TabsList className="grid w-full grid-cols-5 lg:w-auto">
-          {categories.map((category) => {
+                      {(Array.isArray(categories) ? categories : []).map((category) => {
             const Icon = category.icon;
             return (
               <TabsTrigger key={category.value} value={category.value} className="flex items-center space-x-2">
@@ -294,7 +294,7 @@ export default function NewsPage() {
       <div className="space-y-6">
         {filteredNews && filteredNews.length > 0 ? (
           <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-            {filteredNews.map((article) => (
+            {(Array.isArray(filteredNews) ? filteredNews : []).map((article) => (
               <NewsCard key={article.id} article={article} />
             ))}
           </div>

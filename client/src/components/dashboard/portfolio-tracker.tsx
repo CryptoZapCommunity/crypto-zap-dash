@@ -327,7 +327,7 @@ export function PortfolioTracker({ assets = mockAssets, isLoading = false }: Por
               </Button>
             </div>
           ) : (
-            filteredAssets.map((asset) => (
+            (Array.isArray(filteredAssets) ? filteredAssets : []).map((asset) => (
               <PortfolioAssetItem key={asset.id} asset={asset} />
             ))
           )}

@@ -66,7 +66,7 @@ export default function WhaleTracker() {
     .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
 
   // Get unique assets for filter
-  const uniqueAssets = Array.from(new Set(transactions.map(tx => tx.asset)));
+  const uniqueAssets = Array.from(new Set((Array.isArray(transactions) ? transactions : []).map(tx => tx.asset)));
 
   // Calculate statistics
   const totalValue = filteredTransactions.reduce((sum, tx) => sum + parseFloat(tx.valueUsd || '0'), 0);
@@ -251,7 +251,7 @@ export default function WhaleTracker() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All Assets</SelectItem>
-                {uniqueAssets.map(asset => (
+                {(Array.isArray(uniqueAssets) ? uniqueAssets : []).map(asset => (
                   <SelectItem key={asset} value={asset}>{asset}</SelectItem>
                 ))}
               </SelectContent>
@@ -293,7 +293,7 @@ export default function WhaleTracker() {
           </div>
         ) : (
           <div className="space-y-4">
-            {filteredTransactions.map((tx) => (
+            {(Array.isArray(filteredTransactions) ? filteredTransactions : []).map((tx) => (
               <Card key={tx.id} className="hover:shadow-lg transition-shadow">
                 <CardContent className="p-4">
                   <div className="flex items-center justify-between">

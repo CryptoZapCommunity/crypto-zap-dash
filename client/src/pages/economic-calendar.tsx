@@ -240,7 +240,7 @@ function DaySection({ title, events, date }: { title: string; events: EconomicEv
       
       {events.length > 0 ? (
         <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-          {events.map((event) => (
+                      {(Array.isArray(events) ? events : []).map((event) => (
             <EventCard key={event.id} event={event} />
           ))}
         </div>
@@ -317,7 +317,7 @@ export default function EconomicCalendarPage() {
         <div className="flex items-center space-x-4">
           <Tabs value={selectedImpact} onValueChange={setSelectedImpact}>
             <TabsList>
-              {impacts.map((impact) => (
+              {(Array.isArray(impacts) ? impacts : []).map((impact) => (
                 <TabsTrigger key={impact.value} value={impact.value} className={impact.color}>
                   {impact.label}
                 </TabsTrigger>

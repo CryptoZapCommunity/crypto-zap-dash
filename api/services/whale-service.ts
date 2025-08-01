@@ -1,5 +1,5 @@
 import { storage } from '../storage.js';
-import type { WhaleTransaction } from '../../shared/schema.js';
+import type { WhaleTransaction } from '@shared/schema.js';
 
 interface WhaleAlertTransaction {
   id: string;

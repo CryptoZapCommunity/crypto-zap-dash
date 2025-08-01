@@ -180,7 +180,7 @@ export function MarketOverview({ cryptoAssets, marketSummary, isLoading }: Marke
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-      {filteredAssets.map((asset) => (
+                  {(Array.isArray(filteredAssets) ? filteredAssets : []).map((asset) => (
         <CryptoAssetCard key={asset.id} asset={asset} />
       ))}
       

@@ -1,5 +1,5 @@
 import { storage } from '../storage.js';
-import type { News } from '../../shared/schema.js';
+import type { News } from '@shared/schema.js';
 
 interface NewsAPIArticle {
   title: string;
