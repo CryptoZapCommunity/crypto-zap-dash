@@ -12,8 +12,10 @@ import {
   type FedUpdate,
   type InsertFedUpdate,
   type MarketSummary,
-  type InsertMarketSummary
-} from "../shared/schema.js";
+  type InsertMarketSummary,
+  type Alert,
+  type InsertAlert
+} from "@shared/schema.js";
 import { randomUUID } from "crypto";
 
 export interface IStorage {
@@ -45,6 +47,12 @@ export interface IStorage {
   // FED Updates
   getFedUpdates(limit?: number): Promise<FedUpdate[]>;
   createFedUpdate(update: InsertFedUpdate): Promise<FedUpdate>;
+  
+  // Alerts
+  getAlerts(limit?: number): Promise<Alert[]>;
+  createAlert(alert: InsertAlert): Promise<Alert>;
+  markAlertAsRead(id: string): Promise<Alert>;
+  deleteAlert(id: string): Promise<void>;
 }
 
 export class MemStorage implements IStorage {
@@ -55,6 +63,7 @@ export class MemStorage implements IStorage {
   private whaleTransactions: Map<string, WhaleTransaction>;
   private airdrops: Map<string, Airdrop>;
   private fedUpdates: Map<string, FedUpdate>;
+  private alerts: Map<string, Alert>;
 
   constructor() {
     this.cryptoAssets = new Map();
@@ -63,6 +72,7 @@ export class MemStorage implements IStorage {
     this.whaleTransactions = new Map();
     this.airdrops = new Map();
     this.fedUpdates = new Map();
+    this.alerts = new Map();
   }
 
   // Crypto Assets
@@ -239,6 +249,42 @@ export class MemStorage implements IStorage {
     };
     this.fedUpdates.set(id, newUpdate);
     return newUpdate;
+  }
+
+  // Alerts
+  async getAlerts(limit = 50): Promise<Alert[]> {
+    return Array.from(this.alerts.values())
+      .sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime())
+      .slice(0, limit);
+  }
+
+  async createAlert(alert: InsertAlert): Promise<Alert> {
+    const id = randomUUID();
+    const newAlert: Alert = {
+      id,
+      ...alert,
+      value: alert.value || null,
+      change: alert.change || null,
+      asset: alert.asset || null,
+      isRead: alert.isRead || false,
+      createdAt: new Date(),
+    };
+    this.alerts.set(id, newAlert);
+    return newAlert;
+  }
+
+  async markAlertAsRead(id: string): Promise<Alert> {
+    const alert = this.alerts.get(id);
+    if (alert) {
+      const updatedAlert = { ...alert, isRead: true };
+      this.alerts.set(id, updatedAlert);
+      return updatedAlert;
+    }
+    throw new Error(`Alert with ID ${id} not found`);
+  }
+
+  async deleteAlert(id: string): Promise<void> {
+    this.alerts.delete(id);
   }
 }
 

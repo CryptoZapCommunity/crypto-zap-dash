@@ -65,8 +65,43 @@ export async function registerRoutes(app: Express): Promise<void> {
   // Trending coins endpoint
   app.get("/api/trending-coins", async (req, res) => {
     try {
-      const trendingCoins = await cryptoService.getTrendingCoins();
-      res.json(trendingCoins);
+      // Get all crypto assets from storage
+      const allAssets = await storage.getCryptoAssets();
+      
+      // Sort by 24h price change to get gainers and losers
+      const sortedAssets = allAssets.sort((a, b) => {
+        const aChange = parseFloat(a.priceChange24h || '0');
+        const bChange = parseFloat(b.priceChange24h || '0');
+        return bChange - aChange;
+      });
+      
+      const gainers = sortedAssets
+        .filter(asset => parseFloat(asset.priceChange24h || '0') > 0)
+        .slice(0, 5)
+        .map(asset => ({
+          id: asset.id,
+          symbol: asset.symbol,
+          name: asset.name,
+          price: parseFloat(asset.price),
+          marketCapRank: 0, // Would need to be calculated
+          image: `https://assets.coingecko.com/coins/images/1/large/${asset.symbol.toLowerCase()}.png`,
+          priceChange24h: parseFloat(asset.priceChange24h || '0')
+        }));
+      
+      const losers = sortedAssets
+        .filter(asset => parseFloat(asset.priceChange24h || '0') < 0)
+        .slice(0, 5)
+        .map(asset => ({
+          id: asset.id,
+          symbol: asset.symbol,
+          name: asset.name,
+          price: parseFloat(asset.price),
+          marketCapRank: 0, // Would need to be calculated
+          image: `https://assets.coingecko.com/coins/images/1/large/${asset.symbol.toLowerCase()}.png`,
+          priceChange24h: parseFloat(asset.priceChange24h || '0')
+        }));
+      
+      res.json({ gainers, losers });
     } catch (error) {
       console.error('Error fetching trending coins:', error);
       res.status(500).json({ message: 'Failed to fetch trending coins' });
@@ -264,6 +299,64 @@ export async function registerRoutes(app: Express): Promise<void> {
     }
   });
 
+  // Alerts endpoint
+  app.get("/api/alerts", async (req, res) => {
+    const startTime = Date.now();
+    
+    try {
+      const limit = parseInt(req.query.limit as string) || 50;
+      const alerts = await storage.getAlerts(limit);
+      
+      const duration = Date.now() - startTime;
+      try {
+        requestMonitor.logRequest('/api/alerts', 'GET', duration, 200);
+      } catch (monitorError) {
+        console.error('Monitoring error:', monitorError);
+      }
+      
+      res.json(alerts);
+    } catch (error) {
+      const duration = Date.now() - startTime;
+      try {
+        requestMonitor.logRequest('/api/alerts', 'GET', duration, 500);
+      } catch (monitorError) {
+        console.error('Monitoring error:', monitorError);
+      }
+      
+      console.error('Error fetching alerts:', error);
+      res.status(500).json({ message: 'Failed to fetch alerts' });
+    }
+  });
+
+  // Mark alert as read endpoint
+  app.put("/api/alerts/:id/read", async (req, res) => {
+    const startTime = Date.now();
+    
+    try {
+      const { id } = req.params;
+      const alert = await storage.markAlertAsRead(id);
+      
+      const duration = Date.now() - startTime;
+      try {
+        requestMonitor.logRequest('/api/alerts/:id/read', 'PUT', duration, 200);
+      } catch (monitorError) {
+        console.error('Monitoring error:', monitorError);
+      }
+      
+      res.json(alert);
+    } catch (error) {
+      const duration = Date.now() - startTime;
+      try {
+        requestMonitor.logRequest('/api/alerts/:id/read', 'PUT', duration, 500);
+      } catch (monitorError) {
+        console.error('Monitoring error:', monitorError);
+      }
+      
+      console.error('Error marking alert as read:', error);
+      res.status(500).json({ message: 'Failed to mark alert as read' });
+    }
+  });
+
   // FED updates endpoint
   app.get("/api/fed-updates", async (req, res) => {
     const startTime = Date.now();
@@ -386,7 +479,16 @@ export async function registerRoutes(app: Express): Promise<void> {
     try {
       const { timeframe = '1D', limit = 100 } = req.query;
       
-      // Generate mock candlestick data
+      // Get asset data from storage
+      const asset = await storage.getCryptoAsset(symbol);
+      if (!asset) {
+        return res.status(404).json({ 
+          message: 'Asset not found',
+          symbol: symbol.toUpperCase()
+        });
+      }
+
+      // Generate realistic candlestick data based on asset price
       const now = Date.now();
       const interval = timeframe === '1H' ? 60 * 60 * 1000 : 
                       timeframe === '4H' ? 4 * 60 * 60 * 1000 :
@@ -395,11 +497,11 @@ export async function registerRoutes(app: Express): Promise<void> {
                       30 * 24 * 60 * 60 * 1000;
       
       const data = [];
-      let basePrice = 45000;
+      let basePrice = parseFloat(asset.price);
       
       for (let i = parseInt(limit as string) - 1; i >= 0; i--) {
         const time = now - (i * interval);
-        const volatility = 0.02;
+        const volatility = 0.02; // 2% volatility
         const open = basePrice;
         const close = open + (Math.random() - 0.5) * open * volatility;
         const high = Math.max(open, close) + Math.random() * open * volatility * 0.5;
@@ -445,12 +547,15 @@ export async function registerRoutes(app: Express): Promise<void> {
   app.get("/api/market-sentiment", async (req, res) => {
     const startTime = Date.now();
     try {
-      // Generate mock sentiment data
+      // Get market summary data
+      const marketSummary = await storage.getMarketSummary();
+      
+      // Calculate sentiment based on real data
       const sentiment = {
-        overall: 68,
-        fear_greed_index: 72,
-        social_mentions: 15420,
-        news_sentiment: 65,
+        overall: marketSummary?.fearGreedIndex || 50,
+        fear_greed_index: marketSummary?.fearGreedIndex || 50,
+        social_mentions: Math.floor(Math.random() * 20000) + 5000, // Mock for now
+        news_sentiment: Math.floor(Math.random() * 40) + 50, // Mock for now
         whale_activity: 'bullish' as const,
         technical_indicators: 'neutral' as const,
         updated_at: new Date().toISOString(),
@@ -552,6 +657,70 @@ export async function registerRoutes(app: Express): Promise<void> {
         console.error('Monitoring error:', monitorError);
       }
       res.status(500).json({ message: 'Failed to fetch market analysis' });
+    }
+  });
+
+  // Portfolio endpoint
+  app.get("/api/portfolio", async (req, res) => {
+    const startTime = Date.now();
+    
+    try {
+      // For now, return mock portfolio data
+      // In a real implementation, this would fetch from user's portfolio
+      const portfolioData = [
+        {
+          id: '1',
+          symbol: 'BTC',
+          name: 'Bitcoin',
+          amount: 0.25,
+          avgPrice: 95000,
+          currentPrice: 102347,
+          value: 25586.75,
+          change24h: 3.2,
+          isWatching: true,
+        },
+        {
+          id: '2',
+          symbol: 'ETH',
+          name: 'Ethereum',
+          amount: 5.5,
+          avgPrice: 3200,
+          currentPrice: 3456,
+          value: 19008,
+          change24h: -1.8,
+          isWatching: true,
+        },
+        {
+          id: '3',
+          symbol: 'SOL',
+          name: 'Solana',
+          amount: 100,
+          avgPrice: 180,
+          currentPrice: 198.45,
+          value: 19845,
+          change24h: 5.4,
+          isWatching: true,
+        },
+      ];
+      
+      const duration = Date.now() - startTime;
+      try {
+        requestMonitor.logRequest('/api/portfolio', 'GET', duration, 200);
+      } catch (monitorError) {
+        console.error('Monitoring error:', monitorError);
+      }
+      
+      res.json(portfolioData);
+    } catch (error) {
+      const duration = Date.now() - startTime;
+      try {
+        requestMonitor.logRequest('/api/portfolio', 'GET', duration, 500);
+      } catch (monitorError) {
+        console.error('Monitoring error:', monitorError);
+      }
+      
+      console.error('Error fetching portfolio:', error);
+      res.status(500).json({ message: 'Failed to fetch portfolio' });
     }
   });
 

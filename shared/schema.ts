@@ -94,6 +94,20 @@ export const marketSummary = pgTable("market_summary", {
   lastUpdated: timestamp("last_updated").defaultNow(),
 });
 
+export const alerts = pgTable("alerts", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  type: text("type").notNull(), // price_target, volume_spike, whale_movement, news_sentiment, technical_indicator
+  priority: text("priority").notNull(), // low, medium, high, critical
+  asset: text("asset"),
+  title: text("title").notNull(),
+  message: text("message").notNull(),
+  value: text("value"),
+  change: decimal("change", { precision: 10, scale: 4 }),
+  isRead: boolean("is_read").default(false),
+  timestamp: timestamp("timestamp").notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
 // Insert schemas
 export const insertCryptoAssetSchema = createInsertSchema(cryptoAssets).omit({
   lastUpdated: true,
@@ -129,6 +143,11 @@ export const insertMarketSummarySchema = createInsertSchema(marketSummary).omit(
   lastUpdated: true,
 });
 
+export const insertAlertSchema = createInsertSchema(alerts).omit({
+  id: true,
+  createdAt: true,
+});
+
 // Types
 export type CryptoAsset = typeof cryptoAssets.$inferSelect;
 export type InsertCryptoAsset = z.infer<typeof insertCryptoAssetSchema>;
@@ -150,3 +169,6 @@ export type InsertFedUpdate = z.infer<typeof insertFedUpdateSchema>;
 
 export type MarketSummary = typeof marketSummary.$inferSelect;
 export type InsertMarketSummary = z.infer<typeof insertMarketSummarySchema>;
+
+export type Alert = typeof alerts.$inferSelect;
+export type InsertAlert = z.infer<typeof insertAlertSchema>;

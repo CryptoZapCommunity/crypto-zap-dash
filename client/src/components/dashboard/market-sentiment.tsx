@@ -4,6 +4,7 @@ import { Skeleton } from '@/components/ui/loading-skeleton';
 import { t } from '@/lib/i18n';
 import { TrendingUp, TrendingDown, Heart, Brain, Users, BarChart3 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useEffect, useState } from 'react';
 
 interface SentimentData {
   overall: number; // 0-100
@@ -20,16 +21,178 @@ interface MarketSentimentProps {
   isLoading?: boolean;
 }
 
-// Mock data for demonstration
-const mockSentiment: SentimentData = {
-  overall: 68,
-  fear_greed_index: 72,
-  social_mentions: 15420,
-  news_sentiment: 65,
-  whale_activity: 'bullish',
-  technical_indicators: 'neutral',
-  updated_at: new Date().toISOString(),
-};
+export function MarketSentiment({ sentiment: propSentiment, isLoading: propIsLoading }: MarketSentimentProps) {
+  const [sentiment, setSentiment] = useState<SentimentData | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    const fetchSentiment = async () => {
+      if (propSentiment) {
+        setSentiment(propSentiment);
+        return;
+      }
+
+      setIsLoading(true);
+      try {
+        const response = await fetch('/api/market-sentiment');
+        if (response.ok) {
+          const data = await response.json();
+          setSentiment(data);
+        } else {
+          console.error('Failed to fetch market sentiment');
+          setSentiment(null);
+        }
+      } catch (error) {
+        console.error('Error fetching market sentiment:', error);
+        setSentiment(null);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchSentiment();
+  }, [propSentiment]);
+
+  const displayIsLoading = propIsLoading !== undefined ? propIsLoading : isLoading;
+
+  if (displayIsLoading) {
+    return (
+      <Card className="glassmorphism">
+        <CardHeader>
+          <Skeleton className="w-48 h-6" />
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-2 gap-4">
+            <div className="flex flex-col items-center space-y-2">
+              <Skeleton className="w-20 h-20 rounded-full" />
+              <Skeleton className="w-16 h-4" />
+            </div>
+            <div className="flex flex-col items-center space-y-2">
+              <Skeleton className="w-20 h-20 rounded-full" />
+              <Skeleton className="w-20 h-4" />
+            </div>
+          </div>
+          <div className="space-y-3">
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
+                <div className="flex items-center space-x-3">
+                  <Skeleton className="w-8 h-8 rounded-full" />
+                  <Skeleton className="w-24 h-4" />
+                </div>
+                <Skeleton className="w-16 h-5 rounded-full" />
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (!sentiment) {
+    return (
+      <Card className="glassmorphism">
+        <CardContent className="p-6">
+          <p className="text-muted-foreground text-center">
+            {t('common.error')}
+          </p>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  const formatTimeAgo = (timestamp: string) => {
+    try {
+      const date = new Date(timestamp);
+      const now = new Date();
+      const diffInMs = now.getTime() - date.getTime();
+      const diffInMinutes = Math.floor(diffInMs / (1000 * 60));
+      
+      if (diffInMinutes < 1) return t('alerts.now');
+      if (diffInMinutes < 60) return `${diffInMinutes}min atrás`;
+      if (diffInMinutes < 1440) return `${Math.floor(diffInMinutes / 60)}h atrás`;
+      return `${Math.floor(diffInMinutes / 1440)}d atrás`;
+    } catch {
+      return t('alerts.recent');
+    }
+  };
+
+  return (
+    <Card className="glassmorphism">
+      <CardHeader className="pb-4">
+        <CardTitle className="text-lg font-semibold text-foreground flex items-center justify-between">
+          <div className="flex items-center">
+            <Brain className="w-5 h-5 mr-2 text-purple-500" />
+            Sentimento do Mercado
+          </div>
+          <Badge variant="outline" className="text-xs">
+            {formatTimeAgo(sentiment.updated_at)}
+          </Badge>
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-6">
+        {/* Main Sentiment Gauges */}
+        <div className="grid grid-cols-2 gap-6">
+          <SentimentGauge 
+            value={sentiment.overall} 
+            label="Sentimento Geral"
+          />
+          <SentimentGauge 
+            value={sentiment.fear_greed_index} 
+            label="Índice Medo & Ganância"
+          />
+        </div>
+
+        {/* Sentiment Indicators */}
+        <div className="space-y-3">
+          <SentimentIndicator
+            value={sentiment.news_sentiment}
+            label="Sentimento das Notícias"
+            icon={<Heart className="w-4 h-4" />}
+          />
+          
+          <SentimentIndicator
+            value={sentiment.social_mentions}
+            label="Menções Sociais (24h)"
+            icon={<Users className="w-4 h-4" />}
+          />
+          
+          <SentimentIndicator
+            value={sentiment.whale_activity}
+            label="Atividade de Baleias"
+            icon={<TrendingUp className="w-4 h-4" />}
+          />
+          
+          <SentimentIndicator
+            value={sentiment.technical_indicators}
+            label="Indicadores Técnicos"
+            icon={<BarChart3 className="w-4 h-4" />}
+          />
+        </div>
+
+        {/* Summary */}
+        <div className="pt-4 border-t border-border/50">
+          <div className="flex items-center space-x-2">
+            {sentiment.overall >= 60 ? (
+              <TrendingUp className="w-4 h-4 text-green-500" />
+            ) : sentiment.overall >= 40 ? (
+              <BarChart3 className="w-4 h-4 text-yellow-500" />
+            ) : (
+              <TrendingDown className="w-4 h-4 text-red-500" />
+            )}
+            <span className="text-sm text-muted-foreground">
+              {sentiment.overall >= 60 
+                ? 'O mercado demonstra sentimento positivo com sinais de otimismo.' 
+                : sentiment.overall >= 40
+                ? 'O sentimento do mercado está neutro com tendências mistas.'
+                : 'O mercado mostra cautela com sinais de pessimismo.'
+              }
+            </span>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
 
 function SentimentGauge({ value, label, size = 'md' }: { value: number; label: string; size?: 'sm' | 'md' | 'lg' }) {
   const getColor = (val: number) => {
@@ -156,133 +319,5 @@ function SentimentIndicator({
         {formatValue(value)}
       </Badge>
     </div>
-  );
-}
-
-export function MarketSentiment({ sentiment = mockSentiment, isLoading = false }: MarketSentimentProps) {
-  if (isLoading) {
-    return (
-      <Card className="glassmorphism">
-        <CardHeader>
-          <Skeleton className="w-48 h-6" />
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
-            <div className="flex flex-col items-center space-y-2">
-              <Skeleton className="w-20 h-20 rounded-full" />
-              <Skeleton className="w-16 h-4" />
-            </div>
-            <div className="flex flex-col items-center space-y-2">
-              <Skeleton className="w-20 h-20 rounded-full" />
-              <Skeleton className="w-20 h-4" />
-            </div>
-          </div>
-          <div className="space-y-3">
-            {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
-                <div className="flex items-center space-x-3">
-                  <Skeleton className="w-8 h-8 rounded-full" />
-                  <Skeleton className="w-24 h-4" />
-                </div>
-                <Skeleton className="w-16 h-5 rounded-full" />
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
-
-  const formatTimeAgo = (timestamp: string) => {
-    try {
-      const date = new Date(timestamp);
-      const now = new Date();
-      const diffInMs = now.getTime() - date.getTime();
-      const diffInMinutes = Math.floor(diffInMs / (1000 * 60));
-      
-      if (diffInMinutes < 1) return 'Agora';
-      if (diffInMinutes < 60) return `${diffInMinutes}min atrás`;
-      if (diffInMinutes < 1440) return `${Math.floor(diffInMinutes / 60)}h atrás`;
-      return `${Math.floor(diffInMinutes / 1440)}d atrás`;
-    } catch {
-      return 'Recente';
-    }
-  };
-
-  return (
-    <Card className="glassmorphism">
-      <CardHeader className="pb-4">
-        <CardTitle className="text-lg font-semibold text-foreground flex items-center justify-between">
-          <div className="flex items-center">
-            <Brain className="w-5 h-5 mr-2 text-purple-500" />
-            Sentimento do Mercado
-          </div>
-          <Badge variant="outline" className="text-xs">
-            {formatTimeAgo(sentiment.updated_at)}
-          </Badge>
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-6">
-        {/* Main Sentiment Gauges */}
-        <div className="grid grid-cols-2 gap-6">
-          <SentimentGauge 
-            value={sentiment.overall} 
-            label="Sentimento Geral"
-          />
-          <SentimentGauge 
-            value={sentiment.fear_greed_index} 
-            label="Índice Medo & Ganância"
-          />
-        </div>
-
-        {/* Sentiment Indicators */}
-        <div className="space-y-3">
-          <SentimentIndicator
-            value={sentiment.news_sentiment}
-            label="Sentimento das Notícias"
-            icon={<Heart className="w-4 h-4" />}
-          />
-          
-          <SentimentIndicator
-            value={sentiment.social_mentions}
-            label="Menções Sociais (24h)"
-            icon={<Users className="w-4 h-4" />}
-          />
-          
-          <SentimentIndicator
-            value={sentiment.whale_activity}
-            label="Atividade de Baleias"
-            icon={<TrendingUp className="w-4 h-4" />}
-          />
-          
-          <SentimentIndicator
-            value={sentiment.technical_indicators}
-            label="Indicadores Técnicos"
-            icon={<BarChart3 className="w-4 h-4" />}
-          />
-        </div>
-
-        {/* Summary */}
-        <div className="pt-4 border-t border-border/50">
-          <div className="flex items-center space-x-2">
-            {sentiment.overall >= 60 ? (
-              <TrendingUp className="w-4 h-4 text-green-500" />
-            ) : sentiment.overall >= 40 ? (
-              <BarChart3 className="w-4 h-4 text-yellow-500" />
-            ) : (
-              <TrendingDown className="w-4 h-4 text-red-500" />
-            )}
-            <span className="text-sm text-muted-foreground">
-              {sentiment.overall >= 60 
-                ? 'O mercado demonstra sentimento positivo com sinais de otimismo.' 
-                : sentiment.overall >= 40
-                ? 'O sentimento do mercado está neutro com tendências mistas.'
-                : 'O mercado mostra cautela com sinais de pessimismo.'
-              }
-            </span>
-          </div>
-        </div>
-      </CardContent>
-    </Card>
   );
 }

@@ -23,60 +23,57 @@ interface CandlestickChartProps {
 
 type Timeframe = '1H' | '4H' | '1D' | '1W' | '1M';
 
-export function CandlestickChart({ symbol, data, isLoading }: CandlestickChartProps) {
+export function CandlestickChart({ symbol, data: propData, isLoading: propIsLoading }: CandlestickChartProps) {
   if (typeof console !== 'undefined' && typeof console.log === 'function') {
-    console.log('🕯️ CandlestickChart rendering:', { symbol, data: Array.isArray(data) ? data.length : 0, isLoading });
+    console.log('🕯️ CandlestickChart rendering:', { symbol, data: Array.isArray(propData) ? propData.length : 0, isLoading: propIsLoading });
   }
   
   const chartContainerRef = useRef<HTMLDivElement>(null);
   const chartRef = useRef<any>(null);
   const [selectedTimeframe, setSelectedTimeframe] = useState<Timeframe>('1D');
   const [isChartLoaded, setIsChartLoaded] = useState(false);
+  const [data, setData] = useState<CandlestickData[] | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const timeframes: Timeframe[] = ['1H', '4H', '1D', '1W', '1M'];
 
-  // Generate mock candlestick data
-  const generateMockData = (timeframe: Timeframe): CandlestickData[] => {
-    const now = Date.now();
-    const interval = timeframe === '1H' ? 60 * 60 * 1000 : 
-                    timeframe === '4H' ? 4 * 60 * 60 * 1000 :
-                    timeframe === '1D' ? 24 * 60 * 60 * 1000 :
-                    timeframe === '1W' ? 7 * 24 * 60 * 60 * 1000 :
-                    30 * 24 * 60 * 60 * 1000;
-    
-    const points = timeframe === '1H' ? 24 : 
-                   timeframe === '4H' ? 30 : 
-                   timeframe === '1D' ? 30 : 
-                   timeframe === '1W' ? 52 : 12;
-    
-    const data: CandlestickData[] = [];
-    let basePrice = 45000;
-    
-    for (let i = points - 1; i >= 0; i--) {
-      const time = now - (i * interval);
-      const volatility = 0.02; // 2% volatility
-      const open = basePrice;
-      const close = open + (Math.random() - 0.5) * open * volatility;
-      const high = Math.max(open, close) + Math.random() * open * volatility * 0.5;
-      const low = Math.min(open, close) - Math.random() * open * volatility * 0.5;
-      
-      data.push({
-        time: Math.floor(time / 1000),
-        open,
-        high,
-        low,
-        close,
-        volume: Math.random() * 1000000 + 500000
-      });
-      
-      basePrice = close;
-    }
-    
-    return data;
-  };
+  // Fetch candlestick data from API
+  useEffect(() => {
+    const fetchCandlestickData = async () => {
+      if (propData) {
+        setData(propData);
+        return;
+      }
+
+      if (!symbol) return;
+
+      setIsLoading(true);
+      try {
+        const response = await fetch(`/api/candlestick/${symbol}?timeframe=${selectedTimeframe}&limit=100`);
+        if (response.ok) {
+          const result = await response.json();
+          setData(Array.isArray(result.data) ? result.data : []);
+        } else {
+          console.error('Failed to fetch candlestick data');
+          setData([]);
+        }
+      } catch (error) {
+        console.error('Error fetching candlestick data:', error);
+        setData([]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchCandlestickData();
+  }, [symbol, selectedTimeframe, propData]);
+
+  const displayIsLoading = propIsLoading !== undefined ? propIsLoading : isLoading;
+
+
 
   useEffect(() => {
-    if (!chartContainerRef.current || isLoading) return;
+    if (!chartContainerRef.current || displayIsLoading) return;
 
     const loadChart = async () => {
       try {
@@ -179,8 +176,8 @@ export function CandlestickChart({ symbol, data, isLoading }: CandlestickChartPr
           console.log('✅ Chart created successfully');
         }
 
-        // Use real data or generate mock data
-        const chartData = (Array.isArray(data) && data.length > 0) ? data : (typeof generateMockData === 'function' && selectedTimeframe ? generateMockData(selectedTimeframe) : []);
+        // Use real data from API
+        const chartData = Array.isArray(data) && data.length > 0 ? data : [];
         
                 if (typeof console !== 'undefined' && typeof console.log === 'function') {
           console.log('📈 Chart data:', {
@@ -289,9 +286,9 @@ export function CandlestickChart({ symbol, data, isLoading }: CandlestickChartPr
     };
 
     loadChart();
-  }, [data, selectedTimeframe, isLoading]);
+  }, [data, selectedTimeframe, displayIsLoading]);
 
-  if (isLoading) {
+  if (displayIsLoading) {
     return (
       <Card className="glassmorphism">
         <CardHeader className="pb-4">
