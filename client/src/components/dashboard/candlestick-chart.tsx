@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/loading-skeleton';
 import { t } from '@/lib/i18n';
 import { cn } from '@/lib/utils';
+import { createChart, LineSeries, AreaSeries } from 'lightweight-charts';
 
 interface CandlestickData {
   time: number;
@@ -190,61 +191,50 @@ export function CandlestickChart({ symbol, data, isLoading }: CandlestickChartPr
           });
         }
         
-        // Try to add a simple area series first (more compatible)
+        // Try to add a simple area series first (mais compatível)
         if (typeof console !== 'undefined' && typeof console.log === 'function') {
-          console.log('📊 Adding line series...');
+          console.log('📊 Adding line/area series...');
         }
         try {
-          if (chart && typeof chart.addLineSeries === 'function') {
-            const lineSeries = chart.addLineSeries({
-              color: '#10b981',
-              lineWidth: 2,
-            });
-            
-            if (typeof console !== 'undefined' && typeof console.log === 'function') {
-              console.log('📊 Setting line data...');
+          if (chart && typeof chart.addSeries === 'function') {
+            let series;
+            try {
+              // Tenta linha primeiro
+              series = chart.addSeries(LineSeries, {
+                color: '#10b981',
+                lineWidth: 2,
+              });
+            } catch (err) {
+              // Se falhar, tenta área
+              if (typeof console !== 'undefined' && typeof console.warn === 'function') {
+                console.warn('⚠️ Line series failed, trying area series...');
+              }
+              series = chart.addSeries(AreaSeries, {
+                lineColor: '#10b981',
+                lineWidth: 2,
+                topColor: 'rgba(16, 185, 129, 0.3)',
+                bottomColor: 'rgba(16, 185, 129, 0.0)',
+              });
             }
-            if (lineSeries && typeof lineSeries.setData === 'function') {
-              lineSeries.setData((Array.isArray(chartData) ? chartData : []).map(d => ({
+            if (series && typeof series.setData === 'function') {
+              series.setData((Array.isArray(chartData) ? chartData : []).map(d => ({
                 time: d.time as any,
                 value: d.close
               })));
             } else {
-              throw new Error('setData method not available on lineSeries');
+              throw new Error('setData method not available on series');
             }
           } else {
-            throw new Error('addLineSeries method not available');
+            throw new Error('addSeries method not available');
           }
         } catch (seriesError) {
-          if (typeof console !== 'undefined' && typeof console.warn === 'function') {
-            console.warn('⚠️ Line series failed, trying area series...');
+          if (typeof console !== 'undefined' && typeof console.error === 'function') {
+            console.error('❌ Failed to add series:', seriesError);
           }
-          if (chart && typeof chart.addAreaSeries === 'function') {
-            const areaSeries = chart.addAreaSeries({
-              color: '#10b981',
-              lineColor: '#10b981',
-              lineWidth: 2,
-              topColor: 'rgba(16, 185, 129, 0.3)',
-              bottomColor: 'rgba(16, 185, 129, 0.0)',
-            });
-            
-            if (areaSeries && typeof areaSeries.setData === 'function') {
-              areaSeries.setData((Array.isArray(chartData) ? chartData : []).map(d => ({
-                time: d.time as any,
-                value: d.close
-              })));
-            } else {
-              throw new Error('setData method not available on areaSeries');
-            }
-          } else {
-            if (typeof console !== 'undefined' && typeof console.error === 'function') {
-              console.error('❌ Neither addLineSeries nor addAreaSeries methods are available');
-            }
-            throw new Error('Chart series methods not available');
-          }
+          throw seriesError;
         }
         if (typeof console !== 'undefined' && typeof console.log === 'function') {
-          console.log('✅ Line data set');
+          console.log('✅ Line/area data set');
         }
 
         // Handle resize

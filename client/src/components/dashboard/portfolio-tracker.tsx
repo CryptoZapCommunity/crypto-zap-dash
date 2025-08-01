@@ -274,7 +274,7 @@ export function PortfolioTracker({ assets = mockAssets, isLoading = false }: Por
     );
   }
 
-  const filteredAssets = filter === 'watching' ? assets.filter(asset => asset.isWatching) : assets;
+  const filteredAssets = filter === 'watching' ? (Array.isArray(assets) ? assets : []).filter(asset => asset.isWatching) : (Array.isArray(assets) ? assets : []);
 
   return (
     <Card className="glassmorphism">
@@ -300,7 +300,7 @@ export function PortfolioTracker({ assets = mockAssets, isLoading = false }: Por
               className="text-xs"
             >
               <Star className="w-3 h-3 mr-1" />
-              Favoritos ({assets.filter(a => a.isWatching).length})
+              Favoritos ({(Array.isArray(assets) ? assets : []).filter(a => a.isWatching).length})
             </Button>
             <Button variant="outline" size="sm" className="text-xs">
               <Plus className="w-3 h-3 mr-1" />

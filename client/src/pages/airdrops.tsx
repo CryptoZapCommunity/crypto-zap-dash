@@ -44,7 +44,7 @@ export default function Airdrops() {
   const airdropsList: Airdrop[] = (airdrops as Airdrop[]) || [];
 
   // Filter and sort airdrops
-  const filteredAirdrops = airdropsList
+  const filteredAirdrops = (Array.isArray(airdropsList) ? airdropsList : [])
     .filter(airdrop => {
       const matchesSearch = 
         airdrop.projectName.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -132,9 +132,9 @@ export default function Airdrops() {
 
   // Calculate statistics
   const totalAirdrops = filteredAirdrops.length;
-  const upcomingCount = filteredAirdrops.filter(a => a.status === 'upcoming').length;
-  const ongoingCount = filteredAirdrops.filter(a => a.status === 'ongoing').length;
-  const endedCount = filteredAirdrops.filter(a => a.status === 'ended').length;
+  const upcomingCount = (Array.isArray(filteredAirdrops) ? filteredAirdrops : []).filter(a => a.status === 'upcoming').length;
+  const ongoingCount = (Array.isArray(filteredAirdrops) ? filteredAirdrops : []).filter(a => a.status === 'ongoing').length;
+  const endedCount = (Array.isArray(filteredAirdrops) ? filteredAirdrops : []).filter(a => a.status === 'ended').length;
 
   if (error) {
     return (

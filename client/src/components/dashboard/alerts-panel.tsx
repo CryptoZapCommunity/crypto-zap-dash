@@ -222,8 +222,8 @@ export function AlertsPanel({ alerts = mockAlerts, isLoading = false }: AlertsPa
     );
   }
 
-  const unreadCount = alerts.filter(alert => !alert.isRead).length;
-  const criticalAlerts = alerts.filter(alert => alert.priority === 'critical');
+  const unreadCount = (Array.isArray(alerts) ? alerts : []).filter(alert => !alert.isRead).length;
+  const criticalAlerts = (Array.isArray(alerts) ? alerts : []).filter(alert => alert.priority === 'critical');
 
   return (
     <Card className="glassmorphism">
@@ -234,7 +234,7 @@ export function AlertsPanel({ alerts = mockAlerts, isLoading = false }: AlertsPa
             Alertas de Mercado
           </div>
           <div className="flex items-center space-x-2">
-            {criticalAlerts.length > 0 && (
+            {(Array.isArray(criticalAlerts) ? criticalAlerts : []).length > 0 && (
               <Badge variant="destructive" className="text-xs">
                 {criticalAlerts.length} Crítico{criticalAlerts.length > 1 ? 's' : ''}
               </Badge>
@@ -248,7 +248,7 @@ export function AlertsPanel({ alerts = mockAlerts, isLoading = false }: AlertsPa
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-3 max-h-96 overflow-y-auto">
-        {alerts.length === 0 ? (
+        {(Array.isArray(alerts) ? alerts : []).length === 0 ? (
           <div className="text-center py-8">
             <CheckCircle className="w-8 h-8 text-green-500 mx-auto mb-2" />
             <p className="text-sm text-muted-foreground">
@@ -259,7 +259,7 @@ export function AlertsPanel({ alerts = mockAlerts, isLoading = false }: AlertsPa
             </p>
           </div>
         ) : (
-          alerts
+          (Array.isArray(alerts) ? alerts : [])
             .sort((a, b) => {
               // Sort by read status (unread first), then by priority, then by timestamp
               if (a.isRead !== b.isRead) return a.isRead ? 1 : -1;
@@ -275,7 +275,7 @@ export function AlertsPanel({ alerts = mockAlerts, isLoading = false }: AlertsPa
             ))
         )}
         
-        {alerts.length > 0 && (
+        {(Array.isArray(alerts) ? alerts : []).length > 0 && (
           <div className="pt-3 border-t border-border/50">
             <Button variant="ghost" size="sm" className="w-full text-xs">
               <CheckCircle className="w-3 h-3 mr-1" />

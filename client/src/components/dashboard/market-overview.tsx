@@ -176,7 +176,7 @@ export function MarketOverview({ cryptoAssets, marketSummary, isLoading }: Marke
   }
 
   const mainAssets = ['bitcoin', 'ethereum', 'solana'];
-  const filteredAssets = cryptoAssets.filter(asset => mainAssets.includes(asset.id));
+  const filteredAssets = (Array.isArray(cryptoAssets) ? cryptoAssets : []).filter(asset => mainAssets.includes(asset.id));
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">

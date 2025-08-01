@@ -44,7 +44,7 @@ export default function WhaleTracker() {
   const transactions: WhaleTransaction[] = (whaleTransactions as WhaleTransaction[]) || [];
 
   // Filter transactions
-  const filteredTransactions = transactions
+  const filteredTransactions = (Array.isArray(transactions) ? transactions : [])
     .filter(tx => {
       // Search filter
       const matchesSearch = 
@@ -70,10 +70,10 @@ export default function WhaleTracker() {
 
   // Calculate statistics
   const totalValue = filteredTransactions.reduce((sum, tx) => sum + parseFloat(tx.valueUsd || '0'), 0);
-  const inflowValue = filteredTransactions
+  const inflowValue = (Array.isArray(filteredTransactions) ? filteredTransactions : [])
     .filter(tx => tx.type === 'inflow')
     .reduce((sum, tx) => sum + parseFloat(tx.valueUsd || '0'), 0);
-  const outflowValue = filteredTransactions
+  const outflowValue = (Array.isArray(filteredTransactions) ? filteredTransactions : [])
     .filter(tx => tx.type === 'outflow')
     .reduce((sum, tx) => sum + parseFloat(tx.valueUsd || '0'), 0);
 
@@ -186,7 +186,7 @@ export default function WhaleTracker() {
               ${(typeof inflowValue === 'number' ? (inflowValue / 1e6).toFixed(2) : '0.00')}M
             </div>
             <p className="text-xs text-muted-foreground">
-              {filteredTransactions.filter(tx => tx.type === 'inflow').length} transactions
+              {(Array.isArray(filteredTransactions) ? filteredTransactions : []).filter(tx => tx.type === 'inflow').length} transactions
             </p>
           </CardContent>
         </Card>
@@ -203,7 +203,7 @@ export default function WhaleTracker() {
               ${(typeof outflowValue === 'number' ? (outflowValue / 1e6).toFixed(2) : '0.00')}M
             </div>
             <p className="text-xs text-muted-foreground">
-              {filteredTransactions.filter(tx => tx.type === 'outflow').length} transactions
+              {(Array.isArray(filteredTransactions) ? filteredTransactions : []).filter(tx => tx.type === 'outflow').length} transactions
             </p>
           </CardContent>
         </Card>

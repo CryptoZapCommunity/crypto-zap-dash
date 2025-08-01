@@ -126,7 +126,7 @@ function PriceLevelsCard({
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-2">
-        {levels.map((level, index) => {
+        {(Array.isArray(levels) ? levels : []).map((level, index) => {
           const distance = Math.abs((level - currentPrice) / currentPrice * 100);
           return (
             <div key={index} className="flex items-center justify-between p-2 rounded bg-muted/30">
@@ -229,7 +229,7 @@ function AssetAnalysisCard({ analysis }: { analysis: MarketAnalysis }) {
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {analysis.technicalIndicators.map((indicator, index) => (
+            {(Array.isArray(analysis.technicalIndicators) ? analysis.technicalIndicators : []).map((indicator, index) => (
               <TechnicalIndicatorCard key={index} indicator={indicator} />
             ))}
           </div>
@@ -309,7 +309,7 @@ export default function MarketAnalysisPage() {
 
       <Tabs defaultValue="BTC" className="space-y-6">
         <TabsList className="grid w-full grid-cols-2 lg:w-auto lg:grid-cols-4">
-          {analysisData.map((analysis) => (
+          {(Array.isArray(analysisData) ? analysisData : []).map((analysis) => (
             <TabsTrigger key={analysis.asset} value={analysis.asset} className="flex items-center space-x-2">
               <CryptoIcon symbol={analysis.asset} size="sm" />
               <span>{analysis.asset}</span>
@@ -317,7 +317,7 @@ export default function MarketAnalysisPage() {
           ))}
         </TabsList>
 
-        {analysisData.map((analysis) => (
+        {(Array.isArray(analysisData) ? analysisData : []).map((analysis) => (
           <TabsContent key={analysis.asset} value={analysis.asset}>
             <AssetAnalysisCard analysis={analysis} />
           </TabsContent>

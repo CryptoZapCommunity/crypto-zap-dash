@@ -65,7 +65,7 @@ export default function CryptoMarket() {
   const marketSummary: MarketSummary | null = (marketData as any)?.marketSummary || null;
 
   // Filter and sort crypto assets
-  const filteredAssets = cryptoAssets
+  const filteredAssets = (Array.isArray(cryptoAssets) ? cryptoAssets : [])
     .filter(asset => 
       asset.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       asset.symbol.toLowerCase().includes(searchTerm.toLowerCase())

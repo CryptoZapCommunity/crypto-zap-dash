@@ -217,7 +217,7 @@ function EventCard({ event }: { event: EconomicEvent }) {
 }
 
 function DaySection({ title, events, date }: { title: string; events: EconomicEvent[]; date: Date }) {
-  const highImpactCount = events.filter(e => e.impact === 'high').length;
+  const highImpactCount = (Array.isArray(events) ? events : []).filter(e => e.impact === 'high').length;
   
   return (
     <div className="space-y-4">
@@ -264,7 +264,7 @@ export default function EconomicCalendarPage() {
     select: () => mockEvents,
   });
 
-  const filteredEvents = eventsData?.filter(event => {
+  const filteredEvents = (Array.isArray(eventsData) ? eventsData : []).filter(event => {
     return selectedImpact === 'all' || event.impact === selectedImpact;
   });
 
@@ -273,18 +273,18 @@ export default function EconomicCalendarPage() {
   const tomorrow = addDays(today, 1);
   const dayAfterTomorrow = addDays(today, 2);
 
-  const todayEvents = filteredEvents?.filter(event => 
+  const todayEvents = (Array.isArray(filteredEvents) ? filteredEvents : []).filter(event => 
     isToday(new Date(event.datetime))
-  ) || [];
+  );
 
-  const tomorrowEvents = filteredEvents?.filter(event => 
+  const tomorrowEvents = (Array.isArray(filteredEvents) ? filteredEvents : []).filter(event => 
     isTomorrow(new Date(event.datetime))
-  ) || [];
+  );
 
-  const laterEvents = filteredEvents?.filter(event => {
+  const laterEvents = (Array.isArray(filteredEvents) ? filteredEvents : []).filter(event => {
     const eventDate = new Date(event.datetime);
     return eventDate >= dayAfterTomorrow;
-  }) || [];
+  });
 
   const impacts = [
     { value: 'all', label: 'Todos', color: 'text-foreground' },

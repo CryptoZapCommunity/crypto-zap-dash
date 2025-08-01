@@ -219,7 +219,7 @@ export default function NewsPage() {
     select: () => mockNews,
   });
 
-  const filteredNews = newsData?.filter(article => {
+  const filteredNews = (Array.isArray(newsData) ? newsData : []).filter(article => {
     const matchesSearch = article.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          article.description.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = selectedCategory === 'all' || article.category === selectedCategory;
