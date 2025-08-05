@@ -209,7 +209,7 @@ export default function Dashboard() {
                 {['1D', '7D', '1M', '1Y'].map((period) => (
                   <button
                     key={period}
-                    className="px-3 py-1 text-sm rounded-md bg-muted hover:bg-muted/80 transition-colors"
+                    className="px-3 py-1 text-sm rounded-md bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
                   >
                     {period}
                   </button>

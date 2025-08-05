@@ -117,7 +117,7 @@ function WhaleTransactionItem({ transaction }: { transaction: WhaleTransaction }
   };
 
   return (
-    <div className="p-3 rounded-lg bg-muted/50 hover:bg-muted transition-colors">
+    <div className="p-3 rounded-lg bg-gray-100/50 dark:bg-gray-800/50 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-center space-x-2">
           <CryptoIcon symbol={transaction.asset} size="sm" />

@@ -42,7 +42,7 @@ function CoinList({ title, icon, coins, isGainers }: CoinListProps) {
           (Array.isArray(coins) ? coins : []).map((coin, index) => (
             <div
               key={coin.id}
-              className="flex items-center justify-between p-3 rounded-lg hover:bg-muted/50 transition-colors cursor-pointer table-row-hover"
+              className="flex items-center justify-between p-3 rounded-lg hover:bg-gray-100/50 dark:hover:bg-gray-800/50 transition-colors cursor-pointer table-row-hover"
             >
               <div className="flex items-center space-x-3">
                 <CryptoIcon symbol={coin.symbol} size="md" />
@@ -84,7 +84,7 @@ export function TrendingCoins({ trendingCoins, isLoading }: TrendingCoinsProps) 
         <div className="flex items-center justify-between">
           <h2 className="text-2xl font-bold text-foreground">Trending Coins</h2>
           <div className="flex space-x-2">
-            <button className="px-3 py-1 text-sm rounded-md bg-muted hover:bg-muted/80 transition-colors">
+            <button className="px-3 py-1 text-sm rounded-md bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
               24H
             </button>
             <button className="px-3 py-1 text-sm rounded-md bg-primary text-primary-foreground">
@@ -150,13 +150,13 @@ export function TrendingCoins({ trendingCoins, isLoading }: TrendingCoinsProps) 
           </p>
         </div>
         <div className="flex space-x-2">
-          <button className="px-3 py-1 text-sm rounded-md bg-muted hover:bg-muted/80 transition-colors">
+          <button className="px-3 py-1 text-sm rounded-md bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
             24H
           </button>
           <button className="px-3 py-1 text-sm rounded-md bg-primary text-primary-foreground">
             1H
           </button>
-          <button className="px-3 py-1 text-sm rounded-md bg-muted hover:bg-muted/80 transition-colors">
+          <button className="px-3 py-1 text-sm rounded-md bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
             7D
           </button>
         </div>

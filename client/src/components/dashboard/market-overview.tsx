@@ -171,7 +171,7 @@ export function MarketOverview({ cryptoAssets, marketSummary, isLoading }: Marke
         <div className="flex items-center justify-between">
           <h2 className="text-2xl font-bold text-foreground">{t('dashboard.marketOverview')}</h2>
           <div className="flex space-x-2">
-            <button className="px-3 py-1 text-sm rounded-md bg-muted hover:bg-muted/80 transition-colors">
+            <button className="px-3 py-1 text-sm rounded-md bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
               24H
             </button>
             <button className="px-3 py-1 text-sm rounded-md bg-primary text-primary-foreground">
@@ -202,13 +202,13 @@ export function MarketOverview({ cryptoAssets, marketSummary, isLoading }: Marke
           </p>
         </div>
         <div className="flex space-x-2">
-          <button className="px-3 py-1 text-sm rounded-md bg-muted hover:bg-muted/80 transition-colors">
+          <button className="px-3 py-1 text-sm rounded-md bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
             24H
           </button>
           <button className="px-3 py-1 text-sm rounded-md bg-primary text-primary-foreground">
             7D
           </button>
-          <button className="px-3 py-1 text-sm rounded-md bg-muted hover:bg-muted/80 transition-colors">
+          <button className="px-3 py-1 text-sm rounded-md bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
             1M
           </button>
         </div>

@@ -70,7 +70,7 @@ function EconomicEventItem({ event }: { event: EconomicEvent }) {
 
   return (
     <div className={cn(
-      'flex items-center justify-between p-3 rounded-lg bg-muted/50 border-l-4 transition-colors hover:bg-muted',
+      'flex items-center justify-between p-3 rounded-lg bg-gray-100/50 dark:bg-gray-800/50 border-l-4 transition-colors hover:bg-gray-200 dark:hover:bg-gray-700',
       getBorderColor(event.impact)
     )}>
       <div className="flex items-center space-x-3 flex-1 min-w-0">

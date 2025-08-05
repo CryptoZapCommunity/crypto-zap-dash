@@ -169,7 +169,7 @@ function PortfolioAssetItem({ asset }: { asset: PortfolioAsset }) {
   };
 
   return (
-    <div className="p-4 rounded-lg bg-muted/50 hover:bg-muted/70 transition-colors border border-border/50">
+    <div className="p-4 rounded-lg bg-gray-100/50 dark:bg-gray-800/50 hover:bg-gray-200/70 dark:hover:bg-gray-700/70 transition-colors border border-border/50">
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center space-x-3">
           <CryptoIcon symbol={asset.symbol} size="md" />

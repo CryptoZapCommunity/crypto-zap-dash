@@ -62,7 +62,7 @@ export function Header({ onSidebarToggle, onRefresh }: HeaderProps) {
             variant="ghost"
             size="icon"
             onClick={onRefresh}
-            className="hover:bg-muted"
+            className="hover:bg-gray-100 dark:hover:bg-gray-800"
           >
             <RefreshCw className="w-5 h-5" />
           </Button>
@@ -71,7 +71,7 @@ export function Header({ onSidebarToggle, onRefresh }: HeaderProps) {
           <Button
             variant="ghost"
             size="icon"
-            className="relative hover:bg-muted"
+            className="relative hover:bg-gray-100 dark:hover:bg-gray-800"
           >
             <Bell className="w-5 h-5" />
             <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full"></span>

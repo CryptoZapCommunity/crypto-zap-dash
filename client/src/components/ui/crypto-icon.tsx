@@ -243,7 +243,7 @@ export function CryptoIcon({
 
   if (hasError || !iconUrl) {
     return (
-      <div className={`${sizeClasses[size]} rounded-full bg-muted flex items-center justify-center text-xs font-bold text-muted-foreground ${className}`}>
+      <div className={`${sizeClasses[size]} rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-xs font-bold text-gray-600 dark:text-gray-400 ${className}`}>
         {fallback || getFallbackText(symbol)}
       </div>
     );

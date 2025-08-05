@@ -250,7 +250,7 @@ function AlertItem({ alert, onMarkAsRead }: { alert: Alert; onMarkAsRead: (id: s
       className={cn(
         'p-3 rounded-lg transition-colors cursor-pointer border',
         alert.isRead 
-          ? 'bg-muted/30 hover:bg-muted/50 border-border/50' 
+          ? 'bg-gray-100/30 dark:bg-gray-800/30 hover:bg-gray-200/50 dark:hover:bg-gray-700/50 border-border/50' 
           : 'bg-accent/50 hover:bg-accent/70 border-accent/70'
       )}
       onClick={() => !alert.isRead && onMarkAsRead(alert.id)}

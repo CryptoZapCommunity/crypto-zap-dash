@@ -66,7 +66,7 @@ function NewsItem({ article }: { article: News }) {
   };
 
   return (
-    <div className="border-l-4 border-primary pl-4 py-3 hover:bg-muted/50 transition-colors rounded-r-lg table-row-hover">
+    <div className="border-l-4 border-primary pl-4 py-3 hover:bg-gray-100/50 dark:hover:bg-gray-800/50 transition-colors rounded-r-lg table-row-hover">
       <div className="flex items-start space-x-3">
         <div className="flex-shrink-0 text-lg">
           {getCountryFlag(article.country)}

@@ -78,7 +78,7 @@ export function ErrorFallback({
         </p>
         
         {error && import.meta.env.DEV && (
-          <details className="text-left bg-muted p-3 rounded-lg mb-4">
+          <details className="text-left bg-gray-100 dark:bg-gray-800 p-3 rounded-lg mb-4">
             <summary className="cursor-pointer text-sm font-medium text-muted-foreground">
               Error Details (Dev)
             </summary>

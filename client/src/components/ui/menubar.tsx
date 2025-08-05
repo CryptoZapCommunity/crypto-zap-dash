@@ -214,7 +214,7 @@ const MenubarSeparator = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <MenubarPrimitive.Separator
     ref={ref}
-    className={cn("-mx-1 my-1 h-px bg-muted", className)}
+    className={cn("-mx-1 my-1 h-px bg-gray-200 dark:bg-gray-700", className)}
     {...props}
   />
 ))
