@@ -1,5 +1,5 @@
 """
-Alerts Service - MISSING from original migration
+Alerts Service
 Handles user alerts and notifications system
 """
 
@@ -61,7 +61,7 @@ class AlertsService:
         self.alerts_cache = MOCK_ALERTS.copy()
     
     async def get_user_alerts(self, user_id: str = "default", limit: int = 20) -> List[Dict]:
-        """Get user alerts - MISSING from migration"""
+        """Get user alerts"""
         try:
             if settings.DEBUG:
                 print(f"🔔 Fetching alerts for user: {user_id}, limit: {limit}")
@@ -81,7 +81,7 @@ class AlertsService:
             return []
     
     async def create_alert(self, alert_data: dict) -> Dict:
-        """Create new alert - MISSING from migration"""
+        """Create new alert"""
         try:
             if settings.DEBUG:
                 print(f"🔔 Creating new alert: {alert_data}")
@@ -117,7 +117,7 @@ class AlertsService:
             raise Exception("Failed to create alert")
     
     async def mark_as_read(self, alert_id: str) -> bool:
-        """Mark alert as read - MISSING from migration"""
+        """Mark alert as read"""
         try:
             if settings.DEBUG:
                 print(f"🔔 Marking alert as read: {alert_id}")
@@ -140,7 +140,7 @@ class AlertsService:
             return False
     
     async def delete_alert(self, alert_id: str) -> bool:
-        """Delete alert - MISSING from migration"""
+        """Delete alert"""
         try:
             if settings.DEBUG:
                 print(f"🔔 Deleting alert: {alert_id}")
@@ -158,7 +158,7 @@ class AlertsService:
             return False
     
     async def mark_all_as_read(self, user_id: str = "default") -> bool:
-        """Mark all alerts as read - MISSING from migration"""
+        """Mark all alerts as read"""
         try:
             if settings.DEBUG:
                 print(f"🔔 Marking all alerts as read for user: {user_id}")
@@ -177,7 +177,7 @@ class AlertsService:
             return False
     
     async def get_alert_stats(self, user_id: str = "default") -> Dict:
-        """Get alert statistics - MISSING from migration"""
+        """Get alert statistics"""
         try:
             total_alerts = len(self.alerts_cache)
             unread_alerts = len([alert for alert in self.alerts_cache if not alert["isRead"]])

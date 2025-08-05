@@ -17,6 +17,46 @@ class AirdropService:
         self.coingecko_api_key = settings.COINGECKO_API_KEY
         self.airdrop_api_key = settings.AIRDROP_API_KEY
     
+    async def get_airdrops(self, status: str = None) -> List[Dict]:
+        """Get airdrops with optional status filter"""
+        try:
+            print("🎁 Fetching airdrops...")
+            
+            airdrops = []
+            
+            # 1. Try CoinGecko API for new token launches (potential airdrops)
+            if self.coingecko_api_key:
+                try:
+                    coingecko_airdrops = await self._get_coingecko_airdrops()
+                    airdrops.extend(coingecko_airdrops)
+                    print(f"✅ Retrieved {len(coingecko_airdrops)} CoinGecko airdrops")
+                except Exception as e:
+                    print(f"⚠️ CoinGecko airdrop fetch failed: {e}")
+            
+            # 2. Try dedicated airdrop APIs
+            if self.airdrop_api_key:
+                try:
+                    api_airdrops = await self._get_airdrop_api_data()
+                    airdrops.extend(api_airdrops)
+                    print(f"✅ Retrieved {len(api_airdrops)} API airdrops")
+                except Exception as e:
+                    print(f"⚠️ Airdrop API fetch failed: {e}")
+            
+            # 3. Use public data as fallback
+            if not airdrops:
+                airdrops = await self._get_public_airdrop_data()
+            
+            # Filter by status if specified
+            if status:
+                airdrops = [airdrop for airdrop in airdrops if airdrop.get("status") == status]
+            
+            print(f"🎁 Total airdrops: {len(airdrops)}")
+            return airdrops
+                
+        except Exception as error:
+            print(f"❌ Error fetching airdrops: {error}")
+            return []
+
     async def update_airdrops(self) -> List[Dict]:
         """Update airdrops from real APIs"""
         try:

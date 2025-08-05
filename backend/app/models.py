@@ -542,7 +542,7 @@ class AlertsResponse(ApiResponse):
     )
 
 
-# Portfolio Models - MISSING from migration
+# Portfolio Models
 class PortfolioAsset(BaseModel):
     """Portfolio asset model"""
     id: str
@@ -695,7 +695,7 @@ class PortfolioSummaryResponse(ApiResponse):
     )
 
 
-# Alert Create/Update Models - MISSING from migration
+# Alert Create/Update Models
 class AlertCreate(BaseModel):
     """Create alert model"""
     type: str  # price_target, volume_spike, whale_movement, news_sentiment, technical_indicator

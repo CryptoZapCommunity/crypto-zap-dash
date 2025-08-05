@@ -18,6 +18,49 @@ class EconomicService:
         self.fred_api_key = settings.FRED_API_KEY
         self.economic_calendar_api_key = settings.ECONOMIC_CALENDAR_API_KEY
     
+    async def get_economic_events(self, days: int = 7) -> List[Dict]:
+        """Get economic events for the specified number of days"""
+        try:
+            print(f"📅 Fetching economic events for {days} days...")
+            
+            events = []
+            
+            # 1. Try Alpha Vantage for economic indicators
+            if self.alpha_vantage_api_key:
+                try:
+                    alpha_events = await self._get_alpha_vantage_events()
+                    events.extend(alpha_events)
+                    print(f"✅ Retrieved {len(alpha_events)} Alpha Vantage events")
+                except Exception as e:
+                    print(f"⚠️ Alpha Vantage fetch failed: {e}")
+            
+            # 2. Try FRED API for Federal Reserve data
+            if self.fred_api_key:
+                try:
+                    fred_events = await self._get_fred_events()
+                    events.extend(fred_events)
+                    print(f"✅ Retrieved {len(fred_events)} FRED events")
+                except Exception as e:
+                    print(f"⚠️ FRED fetch failed: {e}")
+            
+            # 3. Use public APIs as fallback
+            if not events:
+                events = await self._get_public_economic_data()
+            
+            # Filter events for the specified number of days
+            cutoff_date = datetime.now() - timedelta(days=days)
+            filtered_events = [
+                event for event in events 
+                if datetime.fromisoformat(event.get("date", "2024-01-01")) >= cutoff_date
+            ]
+            
+            print(f"📅 Total economic events for {days} days: {len(filtered_events)}")
+            return filtered_events
+                
+        except Exception as error:
+            print(f"❌ Error fetching economic events: {error}")
+            return []
+
     async def update_economic_calendar(self) -> List[Dict]:
         """Update economic calendar from real APIs"""
         try:

@@ -116,7 +116,7 @@
   }
   
   .sentiment-neutral {
-    @apply text-muted-foreground bg-muted;
+    @apply text-gray-600 dark:text-gray-400 bg-gray-100 dark:bg-gray-800;
     border-color: var(--border);
   }
 
@@ -155,7 +155,7 @@
 
   /* Better table styling */
   .table-row-hover {
-    @apply hover:bg-muted transition-colors duration-150;
+    @apply hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-150;
   }
 
   /* Enhanced form elements */
@@ -339,7 +339,7 @@
 }
 
 ::-webkit-scrollbar-track {
-  @apply bg-muted;
+  @apply bg-gray-200 dark:bg-gray-700;
 }
 
 ::-webkit-scrollbar-thumb {
@@ -347,7 +347,7 @@
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  @apply bg-muted-foreground;
+  @apply bg-gray-400 dark:bg-gray-600;
 }
 
 /* Custom chart styling */

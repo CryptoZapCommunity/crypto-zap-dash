@@ -74,7 +74,7 @@ services:
     env_file:
       - .env
     environment:
-      - VITE_API_BASE_URL=${VITE_API_BASE_URL:-http://localhost:5000/api}
+      - VITE_API_BASE_URL=${VITE_API_BASE_URL:-http://backend:5000/api}
       - VITE_API_TIMEOUT=${VITE_API_TIMEOUT:-10000}
       - VITE_DEBUG=${VITE_DEBUG:-false}
       - VITE_MOCK_API=${VITE_MOCK_API:-false}
@@ -89,7 +89,7 @@ services:
       - crypto-network
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3000", "--max-time", "10"]
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://0.0.0.0:3000 || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 3

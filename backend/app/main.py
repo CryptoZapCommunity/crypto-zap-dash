@@ -856,7 +856,7 @@ async def get_portfolio_summary():
         raise HTTPException(status_code=500, detail="Failed to fetch portfolio summary")
 
 
-# Sentiment Analysis endpoints - MISSING from migration
+# Sentiment Analysis endpoints
 @app.get(
     "/api/sentiment/analyze",
     response_model=ApiResponse,
@@ -864,7 +864,7 @@ async def get_portfolio_summary():
     description="Analyze sentiment of provided text"
 )
 async def analyze_sentiment(text: str = Query(..., description="Text to analyze")):
-    """Analyze sentiment of text - MISSING from migration"""
+    """Analyze sentiment of text - ✅ Implementado"""
     try:
         sentiment_data = await sentiment_service.analyze_news_sentiment(text)
         
@@ -886,8 +886,8 @@ async def analyze_sentiment(text: str = Query(..., description="Text to analyze"
     summary="Get Market Sentiment",
     description="Get overall market sentiment analysis"
 )
-async def get_market_sentiment():
-    """Get market sentiment - MISSING from migration"""
+async def get_sentiment_market():
+    """Get market sentiment - ✅ Implementado"""
     try:
         sentiment_data = await sentiment_service.get_market_sentiment()
         
@@ -910,7 +910,7 @@ async def get_market_sentiment():
     description="Get sentiment analysis for specific cryptocurrency"
 )
 async def get_crypto_sentiment(symbol: str):
-    """Get crypto sentiment - MISSING from migration"""
+    """Get crypto sentiment - ✅ Implementado"""
     try:
         sentiment_data = await sentiment_service.analyze_crypto_sentiment(symbol)
         
@@ -936,7 +936,7 @@ async def get_sentiment_history(
     symbol: str,
     days: int = Query(7, ge=1, le=30, description="Number of days to retrieve")
 ):
-    """Get sentiment history - MISSING from migration"""
+    """Get sentiment history - ✅ Implementado"""
     try:
         history_data = await sentiment_service.get_sentiment_history(symbol, days)
         
@@ -959,7 +959,7 @@ async def get_sentiment_history(
     description="Compare sentiment across multiple cryptocurrencies"
 )
 async def compare_sentiment(symbols: str = Query(..., description="Comma-separated list of crypto symbols")):
-    """Compare sentiment - MISSING from migration"""
+    """Compare sentiment - ✅ Implementado"""
     try:
         symbol_list = [s.strip().upper() for s in symbols.split(",")]
         comparison_data = await sentiment_service.get_sentiment_comparison(symbol_list)
@@ -976,7 +976,7 @@ async def compare_sentiment(symbols: str = Query(..., description="Comma-separat
         raise HTTPException(status_code=500, detail="Failed to compare sentiment")
 
 
-# Chart data endpoints - missing from migration
+# Chart data endpoints
 @app.get(
     "/api/charts/{symbol}",
     response_model=ApiResponse,
@@ -984,7 +984,7 @@ async def compare_sentiment(symbols: str = Query(..., description="Comma-separat
     description="Get historical chart data for a specific cryptocurrency"
 )
 async def get_chart_data(symbol: str):
-    """Chart data endpoint - restored from original"""
+    """Chart data endpoint - ✅ Implementado"""
     try:
         chart_data = await crypto_service.get_chart_data(symbol)
         
@@ -1000,7 +1000,7 @@ async def get_chart_data(symbol: str):
         raise HTTPException(status_code=500, detail=f"Failed to fetch chart data for {symbol}")
 
 
-# Candlestick data endpoints - missing from migration  
+# Candlestick data endpoints  
 @app.get(
     "/api/candlestick/{symbol}",
     response_model=ApiResponse,
@@ -1012,7 +1012,7 @@ async def get_candlestick_data(
     timeframe: Optional[str] = Query("1h", description="Timeframe (1m, 5m, 15m, 1h, 4h, 1d)"),
     limit: Optional[int] = Query(100, description="Number of candles to return")
 ):
-    """Candlestick data endpoint - restored from original"""
+    """Candlestick data endpoint - ✅ Implementado"""
     try:
         candlestick_data = await crypto_service.get_candlestick_data(symbol, timeframe, limit)
         
@@ -1028,7 +1028,7 @@ async def get_candlestick_data(
         raise HTTPException(status_code=500, detail=f"Failed to fetch candlestick data for {symbol}")
 
 
-# Market analysis endpoint - missing from migration
+# Market analysis endpoint
 @app.get(
     "/api/market-analysis",
     response_model=ApiResponse,
@@ -1036,7 +1036,7 @@ async def get_candlestick_data(
     description="Get comprehensive market analysis and insights"
 )
 async def get_market_analysis():
-    """Market analysis endpoint - restored from original"""
+    """Market analysis endpoint - ✅ Implementado"""
     try:
         analysis_data = await crypto_service.get_market_analysis()
         
@@ -1052,7 +1052,7 @@ async def get_market_analysis():
         raise HTTPException(status_code=500, detail="Failed to fetch market analysis")
 
 
-# Market sentiment endpoint - missing from migration
+# Market sentiment endpoint
 @app.get(
     "/api/market-sentiment",
     response_model=ApiResponse,
@@ -1060,7 +1060,7 @@ async def get_market_analysis():
     description="Get current market sentiment indicators"
 )
 async def get_market_sentiment():
-    """Market sentiment endpoint - restored from original"""
+    """Market sentiment endpoint - ✅ Implementado"""
     try:
         sentiment_data = await crypto_service.get_market_sentiment()
         

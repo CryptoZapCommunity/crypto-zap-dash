@@ -1,5 +1,5 @@
 """
-Portfolio Service - MISSING from original migration
+Portfolio Service
 Handles user portfolio and asset tracking
 """
 
@@ -63,7 +63,7 @@ class PortfolioService:
         self.crypto_service = crypto_service
     
     async def get_user_portfolio(self, user_id: str = "default") -> List[Dict]:
-        """Get user portfolio - MISSING from migration"""
+        """Get user portfolio"""
         try:
             if settings.DEBUG:
                 print(f"💼 Fetching portfolio for user: {user_id}")
@@ -83,7 +83,7 @@ class PortfolioService:
             return []
     
     async def add_asset(self, user_id: str, asset_data: dict) -> Dict:
-        """Add asset to portfolio - MISSING from migration"""
+        """Add asset to portfolio"""
         try:
             if settings.DEBUG:
                 print(f"💼 Adding asset to portfolio: {asset_data}")
@@ -127,7 +127,7 @@ class PortfolioService:
             raise Exception("Failed to add asset to portfolio")
     
     async def update_asset(self, asset_id: str, asset_data: dict) -> Dict:
-        """Update portfolio asset - MISSING from migration"""
+        """Update portfolio asset"""
         try:
             if settings.DEBUG:
                 print(f"💼 Updating asset: {asset_id}")
@@ -160,7 +160,7 @@ class PortfolioService:
             return {}
     
     async def remove_asset(self, asset_id: str) -> bool:
-        """Remove asset from portfolio - MISSING from migration"""
+        """Remove asset from portfolio"""
         try:
             if settings.DEBUG:
                 print(f"💼 Removing asset: {asset_id}")
@@ -184,7 +184,7 @@ class PortfolioService:
             return False
     
     async def get_portfolio_summary(self, user_id: str = "default") -> Dict:
-        """Get portfolio summary - MISSING from migration"""
+        """Get portfolio summary"""
         try:
             if settings.DEBUG:
                 print(f"💼 Getting portfolio summary for user: {user_id}")
@@ -257,7 +257,7 @@ class PortfolioService:
                 print(f"❌ Error updating portfolio prices: {error}")
     
     async def get_watchlist(self, user_id: str = "default") -> List[Dict]:
-        """Get user watchlist - MISSING from migration"""
+        """Get user watchlist"""
         try:
             if settings.DEBUG:
                 print(f"👀 Fetching watchlist for user: {user_id}")
@@ -276,7 +276,7 @@ class PortfolioService:
             return []
     
     async def toggle_watchlist(self, asset_id: str) -> bool:
-        """Toggle asset in watchlist - MISSING from migration"""
+        """Toggle asset in watchlist"""
         try:
             if settings.DEBUG:
                 print(f"👀 Toggling watchlist for asset: {asset_id}")

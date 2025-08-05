@@ -768,14 +768,12 @@ class CryptoService:
             # Return sentiment data in the format expected by frontend
             sentiment_data = {
                 "overall": int(overall_sentiment),  # Overall sentiment score 0-100
-                "btc_sentiment": int(50 + (btc_change * 2)),  # BTC-specific sentiment
-                "eth_sentiment": int(50 + (eth_change * 1.5)),  # ETH-specific sentiment
-                "news_sentiment": 72,  # 0-100
-                "social_sentiment": 65,  # 0-100
-                "technical_sentiment": 68,  # 0-100
                 "fear_greed_index": int(overall_sentiment),  # 0-100
-                "market_mood": "bullish" if overall_sentiment > 60 else "bearish" if overall_sentiment < 40 else "neutral",
-                "last_updated": datetime.utcnow().isoformat()
+                "social_mentions": 1250,  # Mock social mentions count
+                "news_sentiment": 72,  # 0-100
+                "whale_activity": "bullish" if overall_sentiment > 60 else "bearish" if overall_sentiment < 40 else "neutral",
+                "technical_indicators": "bullish" if overall_sentiment > 60 else "bearish" if overall_sentiment < 40 else "neutral",
+                "updated_at": datetime.utcnow().isoformat()
             }
             
             print("✅ Market sentiment retrieved")
@@ -786,14 +784,12 @@ class CryptoService:
             # Return mock data as fallback
             return {
                 "overall": 50,
-                "btc_sentiment": 50,
-                "eth_sentiment": 50,
-                "news_sentiment": 50,
-                "social_sentiment": 50,
-                "technical_sentiment": 50,
                 "fear_greed_index": 50,
-                "market_mood": "neutral",
-                "last_updated": datetime.utcnow().isoformat()
+                "social_mentions": 1000,
+                "news_sentiment": 50,
+                "whale_activity": "neutral",
+                "technical_indicators": "neutral",
+                "updated_at": datetime.utcnow().isoformat()
             }
 
     async def get_individual_crypto_data(self, coin_id: str) -> Dict:

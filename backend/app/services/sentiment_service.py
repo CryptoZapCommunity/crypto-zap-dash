@@ -1,5 +1,5 @@
 """
-Sentiment Service - MISSING from original migration
+Sentiment Service
 Handles sentiment analysis for news and market data
 """
 
@@ -17,7 +17,7 @@ class SentimentService:
         self.base_url = "https://api.coingecko.com/api/v3"
     
     async def analyze_news_sentiment(self, text: str) -> Dict:
-        """Analyze sentiment of news text - MISSING from migration"""
+        """Analyze sentiment of news text"""
         try:
             if settings.DEBUG:
                 print(f"💭 Analyzing news sentiment for text: {text[:100]}...")
@@ -75,7 +75,7 @@ class SentimentService:
             }
     
     async def get_market_sentiment(self) -> Dict:
-        """Get overall market sentiment - MISSING from migration"""
+        """Get overall market sentiment"""
         try:
             if settings.DEBUG:
                 print("💭 Getting market sentiment...")
@@ -129,7 +129,7 @@ class SentimentService:
             }
     
     async def analyze_crypto_sentiment(self, symbol: str) -> Dict:
-        """Analyze sentiment for specific cryptocurrency - MISSING from migration"""
+        """Analyze sentiment for specific cryptocurrency"""
         try:
             if settings.DEBUG:
                 print(f"💭 Analyzing sentiment for {symbol}...")
@@ -178,7 +178,7 @@ class SentimentService:
             }
     
     async def get_sentiment_history(self, symbol: str, days: int = 7) -> List[Dict]:
-        """Get sentiment history for cryptocurrency - MISSING from migration"""
+        """Get sentiment history for cryptocurrency"""
         try:
             if settings.DEBUG:
                 print(f"💭 Getting sentiment history for {symbol} ({days} days)...")
@@ -215,7 +215,7 @@ class SentimentService:
             return []
     
     async def get_sentiment_comparison(self, symbols: List[str]) -> Dict:
-        """Compare sentiment across multiple cryptocurrencies - MISSING from migration"""
+        """Compare sentiment across multiple cryptocurrencies"""
         try:
             if settings.DEBUG:
                 print(f"💭 Comparing sentiment for {symbols}...")
