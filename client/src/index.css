@@ -119,6 +119,75 @@
     @apply text-muted-foreground bg-muted;
     border-color: var(--border);
   }
+
+  /* Enhanced card hover effects */
+  .card-hover {
+    @apply transition-all duration-300 ease-out;
+  }
+  
+  .card-hover:hover {
+    @apply transform scale-[1.02] shadow-lg;
+  }
+
+  /* Smooth transitions for all interactive elements */
+  .smooth-transition {
+    @apply transition-all duration-200 ease-in-out;
+  }
+
+  /* Loading states with better visual feedback */
+  .loading-pulse {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+
+  /* Enhanced button states */
+  .btn-primary {
+    @apply bg-primary text-primary-foreground hover:bg-primary/90 active:scale-95 transition-all duration-150;
+  }
+
+  .btn-secondary {
+    @apply bg-secondary text-secondary-foreground hover:bg-secondary/80 active:scale-95 transition-all duration-150;
+  }
+
+  /* Improved focus states */
+  .focus-ring {
+    @apply focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background;
+  }
+
+  /* Better table styling */
+  .table-row-hover {
+    @apply hover:bg-muted transition-colors duration-150;
+  }
+
+  /* Enhanced form elements */
+  .input-enhanced {
+    @apply transition-all duration-200 focus:ring-2 focus:ring-primary focus:border-primary;
+  }
+
+  /* Better modal animations */
+  .modal-enter {
+    animation: modalEnter 0.3s ease-out;
+  }
+
+  .modal-exit {
+    animation: modalExit 0.2s ease-in;
+  }
+
+  /* Improved skeleton loading */
+  .skeleton-enhanced {
+    @apply relative overflow-hidden;
+  }
+
+  .skeleton-enhanced::after {
+    content: '';
+    @apply absolute inset-0 -translate-x-full;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.1),
+      transparent
+    );
+    animation: shimmer 1.5s infinite;
+  }
 }
 
 @layer utilities {
@@ -132,6 +201,34 @@
   
   .animate-slide-up {
     animation: slideUp 0.3s ease-out;
+  }
+
+  .animate-slide-down {
+    animation: slideDown 0.3s ease-out;
+  }
+
+  .animate-slide-left {
+    animation: slideLeft 0.3s ease-out;
+  }
+
+  .animate-slide-right {
+    animation: slideRight 0.3s ease-out;
+  }
+
+  .animate-bounce-gentle {
+    animation: bounceGentle 0.6s ease-in-out;
+  }
+
+  .animate-rotate-slow {
+    animation: rotate 2s linear infinite;
+  }
+
+  .animate-scale-in {
+    animation: scaleIn 0.2s ease-out;
+  }
+
+  .animate-scale-out {
+    animation: scaleOut 0.2s ease-in;
   }
   
   @keyframes fadeIn {
@@ -151,6 +248,86 @@
     }
     100% { 
       transform: translateY(0); 
+    }
+  }
+
+  @keyframes slideDown {
+    0% { 
+      transform: translateY(-100%); 
+    }
+    100% { 
+      transform: translateY(0); 
+    }
+  }
+
+  @keyframes slideLeft {
+    0% { 
+      transform: translateX(100%); 
+    }
+    100% { 
+      transform: translateX(0); 
+    }
+  }
+
+  @keyframes slideRight {
+    0% { 
+      transform: translateX(-100%); 
+    }
+    100% { 
+      transform: translateX(0); 
+    }
+  }
+
+  @keyframes bounceGentle {
+    0%, 100% { 
+      transform: translateY(0); 
+    }
+    50% { 
+      transform: translateY(-5px); 
+    }
+  }
+
+  @keyframes scaleIn {
+    0% { 
+      transform: scale(0.9); 
+      opacity: 0; 
+    }
+    100% { 
+      transform: scale(1); 
+      opacity: 1; 
+    }
+  }
+
+  @keyframes scaleOut {
+    0% { 
+      transform: scale(1); 
+      opacity: 1; 
+    }
+    100% { 
+      transform: scale(0.9); 
+      opacity: 0; 
+    }
+  }
+
+  @keyframes modalEnter {
+    0% { 
+      opacity: 0; 
+      transform: scale(0.95) translateY(-10px); 
+    }
+    100% { 
+      opacity: 1; 
+      transform: scale(1) translateY(0); 
+    }
+  }
+
+  @keyframes modalExit {
+    0% { 
+      opacity: 1; 
+      transform: scale(1) translateY(0); 
+    }
+    100% { 
+      opacity: 0; 
+      transform: scale(0.95) translateY(-10px); 
     }
   }
 }
@@ -200,5 +377,69 @@
   }
   100% {
     background-position: 200% 0;
+  }
+}
+
+/* Responsive improvements */
+@media (max-width: 768px) {
+  .card-hover:hover {
+    @apply transform-none;
+  }
+  
+  .animate-slide-up,
+  .animate-slide-down,
+  .animate-slide-left,
+  .animate-slide-right {
+    animation: none;
+  }
+}
+
+/* Print styles */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  
+  .print-break {
+    page-break-before: always;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .glassmorphism {
+    @apply bg-card border-2 border-border;
+  }
+  
+  .btn-primary {
+    @apply border-2 border-primary;
+  }
+  
+  .btn-secondary {
+    @apply border-2 border-secondary;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  
+  .animate-fade-in,
+  .animate-slide-up,
+  .animate-slide-down,
+  .animate-slide-left,
+  .animate-slide-right,
+  .animate-bounce-gentle,
+  .animate-scale-in,
+  .animate-scale-out,
+  .modal-enter,
+  .modal-exit {
+    animation: none !important;
   }
 }

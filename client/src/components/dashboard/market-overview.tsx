@@ -1,5 +1,5 @@
 import { Card, CardContent } from '@/components/ui/card';
-import { Skeleton } from '@/components/ui/loading-skeleton';
+import { CryptoAssetSkeleton } from '@/components/ui/loading-skeleton';
 import { CryptoIcon } from '@/components/ui/crypto-icon';
 import { t } from '@/lib/i18n';
 import { TrendingUp } from 'lucide-react';
@@ -52,11 +52,11 @@ function CryptoAssetCard({ asset }: { asset: CryptoAsset }) {
   const isPositive = change >= 0;
 
   return (
-    <Card className="glassmorphism hover:scale-105 transition-transform duration-200">
+    <Card className="glassmorphism card-hover">
       <CardContent className="p-6">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center space-x-3">
-            <CryptoIcon symbol={asset.symbol} size="md" /> {/* Reduced from lg to md */}
+            <CryptoIcon symbol={asset.symbol} size="md" />
             <div>
               <h3 className="font-semibold text-foreground">{asset.name}</h3>
               <p className="text-sm text-muted-foreground">{asset.symbol.toUpperCase()}</p>
@@ -131,7 +131,7 @@ function MarketCapCard({ marketSummary }: { marketSummary: MarketSummary }) {
   const isPositive = change >= 0;
 
   return (
-    <Card className="glassmorphism hover:scale-105 transition-transform duration-200">
+    <Card className="glassmorphism card-hover">
       <CardContent className="p-6">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center space-x-3">
@@ -167,10 +167,23 @@ function MarketCapCard({ marketSummary }: { marketSummary: MarketSummary }) {
 export function MarketOverview({ cryptoAssets, marketSummary, isLoading }: MarketOverviewProps) {
   if (isLoading) {
     return (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {[1, 2, 3, 4].map((i) => (
-          <Skeleton key={i} className="h-40 rounded-xl" />
-        ))}
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <h2 className="text-2xl font-bold text-foreground">{t('dashboard.marketOverview')}</h2>
+          <div className="flex space-x-2">
+            <button className="px-3 py-1 text-sm rounded-md bg-muted hover:bg-muted/80 transition-colors">
+              24H
+            </button>
+            <button className="px-3 py-1 text-sm rounded-md bg-primary text-primary-foreground">
+              7D
+            </button>
+          </div>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {[1, 2, 3, 4].map((i) => (
+            <CryptoAssetSkeleton key={i} />
+          ))}
+        </div>
       </div>
     );
   }
@@ -179,14 +192,101 @@ export function MarketOverview({ cryptoAssets, marketSummary, isLoading }: Marke
   const filteredAssets = (Array.isArray(cryptoAssets) ? cryptoAssets : []).filter(asset => mainAssets.includes(asset.id));
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                  {(Array.isArray(filteredAssets) ? filteredAssets : []).map((asset) => (
-        <CryptoAssetCard key={asset.id} asset={asset} />
-      ))}
-      
-      {marketSummary && (
-        <MarketCapCard marketSummary={marketSummary} />
-      )}
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-2xl font-bold text-foreground">{t('dashboard.marketOverview')}</h2>
+          <p className="text-muted-foreground">
+            {marketSummary ? `Market Cap: $${(parseFloat(marketSummary.totalMarketCap) / 1e12).toFixed(2)}T` : 'Loading market data...'}
+          </p>
+        </div>
+        <div className="flex space-x-2">
+          <button className="px-3 py-1 text-sm rounded-md bg-muted hover:bg-muted/80 transition-colors">
+            24H
+          </button>
+          <button className="px-3 py-1 text-sm rounded-md bg-primary text-primary-foreground">
+            7D
+          </button>
+          <button className="px-3 py-1 text-sm rounded-md bg-muted hover:bg-muted/80 transition-colors">
+            1M
+          </button>
+        </div>
+      </div>
+
+      {/* Market Stats Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        {marketSummary && (
+          <>
+            <div className="glassmorphism rounded-xl p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-muted-foreground">Market Cap</p>
+                  <p className="text-lg font-bold text-foreground">
+                    ${(parseFloat(marketSummary.totalMarketCap) / 1e12).toFixed(2)}T
+                  </p>
+                </div>
+                <div className="w-8 h-8 bg-blue-500/20 rounded-full flex items-center justify-center">
+                  <span className="text-blue-500 text-sm">📊</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="glassmorphism rounded-xl p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-muted-foreground">24h Volume</p>
+                  <p className="text-lg font-bold text-foreground">
+                    ${(parseFloat(marketSummary.totalVolume24h) / 1e9).toFixed(2)}B
+                  </p>
+                </div>
+                <div className="w-8 h-8 bg-green-500/20 rounded-full flex items-center justify-center">
+                  <span className="text-green-500 text-sm">📈</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="glassmorphism rounded-xl p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-muted-foreground">BTC Dominance</p>
+                  <p className="text-lg font-bold text-foreground">
+                    {parseFloat(marketSummary.btcDominance || '0').toFixed(1)}%
+                  </p>
+                </div>
+                <div className="w-8 h-8 bg-orange-500/20 rounded-full flex items-center justify-center">
+                  <span className="text-orange-500 text-sm">₿</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="glassmorphism rounded-xl p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-muted-foreground">Fear & Greed</p>
+                  <p className="text-lg font-bold text-foreground">
+                    {marketSummary.fearGreedIndex || 50}
+                  </p>
+                </div>
+                <div className="w-8 h-8 bg-purple-500/20 rounded-full flex items-center justify-center">
+                  <span className="text-purple-500 text-sm">😱</span>
+                </div>
+              </div>
+            </div>
+          </>
+        )}
+      </div>
+
+      {/* Crypto Assets Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {(Array.isArray(filteredAssets) ? filteredAssets : []).map((asset) => (
+          <CryptoAssetCard key={asset.id} asset={asset} />
+        ))}
+        
+        {marketSummary && (
+          <MarketCapCard marketSummary={marketSummary} />
+        )}
+      </div>
     </div>
   );
 }

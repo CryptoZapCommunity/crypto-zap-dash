@@ -17,7 +17,7 @@ interface WhaleActivityProps {
 function WhaleTransactionItem({ transaction }: { transaction: WhaleTransaction }) {
 
   const getTypeIcon = (type: string) => {
-    switch (type.toLowerCase()) {
+    switch (type?.toLowerCase()) {
       case 'inflow':
         return <ArrowDownLeft className="w-3 h-3" />;
       case 'outflow':
@@ -30,7 +30,7 @@ function WhaleTransactionItem({ transaction }: { transaction: WhaleTransaction }
   };
 
   const getTypeColor = (type: string) => {
-    switch (type.toLowerCase()) {
+    switch (type?.toLowerCase()) {
       case 'inflow':
         return 'bg-green-500/20 text-green-600 border-green-500/30';
       case 'outflow':
@@ -48,7 +48,7 @@ function WhaleTransactionItem({ transaction }: { transaction: WhaleTransaction }
       outflow: t('whale.outflow'),
       transfer: t('whale.transfer'),
     };
-    return translations[type.toLowerCase() as keyof typeof translations] || type;
+    return translations[type?.toLowerCase() as keyof typeof translations] || type;
   };
 
   const formatTimeAgo = (dateString: string) => {
@@ -110,7 +110,9 @@ function WhaleTransactionItem({ transaction }: { transaction: WhaleTransaction }
   const openTransaction = () => {
     if (transaction.transactionHash) {
       // This would open a blockchain explorer - for now just log
+      if (import.meta.env.DEV) {
       console.log('Opening transaction:', transaction.transactionHash);
+    }
     }
   };
 

@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Skeleton } from '@/components/ui/loading-skeleton';
+import { NewsSkeleton } from '@/components/ui/loading-skeleton';
 import { t } from '@/lib/i18n';
 import { COUNTRY_FLAGS } from '@/types';
 import { Newspaper, ExternalLink } from 'lucide-react';
@@ -16,7 +16,7 @@ interface NewsSectionProps {
 
 function NewsItem({ article }: { article: News }) {
   const getImpactColor = (impact: string) => {
-    switch (impact.toLowerCase()) {
+    switch (impact?.toLowerCase()) {
       case 'high':
         return 'border-red-500 bg-red-500/10 text-red-600';
       case 'medium':
@@ -30,7 +30,7 @@ function NewsItem({ article }: { article: News }) {
 
   const getSentimentColor = (sentiment: string | null) => {
     if (!sentiment) return '';
-    switch (sentiment.toLowerCase()) {
+    switch (sentiment?.toLowerCase()) {
       case 'positive':
         return 'text-green-600';
       case 'negative':
@@ -62,11 +62,11 @@ function NewsItem({ article }: { article: News }) {
       medium: t('impact.medium'),
       low: t('impact.low'),
     };
-    return translations[impact.toLowerCase() as keyof typeof translations] || impact;
+    return translations[impact?.toLowerCase() as keyof typeof translations] || impact;
   };
 
   return (
-    <div className="border-l-4 border-primary pl-4 py-3 hover:bg-muted/50 transition-colors rounded-r-lg">
+    <div className="border-l-4 border-primary pl-4 py-3 hover:bg-muted/50 transition-colors rounded-r-lg table-row-hover">
       <div className="flex items-start space-x-3">
         <div className="flex-shrink-0 text-lg">
           {getCountryFlag(article.country)}
@@ -122,33 +122,24 @@ export function NewsSection({ news, isLoading }: NewsSectionProps) {
       <Card className="glassmorphism">
         <CardHeader className="pb-4">
           <div className="flex items-center justify-between">
-            <Skeleton className="w-32 h-6" />
-            <Skeleton className="w-16 h-4" />
+            <div className="flex items-center space-x-2">
+              <Newspaper className="w-5 h-5" />
+              <div className="w-32 h-6 bg-muted rounded" />
+            </div>
+            <div className="w-16 h-4 bg-muted rounded" />
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
-          {[1, 2, 3].map((i) => (
-            <div key={i} className="border-l-4 border-gray-300 pl-4 py-2 space-y-2">
-              <div className="flex items-start space-x-3">
-                <Skeleton className="w-6 h-6 rounded-full flex-shrink-0" />
-                <div className="flex-1 space-y-2">
-                  <Skeleton className="w-full h-4" />
-                  <Skeleton className="w-3/4 h-3" />
-                  <div className="flex items-center justify-between">
-                    <Skeleton className="w-16 h-3" />
-                    <Skeleton className="w-20 h-5 rounded-full" />
-                  </div>
-                </div>
-              </div>
-            </div>
-          ))}
+          <NewsSkeleton />
+          <NewsSkeleton />
+          <NewsSkeleton />
         </CardContent>
       </Card>
     );
   }
 
   return (
-    <Card className="glassmorphism">
+    <Card className="glassmorphism card-hover">
       <CardHeader className="pb-4">
         <div className="flex items-center justify-between">
           <CardTitle className="text-lg font-semibold text-foreground flex items-center">

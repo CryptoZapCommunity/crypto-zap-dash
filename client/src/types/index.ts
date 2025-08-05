@@ -93,10 +93,10 @@ export interface TrendingCoin {
   id: string;
   name: string;
   symbol: string;
-  price: number;
+  price: string;
   marketCapRank?: number;
   image?: string;
-  priceChange24h: number;
+  priceChange24h: string;
 }
 
 export interface TrendingCoins {
@@ -104,11 +104,127 @@ export interface TrendingCoins {
   losers: TrendingCoin[];
 }
 
-export interface WebSocketMessage {
-  type: string;
-  data: any;
-  timestamp: number;
+export interface PortfolioAsset {
+  id: string;
+  symbol: string;
+  name: string;
+  amount: number;
+  avgPrice: number;
+  currentPrice: number;
+  value: number;
+  change24h: number;
+  isWatching: boolean;
 }
+
+export interface Alert {
+  id: string;
+  type: 'price_target' | 'volume_spike' | 'whale_movement' | 'news_sentiment' | 'technical_indicator';
+  priority: 'low' | 'medium' | 'high' | 'critical';
+  asset?: string;
+  title: string;
+  message: string;
+  timestamp: string;
+  isRead: boolean;
+  value?: string;
+  change?: number;
+}
+
+// API Response types
+export interface ApiResponse<T> {
+  success: boolean;
+  data: T;
+  message?: string;
+  error?: string;
+}
+
+export interface MarketDataResponse {
+  marketSummary: MarketSummary;
+  cryptoAssets: CryptoAsset[];
+}
+
+export interface NewsResponse {
+  news: News[];
+  total: number;
+  page: number;
+  limit: number;
+}
+
+export interface EconomicCalendarResponse {
+  events: EconomicEvent[];
+  total: number;
+  page: number;
+  limit: number;
+}
+
+export interface WhaleTransactionsResponse {
+  transactions: WhaleTransaction[];
+  total: number;
+  page: number;
+  limit: number;
+}
+
+export interface AirdropsResponse {
+  airdrops: Airdrop[];
+  total: number;
+  page: number;
+  limit: number;
+}
+
+export interface FedUpdatesResponse {
+  updates: FedUpdate[];
+  total: number;
+  page: number;
+  limit: number;
+}
+
+// Chart data types
+export interface ChartData {
+  symbol: string;
+  name: string;
+  price: string;
+  sparklineData: number[];
+  timeframes: {
+    '1D': number[];
+    '7D': number[];
+    '1M': number[];
+    '1Y': number[];
+  };
+}
+
+// Market sentiment types
+export interface MarketSentiment {
+  fearGreedIndex: number;
+  sentiment: 'fear' | 'neutral' | 'greed' | 'extreme_fear' | 'extreme_greed';
+  timestamp: string;
+  description: string;
+}
+
+export interface SentimentData {
+  overall: number; // 0-100
+  fear_greed_index: number; // 0-100
+  social_mentions: number;
+  news_sentiment: number; // 0-100
+  whale_activity: 'bullish' | 'bearish' | 'neutral';
+  technical_indicators: 'bullish' | 'bearish' | 'neutral';
+  updated_at: string;
+}
+
+// Technical indicators
+export interface TechnicalIndicator {
+  symbol: string;
+  indicator: string;
+  value: number;
+  signal: 'buy' | 'sell' | 'neutral';
+  strength: number;
+  timestamp: string;
+}
+
+// WebSocket message interface (currently not used - polling is used instead)
+// export interface WebSocketMessage {
+//   type: string;
+//   data: any;
+//   timestamp: number;
+// }
 
 export type Language = 'en' | 'pt';
 
@@ -132,3 +248,33 @@ export const COUNTRY_FLAGS: CountryFlag = {
   ES: '🇪🇸',
   BR: '🇧🇷',
 };
+
+// Utility types for validation
+export type ValidatedData<T> = {
+  data: T;
+  isValid: boolean;
+  errors: string[];
+};
+
+// Hook return types
+export interface UseQueryResult<T> {
+  data: T | null;
+  isLoading: boolean;
+  error: Error | null;
+  refetch: () => void;
+  clearCache: () => void;
+}
+
+// Component prop types
+export interface LoadingProps {
+  isLoading: boolean;
+  error?: Error | null;
+  retry?: () => void;
+}
+
+export interface DataProps<T> {
+  data: T;
+  isLoading: boolean;
+  error?: Error | null;
+  retry?: () => void;
+}

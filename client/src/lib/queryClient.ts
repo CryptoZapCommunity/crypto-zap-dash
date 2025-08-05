@@ -45,12 +45,12 @@ export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       queryFn: getQueryFn({ on401: "throw" }),
-      refetchInterval: false, // Disabled - WebSocket handles updates
+      refetchInterval: false, // Disabled - polling handles updates
       refetchOnWindowFocus: false,
-      staleTime: 10 * 60 * 1000, // 10 minutes (increased)
-      retry: 1,
-      retryDelay: 2000, // 2 second delay
-      gcTime: 15 * 60 * 1000, // 15 minutes garbage collection
+      staleTime: import.meta.env.VITE_CACHE_DURATION ? parseInt(import.meta.env.VITE_CACHE_DURATION) : 5 * 60 * 1000, // 5 minutes (reduced)
+      retry: 2,
+      retryDelay: 1000, // 1 second delay (reduced)
+      gcTime: 10 * 60 * 1000, // 10 minutes garbage collection (reduced)
     },
     mutations: {
       retry: 1,

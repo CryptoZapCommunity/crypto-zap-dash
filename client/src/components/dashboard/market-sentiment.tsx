@@ -5,6 +5,7 @@ import { t } from '@/lib/i18n';
 import { TrendingUp, TrendingDown, Heart, Brain, Users, BarChart3 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useEffect, useState } from 'react';
+import { apiClient } from '@/lib/api';
 
 interface SentimentData {
   overall: number; // 0-100
@@ -34,10 +35,9 @@ export function MarketSentiment({ sentiment: propSentiment, isLoading: propIsLoa
 
       setIsLoading(true);
       try {
-        const response = await fetch('/api/market-sentiment');
-        if (response.ok) {
-          const data = await response.json();
-          setSentiment(data);
+        const response = await apiClient.getMarketSentiment();
+        if (response && response.success && response.data) {
+          setSentiment(response.data);
         } else {
           console.error('Failed to fetch market sentiment');
           setSentiment(null);

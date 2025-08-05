@@ -15,6 +15,12 @@ export const translations = {
       theme: 'Theme',
       dark: 'Dark',
       light: 'Light',
+      noData: 'No data available',
+      errorMessage: 'An error occurred while loading data.',
+      networkError: 'Network error. Please check your connection.',
+      notFound: 'The requested data was not found.',
+      serverError: 'Server error. Please try again later.',
+      apiError: 'API Error',
     },
     nav: {
       dashboard: 'Dashboard',
@@ -24,6 +30,40 @@ export const translations = {
       whaleTracker: 'Whale Tracker',
       airdrops: 'Airdrops',
       fedMonitor: 'FED Monitor',
+    },
+    pages: {
+      news: {
+        title: 'Crypto News',
+        subtitle: 'Latest cryptocurrency and financial news',
+      },
+      crypto: {
+        title: 'Crypto Market',
+        subtitle: 'Real-time cryptocurrency market data and analysis',
+      },
+      whale: {
+        title: 'Whale Tracker',
+        subtitle: 'Track large cryptocurrency transactions',
+      },
+      airdrops: {
+        title: 'Airdrops',
+        subtitle: 'Discover and track cryptocurrency airdrops',
+      },
+      fed: {
+        title: 'FED Monitor',
+        subtitle: 'Monitor Federal Reserve activities and indicators',
+      },
+      economicCalendar: {
+        title: 'Economic Calendar',
+        subtitle: 'Track important economic events and indicators',
+      },
+      marketAnalysis: {
+        title: 'Market Analysis',
+        subtitle: 'Advanced market analysis and technical indicators',
+      },
+      settings: {
+        title: 'Settings',
+        subtitle: 'Configure your dashboard preferences',
+      },
     },
     dashboard: {
       title: 'Crypto ZAP DASH',
@@ -115,6 +155,12 @@ export const translations = {
       theme: 'Tema',
       dark: 'Escuro',
       light: 'Claro',
+      noData: 'Nenhum dado disponível',
+      errorMessage: 'Ocorreu um erro ao carregar os dados.',
+      networkError: 'Erro de rede. Por favor, verifique sua conexão.',
+      notFound: 'Os dados solicitados não foram encontrados.',
+      serverError: 'Erro de servidor. Por favor, tente novamente mais tarde.',
+      apiError: 'Erro da API',
     },
     nav: {
       dashboard: 'Dashboard',
@@ -124,6 +170,40 @@ export const translations = {
       whaleTracker: 'Rastreador de Baleias',
       airdrops: 'Airdrops',
       fedMonitor: 'Monitor FED',
+    },
+    pages: {
+      news: {
+        title: 'Notícias Crypto',
+        subtitle: 'Últimas notícias sobre criptomoedas e finanças',
+      },
+      crypto: {
+        title: 'Mercado Crypto',
+        subtitle: 'Dados de mercado de criptomoedas em tempo real',
+      },
+      whale: {
+        title: 'Rastreador de Baleias',
+        subtitle: 'Acompanhe grandes transações de criptomoedas',
+      },
+      airdrops: {
+        title: 'Airdrops',
+        subtitle: 'Descubra e acompanhe airdrops de criptomoedas',
+      },
+      fed: {
+        title: 'Monitor FED',
+        subtitle: 'Monitore atividades e indicadores do Federal Reserve',
+      },
+      economicCalendar: {
+        title: 'Calendário Econômico',
+        subtitle: 'Acompanhe eventos econômicos importantes e indicadores',
+      },
+      marketAnalysis: {
+        title: 'Análise de Mercado',
+        subtitle: 'Análise avançada de mercado e indicadores técnicos',
+      },
+      settings: {
+        title: 'Configurações',
+        subtitle: 'Configure suas preferências do dashboard',
+      },
     },
     dashboard: {
       title: 'Crypto ZAP DASH',

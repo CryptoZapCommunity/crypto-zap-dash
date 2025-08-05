@@ -59,13 +59,29 @@ function Layout({ children }: { children: React.ReactNode }) {
   // Polling for real-time updates (replaces WebSocket)
   const { isConnected, connectionStatus } = usePolling({
     onUpdate: () => {
-      console.log('Polling update triggered');
+      if (import.meta.env.DEV) {
+        console.log('Polling update triggered');
+      }
     },
-    onConnect: () => console.log('Polling started'),
-    onDisconnect: () => console.log('Polling stopped'),
+    onConnect: () => {
+      if (import.meta.env.DEV) {
+        console.log('Polling started');
+      }
+    },
+    onDisconnect: () => {
+      if (import.meta.env.DEV) {
+        console.log('Polling stopped');
+      }
+    },
     onError: (error) => console.error('Polling error:', error),
     interval: 5 * 60 * 1000, // 5 minutes
-    queries: ['/api/market-summary', '/api/trending-coins'],
+    queries: [
+      '/api/market-summary', 
+      '/api/trending-coins',
+      '/api/crypto-overview',
+      '/api/news',
+      '/api/whale-transactions'
+    ],
   });
 
   return (
@@ -85,8 +101,15 @@ function Layout({ children }: { children: React.ReactNode }) {
           onRefresh={handleRefresh}
         />
         
-        {/* Connection Status Indicator - Hidden to prevent confusion */}
-        {/* Real-time updates are temporarily disabled to prevent API spam */}
+        {/* Connection Status Indicator - Habilitado novamente */}
+        {isConnected && (
+          <div className="fixed top-4 right-4 z-50">
+            <div className="bg-green-500 text-white px-3 py-1 rounded-full text-xs flex items-center space-x-2">
+              <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
+              <span>Live Updates</span>
+            </div>
+          </div>
+        )}
         
         <div className="p-6">
           {children}

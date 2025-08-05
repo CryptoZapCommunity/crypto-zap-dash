@@ -263,8 +263,8 @@ export default function MarketAnalysisPage() {
     staleTime: 10 * 60 * 1000, // 10 minutes
   });
 
-  // Use real data or fallback to mock data
-  const analysisData: MarketAnalysis[] = (analysisDataRaw as MarketAnalysis[]) || mockAnalysis;
+  // Use real data or fallback to mock data - CORRIGIDO para estrutura da API
+  const analysisData: MarketAnalysis[] = (analysisDataRaw as any)?.data || mockAnalysis;
 
   if (isLoading) {
     return (

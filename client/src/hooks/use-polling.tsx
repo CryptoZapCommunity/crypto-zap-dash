@@ -16,7 +16,7 @@ export function usePolling(options: UsePollingOptions = {}) {
     onConnect,
     onDisconnect,
     onError,
-    interval = 5 * 60 * 1000, // 5 minutes default
+    interval = import.meta.env.VITE_POLLING_INTERVAL ? parseInt(import.meta.env.VITE_POLLING_INTERVAL) : 5 * 60 * 1000, // 5 minutes default (reduced)
     queries = ['/api/market-summary', '/api/trending-coins'],
   } = options;
 

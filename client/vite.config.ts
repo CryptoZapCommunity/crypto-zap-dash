@@ -7,20 +7,13 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "src"),
-      "@shared": path.resolve(__dirname, "../shared"),
     },
   },
   root: ".",
   server: {
     port: 3000,
     host: true,
-    proxy: {
-      '/api': {
-        target: 'http://localhost:5000',
-        changeOrigin: true,
-        secure: false,
-      },
-    },
+    // Removido o proxy - agora fazemos chamadas diretas
   },
   build: {
     outDir: "./dist",
@@ -44,9 +37,9 @@ export default defineConfig({
             '@radix-ui/react-dialog',
             '@radix-ui/react-dropdown-menu'
           ],
-          charts: ['chart.js', 'recharts', 'lightweight-charts'],
+          charts: ['chart.js', 'recharts'],
           icons: ['lucide-react', 'react-icons'],
-          forms: ['react-hook-form', '@hookform/resolvers'],
+                      forms: ['react-hook-form'],
           utils: ['clsx', 'tailwind-merge', 'class-variance-authority', 'date-fns']
         },
       },

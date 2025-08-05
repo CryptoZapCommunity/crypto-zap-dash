@@ -15,7 +15,7 @@ interface EconomicCalendarProps {
 
 function EconomicEventItem({ event }: { event: EconomicEvent }) {
   const getImpactColor = (impact: string) => {
-    switch (impact.toLowerCase()) {
+    switch (impact?.toLowerCase()) {
       case 'high':
         return 'border-red-500 bg-red-500/10 text-red-600';
       case 'medium':
@@ -52,11 +52,11 @@ function EconomicEventItem({ event }: { event: EconomicEvent }) {
       medium: t('impact.medium'),
       low: t('impact.low'),
     };
-    return translations[impact.toLowerCase() as keyof typeof translations] || impact;
+    return translations[impact?.toLowerCase() as keyof typeof translations] || impact;
   };
 
   const getBorderColor = (impact: string) => {
-    switch (impact.toLowerCase()) {
+    switch (impact?.toLowerCase()) {
       case 'high':
         return 'border-red-500';
       case 'medium':

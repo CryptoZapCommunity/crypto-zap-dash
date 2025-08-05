@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
+import { apiClient } from '@/lib/api';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -261,10 +262,15 @@ export default function EconomicCalendarPage() {
 
   const { data: eventsData, isLoading } = useQuery({
     queryKey: ['/api/economic-calendar'],
-    select: () => mockEvents,
+    queryFn: () => apiClient.getEconomicCalendar(),
+    refetchInterval: 30 * 60 * 1000, // 30 minutes
+    staleTime: 15 * 60 * 1000,
   });
 
-  const filteredEvents = (Array.isArray(eventsData) ? eventsData : []).filter(event => {
+  // Use real data or fallback to mock data - CORRIGIDO para estrutura da API
+  const events = (eventsData as any)?.data || mockEvents;
+
+  const filteredEvents = (Array.isArray(events) ? events : []).filter(event => {
     return selectedImpact === 'all' || event.impact === selectedImpact;
   });
 

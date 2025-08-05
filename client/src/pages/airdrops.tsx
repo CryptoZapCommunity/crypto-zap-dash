@@ -41,13 +41,14 @@ export default function Airdrops() {
     staleTime: 5 * 60 * 1000,
   });
 
-  const airdropsList: Airdrop[] = (airdrops as Airdrop[]) || [];
+  // Use real data or fallback to mock data - CORRIGIDO para estrutura da API
+  const airdropsList: Airdrop[] = (airdrops as any)?.data || [];
 
   // Filter and sort airdrops
   const filteredAirdrops = (Array.isArray(airdropsList) ? airdropsList : [])
     .filter(airdrop => {
       const matchesSearch = 
-        airdrop.projectName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        airdrop.projectName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         airdrop.tokenSymbol?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         airdrop.description?.toLowerCase().includes(searchTerm.toLowerCase());
       

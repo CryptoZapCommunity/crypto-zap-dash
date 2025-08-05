@@ -1,6 +1,5 @@
 import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { apiClient } from '@/lib/api';
+import { useWhaleTransactions } from '@/hooks/use-market-data';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -33,22 +32,23 @@ export default function WhaleTracker() {
   const [minAmount, setMinAmount] = useState('');
   const [selectedAsset, setSelectedAsset] = useState('all');
 
-  // Fetch whale transactions
-  const { data: whaleTransactions, isLoading, error } = useQuery({
-    queryKey: ['/api/whale-movements'],
-    queryFn: () => apiClient.getWhaleMovements(100),
-    refetchInterval: false, // WebSocket handles updates
-    staleTime: 10 * 60 * 1000, // 10 minutes (increased)
-  });
+  // Fetch whale transactions - usando hook personalizado
+  const { 
+    data: whaleTransactions, 
+    isLoading, 
+    error,
+    refetch: refetchWhale,
+    clearCache: clearWhaleCache
+  } = useWhaleTransactions(100);
 
-  const transactions: WhaleTransaction[] = (whaleTransactions as WhaleTransaction[]) || [];
+  const transactions: WhaleTransaction[] = (whaleTransactions as any)?.data || [];
 
   // Filter transactions
   const filteredTransactions = (Array.isArray(transactions) ? transactions : [])
     .filter(tx => {
       // Search filter
       const matchesSearch = 
-        tx.asset.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        tx.asset?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         tx.fromAddress?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         tx.toAddress?.toLowerCase().includes(searchTerm.toLowerCase());
       
@@ -59,7 +59,7 @@ export default function WhaleTracker() {
       const matchesAmount = !minAmount || parseFloat(tx.valueUsd || '0') >= parseFloat(minAmount);
       
       // Asset filter
-      const matchesAsset = selectedAsset === 'all' || tx.asset.toLowerCase() === selectedAsset.toLowerCase();
+              const matchesAsset = selectedAsset === 'all' || tx.asset?.toLowerCase() === selectedAsset.toLowerCase();
       
       return matchesSearch && matchesType && matchesAmount && matchesAsset;
     })
@@ -99,26 +99,27 @@ export default function WhaleTracker() {
       case 'transfer':
         return 'text-blue-500 bg-blue-500/10';
       default:
-        return 'text-muted-foreground bg-muted';
+        return 'text-gray-500 bg-gray-500/10';
     }
   };
 
   const formatAddress = (address: string | null) => {
-    if (!address || typeof address !== 'string') return 'Unknown';
+    if (!address) return 'Unknown';
     return `${address.slice(0, 6)}...${address.slice(-4)}`;
   };
 
   const formatTimeAgo = (timestamp: string) => {
     const now = new Date();
-    const txDate = new Date(timestamp);
-    const diff = now.getTime() - txDate.getTime();
-    const minutes = Math.floor(diff / (1000 * 60));
-    const hours = Math.floor(diff / (1000 * 60 * 60));
-    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const txTime = new Date(timestamp);
+    const diffMs = now.getTime() - txTime.getTime();
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMins / 60);
+    const diffDays = Math.floor(diffHours / 24);
 
-    if (minutes < 60) return `${minutes}m ago`;
-    if (hours < 24) return `${hours}h ago`;
-    return `${days}d ago`;
+    if (diffMins < 1) return 'Just now';
+    if (diffMins < 60) return `${diffMins}m ago`;
+    if (diffHours < 24) return `${diffHours}h ago`;
+    return `${diffDays}d ago`;
   };
 
   if (error) {
@@ -131,6 +132,12 @@ export default function WhaleTracker() {
           <p className="text-muted-foreground">
             Failed to load whale transaction data. Please try again later.
           </p>
+          <button 
+            onClick={() => refetchWhale()}
+            className="mt-4 px-4 py-2 bg-primary text-primary-foreground rounded-md"
+          >
+            Retry
+          </button>
         </div>
       </div>
     );
@@ -139,257 +146,237 @@ export default function WhaleTracker() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-foreground">Whale Tracker</h1>
+          <h1 className="text-3xl font-bold text-foreground">
+            {t('pages.whale.title') || 'Whale Tracker'}
+          </h1>
           <p className="text-muted-foreground">
-            Monitor large cryptocurrency transactions and whale movements
+            {t('pages.whale.subtitle') || 'Track large cryptocurrency transactions'}
           </p>
         </div>
-        
         <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm">
-            <RefreshCw className="w-4 h-4" />
-            <span className="ml-2">Refresh</span>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => refetchWhale()}
+            disabled={isLoading}
+          >
+            <RefreshCw className={cn("w-4 h-4 mr-2", isLoading && "animate-spin")} />
+            Refresh
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => clearWhaleCache()}
+          >
+            Clear Cache
           </Button>
         </div>
       </div>
 
-      {/* Statistics Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium flex items-center gap-2">
-              <Fish className="w-4 h-4" />
-              Total Value Tracked
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              ${(typeof totalValue === 'number' ? (totalValue / 1e6).toFixed(2) : '0.00')}M
+      {/* Statistics */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <Card className="glassmorphism">
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-muted-foreground">Total Value</p>
+                <p className="text-lg font-semibold">
+                  ${(totalValue / 1e6).toFixed(2)}M
+                </p>
+              </div>
+              <DollarSign className="w-8 h-8 text-blue-500" />
             </div>
-            <p className="text-xs text-muted-foreground">
-              {filteredTransactions.length} transactions
-            </p>
           </CardContent>
         </Card>
-
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium flex items-center gap-2">
-              <TrendingUp className="w-4 h-4 text-green-500" />
-              Inflow Value
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-green-500">
-              ${(typeof inflowValue === 'number' ? (inflowValue / 1e6).toFixed(2) : '0.00')}M
+        
+        <Card className="glassmorphism">
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-muted-foreground">Inflow</p>
+                <p className="text-lg font-semibold text-green-500">
+                  ${(inflowValue / 1e6).toFixed(2)}M
+                </p>
+              </div>
+              <ArrowDownLeft className="w-8 h-8 text-green-500" />
             </div>
-            <p className="text-xs text-muted-foreground">
-              {(Array.isArray(filteredTransactions) ? filteredTransactions : []).filter(tx => tx.type === 'inflow').length} transactions
-            </p>
           </CardContent>
         </Card>
-
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium flex items-center gap-2">
-              <TrendingDown className="w-4 h-4 text-red-500" />
-              Outflow Value
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold text-red-500">
-              ${(typeof outflowValue === 'number' ? (outflowValue / 1e6).toFixed(2) : '0.00')}M
+        
+        <Card className="glassmorphism">
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-muted-foreground">Outflow</p>
+                <p className="text-lg font-semibold text-red-500">
+                  ${(outflowValue / 1e6).toFixed(2)}M
+                </p>
+              </div>
+              <ArrowUpRight className="w-8 h-8 text-red-500" />
             </div>
-            <p className="text-xs text-muted-foreground">
-              {(Array.isArray(filteredTransactions) ? filteredTransactions : []).filter(tx => tx.type === 'outflow').length} transactions
-            </p>
+          </CardContent>
+        </Card>
+        
+        <Card className="glassmorphism">
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-muted-foreground">Transactions</p>
+                <p className="text-lg font-semibold">
+                  {filteredTransactions.length}
+                </p>
+              </div>
+              <Fish className="w-8 h-8 text-purple-500" />
+            </div>
           </CardContent>
         </Card>
       </div>
 
       {/* Filters */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-lg">Filters</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
-              <Input
-                placeholder="Search addresses or assets..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
-              />
-            </div>
-            
-            <Select value={filterType} onValueChange={(value: any) => setFilterType(value)}>
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Types</SelectItem>
-                <SelectItem value="inflow">Inflow</SelectItem>
-                <SelectItem value="outflow">Outflow</SelectItem>
-                <SelectItem value="transfer">Transfer</SelectItem>
-              </SelectContent>
-            </Select>
-            
-            <Input
-              placeholder="Min amount (USD)"
-              value={minAmount}
-              onChange={(e) => setMinAmount(e.target.value)}
-              type="number"
-            />
-            
-            <Select value={selectedAsset} onValueChange={setSelectedAsset}>
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Assets</SelectItem>
-                {(Array.isArray(uniqueAssets) ? uniqueAssets : []).map(asset => (
-                  <SelectItem key={asset} value={asset}>{asset}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Transactions */}
-      <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <h2 className="text-xl font-semibold">Recent Whale Transactions</h2>
-          <Badge variant="secondary">
-            {filteredTransactions.length} transactions
-          </Badge>
+      <div className="flex flex-col sm:flex-row gap-4">
+        <div className="flex-1">
+          <Input
+            placeholder={t('common.search') || 'Search transactions...'}
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="max-w-md"
+          />
         </div>
-
-        {isLoading ? (
-          <div className="space-y-4">
-            {Array.from({ length: 5 }).map((_, i) => (
-              <Card key={i}>
-                <CardContent className="p-4">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-4">
-                      <Skeleton className="w-8 h-8 rounded-full" />
-                      <div className="space-y-2">
-                        <Skeleton className="h-4 w-32" />
-                        <Skeleton className="h-3 w-24" />
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <Skeleton className="h-5 w-20 mb-1" />
-                      <Skeleton className="h-3 w-16" />
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        ) : (
-          <div className="space-y-4">
-            {(Array.isArray(filteredTransactions) ? filteredTransactions : []).map((tx) => (
-              <Card key={tx.id} className="hover:shadow-lg transition-shadow">
-                <CardContent className="p-4">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-4">
-                      <div className="w-8 h-8 bg-gradient-to-r from-primary to-green-500 rounded-full flex items-center justify-center">
-                        {getTransactionIcon(tx.type)}
-                      </div>
-                      <div>
-                        <div className="flex items-center space-x-2">
-                          <span className="font-semibold">{tx.asset}</span>
-                          <Badge className={getTransactionColor(tx.type)}>
-                            {tx.type}
-                          </Badge>
-                        </div>
-                        <div className="text-sm text-muted-foreground space-y-1">
-                          <div className="flex items-center space-x-2">
-                            <span>From: {formatAddress(tx.fromAddress)}</span>
-                            {tx.fromExchange && (
-                              <Badge variant="outline" className="text-xs">
-                                {tx.fromExchange}
-                              </Badge>
-                            )}
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            <span>To: {formatAddress(tx.toAddress)}</span>
-                            {tx.toExchange && (
-                              <Badge variant="outline" className="text-xs">
-                                {tx.toExchange}
-                              </Badge>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <div className="text-right">
-                      <div className="flex items-center space-x-2">
-                        <DollarSign className="w-4 h-4 text-muted-foreground" />
-                        <span className="text-lg font-bold">
-                          ${parseFloat(tx.valueUsd || '0').toLocaleString()}
-                        </span>
-                      </div>
-                      <div className="text-sm text-muted-foreground">
-                        {parseFloat(tx.amount).toLocaleString()} {tx.asset}
-                      </div>
-                      <div className="flex items-center space-x-1 text-xs text-muted-foreground">
-                        <Clock className="w-3 h-3" />
-                        <span>{formatTimeAgo(tx.timestamp)}</span>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  {tx.transactionHash && (
-                    <div className="mt-3 pt-3 border-t border-border">
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs text-muted-foreground">
-                          Hash: {(typeof tx.transactionHash === 'string' ? tx.transactionHash.slice(0, 20) : 'Unknown')}...
-                        </span>
-                        <Button variant="ghost" size="sm" className="h-6 px-2">
-                          <ExternalLink className="w-3 h-3 mr-1" />
-                          View
-                        </Button>
-                      </div>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        )}
-
-        {filteredTransactions.length === 0 && !isLoading && (
-          <div className="text-center py-12">
-            <Fish className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-            <p className="text-muted-foreground">No whale transactions found matching your filters.</p>
-          </div>
-        )}
+        
+        <div className="flex items-center gap-2">
+          <Select value={filterType} onValueChange={(value: any) => setFilterType(value)}>
+            <SelectTrigger className="w-32">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Types</SelectItem>
+              <SelectItem value="inflow">Inflow</SelectItem>
+              <SelectItem value="outflow">Outflow</SelectItem>
+              <SelectItem value="transfer">Transfer</SelectItem>
+            </SelectContent>
+          </Select>
+          
+          <Select value={selectedAsset} onValueChange={setSelectedAsset}>
+            <SelectTrigger className="w-32">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Assets</SelectItem>
+              {uniqueAssets.map(asset => (
+                <SelectItem key={asset} value={asset}>
+                  {asset}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          
+          <Input
+            placeholder="Min $"
+            value={minAmount}
+            onChange={(e) => setMinAmount(e.target.value)}
+            className="w-24"
+          />
+        </div>
       </div>
 
-      {/* Alerts */}
-      <Card className="border-yellow-200 bg-yellow-50 dark:border-yellow-800 dark:bg-yellow-950/20">
-        <CardContent className="p-4">
-          <div className="flex items-start space-x-3">
-            <AlertTriangle className="w-5 h-5 text-yellow-600 dark:text-yellow-400 mt-0.5" />
-            <div>
-              <h3 className="font-semibold text-yellow-800 dark:text-yellow-200">
-                Whale Activity Alert
-              </h3>
-              <p className="text-sm text-yellow-700 dark:text-yellow-300 mt-1">
-                Large transactions can significantly impact market prices. Monitor these movements carefully 
-                and consider their potential impact on your investment strategy.
-              </p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+      {/* Transactions */}
+      {isLoading ? (
+        <div className="space-y-4">
+          {[1, 2, 3, 4, 5].map((i) => (
+            <Card key={i} className="glassmorphism">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-4">
+                    <Skeleton className="w-12 h-12 rounded-full" />
+                    <div className="space-y-2">
+                      <Skeleton className="w-32 h-4" />
+                      <Skeleton className="w-24 h-3" />
+                    </div>
+                  </div>
+                  <div className="text-right space-y-2">
+                    <Skeleton className="w-20 h-4" />
+                    <Skeleton className="w-16 h-3" />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      ) : (
+        <div className="space-y-4">
+          {filteredTransactions.map((tx) => (
+            <Card key={tx.id} className="glassmorphism hover:scale-105 transition-transform duration-200">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-4">
+                    <div className="flex items-center justify-center w-12 h-12 rounded-full bg-muted">
+                      {getTransactionIcon(tx.type)}
+                    </div>
+                    <div>
+                      <div className="flex items-center space-x-2">
+                        <h3 className="font-semibold text-foreground">{tx.asset}</h3>
+                        <Badge className={cn("text-xs", getTransactionColor(tx.type))}>
+                          {tx.type}
+                        </Badge>
+                      </div>
+                      <p className="text-sm text-muted-foreground">
+                        {formatAddress(tx.fromAddress)} → {formatAddress(tx.toAddress)}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        {formatTimeAgo(tx.timestamp)}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <p className="font-semibold text-foreground">
+                      {parseFloat(tx.amount).toLocaleString(undefined, {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 8,
+                      })} {tx.asset}
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      ${parseFloat(tx.valueUsd || '0').toLocaleString(undefined, {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}
+                    </p>
+                  </div>
+                </div>
+                
+                {tx.transactionHash && (
+                  <div className="mt-4 pt-4 border-t border-border/50">
+                    <div className="flex items-center justify-between">
+                      <p className="text-xs text-muted-foreground">Transaction Hash:</p>
+                      <Button variant="ghost" size="sm" asChild>
+                        <a 
+                          href={`https://etherscan.io/tx/${tx.transactionHash}`} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="text-xs text-blue-500 hover:text-blue-600"
+                        >
+                          {formatAddress(tx.transactionHash)}
+                          <ExternalLink className="w-3 h-3 ml-1" />
+                        </a>
+                      </Button>
+                    </div>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      )}
+
+      {!isLoading && filteredTransactions.length === 0 && (
+        <div className="text-center py-12">
+          <Fish className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
+          <p className="text-muted-foreground">
+            {searchTerm ? 'No whale transactions found matching your search.' : 'No whale transactions available.'}
+          </p>
+        </div>
+      )}
     </div>
   );
 } 

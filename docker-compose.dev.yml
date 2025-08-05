@@ -1,0 +1,119 @@
+version: '3.8'
+
+services:
+  # Banco de dados PostgreSQL (desenvolvimento)
+  postgres:
+    image: postgres:15-alpine
+    container_name: crypto-dashboard-postgres-dev
+    environment:
+      POSTGRES_DB: crypto_dashboard
+      POSTGRES_USER: crypto_user
+      POSTGRES_PASSWORD: crypto_password
+      POSTGRES_INITDB_ARGS: "--encoding=UTF-8 --lc-collate=C --lc-ctype=C"
+    volumes:
+      - postgres_data_dev:/var/lib/postgresql/data
+      - ./backend/init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "5432:5432"
+    networks:
+      - crypto-network-dev
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U crypto_user -d crypto_dashboard"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    restart: unless-stopped
+
+  # Backend Python/FastAPI (desenvolvimento)
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      target: development
+    container_name: crypto-dashboard-backend-dev
+    env_file:
+      - .env
+    environment:
+      - DATABASE_URL=${DATABASE_URL:-postgresql://crypto_user:crypto_password@postgres:5432/crypto_dashboard}
+      - COINGECKO_API_KEY=${COINGECKO_API_KEY}
+      - FRED_API_KEY=${FRED_API_KEY}
+      - NEWS_API_KEY=${NEWS_API_KEY}
+      - CRYPTO_PANIC_API_KEY=${CRYPTO_PANIC_API_KEY}
+      - TRADING_ECONOMICS_API_KEY=${TRADING_ECONOMICS_API_KEY}
+      - WHALE_ALERT_API_KEY=${WHALE_ALERT_API_KEY}
+      - PORT=${PORT:-5000}
+      - ENVIRONMENT=${ENVIRONMENT:-development}
+      - DEBUG=${DEBUG:-true}
+      - RATE_LIMIT_PER_MINUTE=${RATE_LIMIT_PER_MINUTE:-100}
+      - RATE_LIMIT_PER_HOUR=${RATE_LIMIT_PER_HOUR:-2000}
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-http://localhost:3000,http://localhost:5173}
+      - LOG_LEVEL=${LOG_LEVEL:-DEBUG}
+    ports:
+      - "5000:5000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - crypto-network-dev
+    volumes:
+      - ./backend:/app
+      - /app/__pycache__
+      - /app/.pytest_cache
+      - /app/.coverage
+    restart: unless-stopped
+    command: ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "5000", "--reload", "--log-level", "debug"]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/api/health", "--max-time", "5"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+
+  # Frontend React (desenvolvimento)
+  frontend:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+      target: development
+    container_name: crypto-dashboard-frontend-dev
+    env_file:
+      - .env
+    environment:
+      - VITE_API_BASE_URL=${VITE_API_BASE_URL:-http://localhost:5000/api}
+      - VITE_API_TIMEOUT=${VITE_API_TIMEOUT:-10000}
+      - VITE_DEBUG=${VITE_DEBUG:-true}
+      - VITE_MOCK_API=${VITE_MOCK_API:-false}
+      - VITE_POLLING_INTERVAL=${VITE_POLLING_INTERVAL:-30000}
+      - VITE_CACHE_DURATION=${VITE_CACHE_DURATION:-300000}
+    ports:
+      - "3000:3000"
+      - "5173:5173"  # Porta alternativa do Vite
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      - crypto-network-dev
+    volumes:
+      - ./client:/app
+      - /app/node_modules
+      - /app/dist
+    restart: unless-stopped
+    command: ["npm", "run", "dev", "--", "--host", "0.0.0.0", "--port", "3000"]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000", "--max-time", "5"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+
+volumes:
+  postgres_data_dev:
+    driver: local
+
+networks:
+  crypto-network-dev:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.21.0.0/16 

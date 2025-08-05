@@ -72,13 +72,13 @@ export default function FedMonitor() {
     staleTime: 30 * 60 * 1000,
   });
 
-  // Use real data or fallback to mock data
+  // Use real data or fallback to mock data - CORRIGIDO para estrutura da API
   const fedData: FedData = {
-    currentRate: (fredData as any)?.federalFundsRate || 5.50,
-    previousRate: (fredData as any)?.federalFundsRate || 5.25,
+    currentRate: (fredData as any)?.data?.federalFundsRate || 5.50,
+    previousRate: (fredData as any)?.data?.federalFundsRate || 5.25,
     nextMeeting: '2024-01-31', // This would need a separate API
-    lastUpdate: (fredData as any)?.lastUpdated || '2024-01-15',
-    rateHistory: (rateHistory as any) || [
+    lastUpdate: (fredData as any)?.data?.lastUpdated || '2024-01-15',
+    rateHistory: (rateHistory as any)?.data || [
       { date: '2024-01-15', rate: 5.50 },
       { date: '2023-12-13', rate: 5.25 },
       { date: '2023-11-01', rate: 5.25 },
