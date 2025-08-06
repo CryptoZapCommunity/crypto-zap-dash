@@ -80,24 +80,24 @@ function TechnicalIndicatorCard({ indicator }: { indicator: TechnicalIndicator }
     <div className="p-4 rounded-lg bg-muted/50 border border-border/50">
       <div className="flex items-center justify-between mb-3">
         <h4 className="font-semibold text-sm">{indicator.name}</h4>
-        <Badge className={cn('text-xs px-2', getSignalColor(indicator.signal))}>
-          {indicator.signal.toUpperCase()}
+        <Badge className={cn('text-xs px-2', getSignalColor(indicator.signal || 'neutral'))}>
+          {(indicator.signal || 'neutral').toUpperCase()}
         </Badge>
       </div>
       <div className="space-y-2">
         <div className="flex justify-between text-sm">
           <span className="text-muted-foreground">Valor:</span>
-          <span className="font-medium">{indicator.value.toLocaleString()}</span>
+          <span className="font-medium">{(indicator.value || 0).toLocaleString()}</span>
         </div>
         <div className="space-y-1">
           <div className="flex justify-between text-xs">
             <span className="text-muted-foreground">Força:</span>
-            <span>{indicator.strength}%</span>
+            <span>{indicator.strength || 0}%</span>
           </div>
           <div className="w-full bg-muted rounded-full h-2">
             <div 
               className="h-2 rounded-full bg-gradient-to-r from-blue-500 to-purple-500"
-              style={{ width: `${indicator.strength}%` }}
+              style={{ width: `${indicator.strength || 0}%` }}
             />
           </div>
         </div>
@@ -176,20 +176,20 @@ function AssetAnalysisCard({ analysis }: { analysis: MarketAnalysis }) {
         <CardContent className="p-6">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center space-x-3">
-              <CryptoIcon symbol={analysis.asset} size="lg" />
+              <CryptoIcon symbol={analysis.asset || 'BTC'} size="lg" />
               <div>
-                <h2 className="text-2xl font-bold">{analysis.asset}</h2>
+                <h2 className="text-2xl font-bold">{analysis.asset || 'BTC'}</h2>
                 <p className="text-muted-foreground">Análise Técnica Completa</p>
               </div>
             </div>
             <div className="text-right">
-              <p className="text-3xl font-bold">${analysis.price.toLocaleString()}</p>
+              <p className="text-3xl font-bold">${(analysis.price || 0).toLocaleString()}</p>
               <p className={cn(
                 'text-sm font-medium flex items-center',
-                analysis.change24h >= 0 ? 'text-green-500' : 'text-red-500'
+                (analysis.change24h || 0) >= 0 ? 'text-green-500' : 'text-red-500'
               )}>
-                {analysis.change24h >= 0 ? <TrendingUp className="w-4 h-4 mr-1" /> : <TrendingDown className="w-4 h-4 mr-1" />}
-                {analysis.change24h >= 0 ? '+' : ''}{analysis.change24h.toFixed(2)}%
+                {(analysis.change24h || 0) >= 0 ? <TrendingUp className="w-4 h-4 mr-1" /> : <TrendingDown className="w-4 h-4 mr-1" />}
+                {(analysis.change24h || 0) >= 0 ? '+' : ''}{(analysis.change24h || 0).toFixed(2)}%
               </p>
             </div>
           </div>
@@ -197,22 +197,22 @@ function AssetAnalysisCard({ analysis }: { analysis: MarketAnalysis }) {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div className="p-3 rounded-lg bg-muted/50">
               <p className="text-xs text-muted-foreground mb-1">Volume 24h</p>
-              <p className="font-semibold">{formatVolume(analysis.volume24h)}</p>
+              <p className="font-semibold">{formatVolume(analysis.volume24h || 0)}</p>
             </div>
             <div className="p-3 rounded-lg bg-muted/50">
               <p className="text-xs text-muted-foreground mb-1">Market Cap</p>
-              <p className="font-semibold">{formatVolume(analysis.marketCap)}</p>
+              <p className="font-semibold">{formatVolume(analysis.marketCap || 0)}</p>
             </div>
             <div className="p-3 rounded-lg bg-muted/50">
               <p className="text-xs text-muted-foreground mb-1">Sentimento</p>
-              <p className={cn('font-semibold', getSentimentColor(analysis.sentiment))}>
-                {analysis.sentiment}%
+              <p className={cn('font-semibold', getSentimentColor(analysis.sentiment || 50))}>
+                {analysis.sentiment || 50}%
               </p>
             </div>
             <div className="p-3 rounded-lg bg-muted/50">
               <p className="text-xs text-muted-foreground mb-1">Risco</p>
-              <p className={cn('font-semibold', getRiskColor(analysis.riskScore))}>
-                {analysis.riskScore}%
+              <p className={cn('font-semibold', getRiskColor(analysis.riskScore || 50))}>
+                {analysis.riskScore || 50}%
               </p>
             </div>
           </div>
@@ -240,14 +240,14 @@ function AssetAnalysisCard({ analysis }: { analysis: MarketAnalysis }) {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <PriceLevelsCard
           title="Níveis de Suporte"
-          levels={analysis.supportLevels}
-          currentPrice={analysis.price}
+          levels={analysis.supportLevels || []}
+          currentPrice={analysis.price || 0}
           type="support"
         />
         <PriceLevelsCard
           title="Níveis de Resistência"
-          levels={analysis.resistanceLevels}
-          currentPrice={analysis.price}
+          levels={analysis.resistanceLevels || []}
+          currentPrice={analysis.price || 0}
           type="resistance"
         />
       </div>

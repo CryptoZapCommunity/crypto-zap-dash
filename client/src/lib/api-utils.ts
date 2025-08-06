@@ -44,13 +44,15 @@ export function validateApiResponse<T>(response: any): response is ApiResponse<T
     return false;
   }
   
-  if (typeof response.success !== 'boolean') {
+  // CORRIGIDO: Verificar se success existe e é boolean, mas ser mais flexível
+  if (response.success === undefined || response.success === null) {
     if (import.meta.env.DEV) {
       console.error('❌ Invalid API response: missing success property', response);
     }
     return false;
   }
   
+  // CORRIGIDO: Verificar se data existe, mas ser mais flexível
   if (!('data' in response)) {
     if (import.meta.env.DEV) {
       console.error('❌ Invalid API response: missing data property', response);
@@ -190,16 +192,38 @@ export function normalizeTrendingCoins(response: any): TrendingCoins {
 }
 
 export function normalizeNews(response: any): News[] {
-  if (!validateApiResponse(response)) return [];
-  const data = toCamelCase(response.data as any);
+  if (import.meta.env.DEV) {
+    console.log('📰 normalizeNews input:', response);
+  }
+  
+  if (!validateApiResponse(response)) {
+    if (import.meta.env.DEV) {
+      console.error('❌ normalizeNews: Invalid API response');
+    }
+    return [];
+  }
+  
+  const data = response.data;
+  if (import.meta.env.DEV) {
+    console.log('📰 normalizeNews data:', data);
+    console.log('📰 normalizeNews data type:', typeof data);
+    console.log('📰 normalizeNews data is array:', Array.isArray(data));
+  }
+  
   let news: any[] = [];
   if (Array.isArray(data)) {
     news = data;
-  } else if (data?.news && Array.isArray(data.news)) {
+  } else if (data && typeof data === 'object' && 'news' in data && Array.isArray(data.news)) {
     news = data.news;
-  } else if (data?.articles && Array.isArray(data.articles)) {
+  } else if (data && typeof data === 'object' && 'articles' in data && Array.isArray(data.articles)) {
     news = data.articles;
   }
+  
+  if (import.meta.env.DEV) {
+    console.log('📰 normalizeNews processed news:', news);
+    console.log('📰 normalizeNews news length:', news.length);
+  }
+  
   return news.map(article => ({
     id: article.id || `news-${Date.now()}-${Math.random()}`,
     title: article.title || 'Untitled',

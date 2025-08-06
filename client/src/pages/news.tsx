@@ -163,8 +163,8 @@ export default function NewsPage() {
     clearCache: clearNewsCache
   } = useNews(undefined, 20);
 
-  // Normalizar dados de notícias e converter para NewsArticle
-  const news: NewsArticle[] = normalizeNews(newsData).map(newsItem => ({
+  // Converter dados de notícias para NewsArticle (já estão normalizados pelo hook)
+  const news: NewsArticle[] = (Array.isArray(newsData) ? newsData : []).map(newsItem => ({
     ...newsItem,
     description: newsItem.summary || undefined,
     url: newsItem.sourceUrl || undefined,
