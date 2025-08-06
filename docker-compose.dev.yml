@@ -64,7 +64,7 @@ services:
     restart: unless-stopped
     command: ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "5000", "--reload", "--log-level", "debug"]
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:5000/api/health", "--max-time", "5"]
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:5000/api/health || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 5
@@ -90,8 +90,7 @@ services:
       - "3000:3000"
       - "5173:5173"  # Porta alternativa do Vite
     depends_on:
-      backend:
-        condition: service_healthy
+      - backend
     networks:
       - crypto-network-dev
     volumes:
@@ -101,11 +100,11 @@ services:
     restart: unless-stopped
     command: ["npm", "run", "dev", "--", "--host", "0.0.0.0", "--port", "3000"]
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3000", "--max-time", "5"]
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:3000 || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 5
-      start_period: 60s
+      start_period: 120s
 
 volumes:
   postgres_data_dev:

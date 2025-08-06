@@ -1,36 +1,122 @@
 import type { ApiResponse, MarketSummary, CryptoAsset, News, EconomicEvent, WhaleTransaction, TrendingCoins, MarketSentiment, SentimentData, Airdrop, FedUpdate } from '@/types';
 
+// Utility function to convert snake_case to camelCase
+export function toCamelCase(obj: any): any {
+  if (obj === null || obj === undefined) {
+    return obj;
+  }
+  
+  if (Array.isArray(obj)) {
+    return obj.map(item => toCamelCase(item));
+  }
+  
+  if (typeof obj === 'object') {
+    const camelCaseObj: any = {};
+    for (const key in obj) {
+      if (obj.hasOwnProperty(key)) {
+        const camelKey = key.replace(/_([a-z])/g, (_, letter) => letter.toUpperCase());
+        camelCaseObj[camelKey] = toCamelCase(obj[key]);
+      }
+    }
+    
+    // Debug log para verificar se a conversão está funcionando
+    if (import.meta.env.DEV) {
+      console.log('🔄 toCamelCase conversion:', { original: obj, converted: camelCaseObj });
+    }
+    
+    return camelCaseObj;
+  }
+  
+  return obj;
+}
+
 export function validateApiResponse<T>(response: any): response is ApiResponse<T> {
-  return (
-    response &&
-    typeof response === 'object' &&
-    typeof response.success === 'boolean' &&
-    'data' in response
-  );
+  if (import.meta.env.DEV) {
+    console.log('🔍 validateApiResponse input:', response);
+    console.log('🔍 validateApiResponse type:', typeof response);
+    console.log('🔍 validateApiResponse keys:', Object.keys(response || {}));
+  }
+  
+  if (!response || typeof response !== 'object') {
+    if (import.meta.env.DEV) {
+      console.error('❌ Invalid API response: not an object', response);
+    }
+    return false;
+  }
+  
+  if (typeof response.success !== 'boolean') {
+    if (import.meta.env.DEV) {
+      console.error('❌ Invalid API response: missing success property', response);
+    }
+    return false;
+  }
+  
+  if (!('data' in response)) {
+    if (import.meta.env.DEV) {
+      console.error('❌ Invalid API response: missing data property', response);
+    }
+    return false;
+  }
+  
+  if (import.meta.env.DEV) {
+    console.log('✅ validateApiResponse: Valid response', response);
+  }
+  
+  return true;
 }
 
 export function normalizeMarketData(response: any): MarketSummary | null {
-  if (!validateApiResponse(response)) return null;
+  if (import.meta.env.DEV) {
+    console.log('📊 normalizeMarketData input:', response);
+    console.log('📊 normalizeMarketData input type:', typeof response);
+    console.log('📊 normalizeMarketData input keys:', Object.keys(response || {}));
+  }
   
-  const data = response.data as any;
+  if (!validateApiResponse(response)) {
+    if (import.meta.env.DEV) {
+      console.error('❌ normalizeMarketData: Invalid API response');
+    }
+    return null;
+  }
   
-  // Handle both nested and direct data structures
-  const marketData = data?.marketSummary || data;
+  const data = response.data;
+  if (!data) {
+    if (import.meta.env.DEV) {
+      console.error('❌ normalizeMarketData: No data in response');
+    }
+    return null;
+  }
   
-  return {
+  // CORRIGIDO: Não aplicar toCamelCase aqui, pois o backend já retorna em formato correto
+  const marketData = data as any;
+  
+  if (import.meta.env.DEV) {
+    console.log('📊 normalizeMarketData marketData:', marketData);
+    console.log('📊 normalizeMarketData marketData type:', typeof marketData);
+    console.log('📊 normalizeMarketData marketData keys:', Object.keys(marketData || {}));
+  }
+  
+  // CORRIGIDO: Garantir que todos os campos são strings conforme esperado pelo frontend
+  const result = {
     id: marketData?.id || 'default',
-    totalMarketCap: marketData?.totalMarketCap || '0',
-    totalVolume24h: marketData?.totalVolume24h || '0',
-    btcDominance: marketData?.btcDominance || '0',
+    totalMarketCap: String(marketData?.totalMarketCap || '0'),
+    totalVolume24h: String(marketData?.totalVolume24h || '0'),
+    btcDominance: String(marketData?.btcDominance || '0'),
     fearGreedIndex: marketData?.fearGreedIndex || null,
-    marketChange24h: marketData?.marketChange24h || '0',
+    marketChange24h: String(marketData?.marketChange24h || '0'),
     lastUpdated: marketData?.lastUpdated || new Date().toISOString()
   };
+  
+  if (import.meta.env.DEV) {
+    console.log('📊 normalizeMarketData result:', result);
+  }
+  
+  return result;
 }
 
 export function normalizeCryptoAssets(response: any): CryptoAsset[] {
   if (!validateApiResponse(response)) return [];
-  const data = response.data as any;
+  const data = toCamelCase(response.data as any);
   let assets: any[] = [];
   if (Array.isArray(data)) {
     assets = data;
@@ -55,32 +141,57 @@ export function normalizeCryptoAssets(response: any): CryptoAsset[] {
 }
 
 export function normalizeTrendingCoins(response: any): TrendingCoins {
-  if (!validateApiResponse(response)) return { gainers: [], losers: [] };
+  if (import.meta.env.DEV) {
+    console.log('📊 normalizeTrendingCoins input:', response);
+  }
   
-  const data = response.data as any;
+  if (!validateApiResponse(response)) {
+    if (import.meta.env.DEV) {
+      console.error('❌ normalizeTrendingCoins: Invalid API response');
+    }
+    return { gainers: [], losers: [] };
+  }
   
-  // Handle both nested and direct data structures
-  const trendingData = data?.trendingCoins || data;
+  const data = response.data;
+  if (!data) {
+    if (import.meta.env.DEV) {
+      console.error('❌ normalizeTrendingCoins: No data in response');
+    }
+    return { gainers: [], losers: [] };
+  }
+  
+  // CORRIGIDO: Não aplicar toCamelCase aqui, pois o backend já retorna em formato correto
+  const trendingData = data as any;
+  
+  if (import.meta.env.DEV) {
+    console.log('📊 normalizeTrendingCoins trendingData:', trendingData);
+  }
   
   const normalizeCoin = (coin: any) => ({
     id: coin?.id || coin?.symbol || 'unknown',
     name: coin?.name || coin?.symbol || 'Unknown',
     symbol: coin?.symbol || 'UNKNOWN',
-    price: coin?.price || '0',
+    price: String(coin?.price || '0'),
     marketCapRank: coin?.marketCapRank,
     image: coin?.image,
-    priceChange24h: coin?.priceChange24h || '0'
+    priceChange24h: String(coin?.priceChange24h || '0')
   });
   
-  return {
+  const result = {
     gainers: (trendingData?.gainers || []).map(normalizeCoin),
     losers: (trendingData?.losers || []).map(normalizeCoin)
   };
+  
+  if (import.meta.env.DEV) {
+    console.log('📊 normalizeTrendingCoins result:', result);
+  }
+  
+  return result;
 }
 
 export function normalizeNews(response: any): News[] {
   if (!validateApiResponse(response)) return [];
-  const data = response.data as any;
+  const data = toCamelCase(response.data as any);
   let news: any[] = [];
   if (Array.isArray(data)) {
     news = data;
@@ -107,7 +218,7 @@ export function normalizeNews(response: any): News[] {
 
 export function normalizeEconomicEvents(response: any): EconomicEvent[] {
   if (!validateApiResponse(response)) return [];
-  const data = response.data as any;
+  const data = toCamelCase(response.data as any);
   let events: any[] = [];
   if (Array.isArray(data)) {
     events = data;
@@ -133,7 +244,7 @@ export function normalizeEconomicEvents(response: any): EconomicEvent[] {
 
 export function normalizeWhaleTransactions(response: any): WhaleTransaction[] {
   if (!validateApiResponse(response)) return [];
-  const data = response.data as any;
+  const data = toCamelCase(response.data as any);
   let transactions: any[] = [];
   if (Array.isArray(data)) {
     transactions = data;
@@ -160,7 +271,7 @@ export function normalizeWhaleTransactions(response: any): WhaleTransaction[] {
 
 export function normalizeAirdrops(response: any): Airdrop[] {
   if (!validateApiResponse(response)) return [];
-  const data = response.data as any;
+  const data = toCamelCase(response.data as any);
   let airdrops: any[] = [];
   if (Array.isArray(data)) {
     airdrops = data;
@@ -185,7 +296,7 @@ export function normalizeAirdrops(response: any): Airdrop[] {
 
 export function normalizeFedUpdates(response: any): FedUpdate[] {
   if (!validateApiResponse(response)) return [];
-  const data = response.data as any;
+  const data = toCamelCase(response.data as any);
   let updates: any[] = [];
   if (Array.isArray(data)) {
     updates = data;
@@ -209,7 +320,7 @@ export function normalizeFedUpdates(response: any): FedUpdate[] {
 
 export function normalizeMarketSentiment(response: any): MarketSentiment | null {
   if (!validateApiResponse(response)) return null;
-  const data = response.data as any;
+  const data = toCamelCase(response.data as any);
   const sentimentData = data?.sentiment || data;
   return {
     fearGreedIndex: sentimentData.fearGreedIndex || sentimentData.index || 50,
@@ -221,7 +332,7 @@ export function normalizeMarketSentiment(response: any): MarketSentiment | null 
 
 export function normalizeSentimentData(response: any): SentimentData | null {
   if (!validateApiResponse(response)) return null;
-  const data = response.data as any;
+  const data = toCamelCase(response.data as any);
   const sentimentData = data?.sentiment || data;
   return {
     overall: sentimentData.overall || 50,

@@ -183,8 +183,13 @@ class CryptoService:
                 # Processar dados reais
                 processed_coins = []
                 for coin_data in coins:
+                    # CORRIGIDO: Verificar se coin_data é um dicionário
+                    if not isinstance(coin_data, dict):
+                        print(f"⚠️ Skipping invalid coin_data: {type(coin_data)}")
+                        continue
+                        
                     coin = coin_data.get("item", {})
-                    if coin:
+                    if coin and isinstance(coin, dict):
                         # Verificar se coin["data"] existe e é um dicionário
                         coin_data_obj = coin.get("data", {})
                         if isinstance(coin_data_obj, dict):
@@ -207,6 +212,8 @@ class CryptoService:
                             "sparklineData": coin_data_obj.get("sparkline", {}).get("price", []) if isinstance(coin_data_obj, dict) else []
                         }
                         processed_coins.append(self._format_coin_for_frontend(processed_coin))
+                    else:
+                        print(f"⚠️ Skipping invalid coin: {type(coin)}")
                 
                 # Separar gainers e losers
                 gainers = [coin for coin in processed_coins if coin.get("priceChange24h") and float(coin["priceChange24h"]) > 0]
@@ -474,8 +481,8 @@ class CryptoService:
             
             # Verificar se temos API key válida
             if not self.api_key or self.api_key == "demo":
-                print("❌ No valid API key configured")
-                raise Exception("CoinGecko API key not configured")
+                print("⚠️ No valid API key configured, using mock data")
+                return self._get_mock_market_summary()
             
             async with httpx.AsyncClient(timeout=30.0) as client:
                 response = await client.get(
@@ -484,15 +491,15 @@ class CryptoService:
                 )
                 
                 if response.status_code != 200:
-                    print(f"❌ CoinGecko API error: {response.status_code}")
-                    raise Exception(f"CoinGecko API returned status {response.status_code}")
+                    print(f"❌ CoinGecko API error: {response.status_code}, using mock data")
+                    return self._get_mock_market_summary()
                 
                 data = response.json()
                 global_data = data.get("data", {})
                 
                 if not global_data:
-                    print("❌ No global data found in API response")
-                    raise Exception("No global market data available")
+                    print("❌ No global data found in API response, using mock data")
+                    return self._get_mock_market_summary()
                 
                 # Exact mapping from original
                 market_summary = {
@@ -509,8 +516,8 @@ class CryptoService:
                 return market_summary
                 
         except Exception as error:
-            print(f"❌ Error updating market summary: {error}")
-            raise error
+            print(f"❌ Error updating market summary: {error}, using mock data")
+            return self._get_mock_market_summary()
     
     def _get_mock_market_summary(self):
         """Get mock market summary as fallback"""

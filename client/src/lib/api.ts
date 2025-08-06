@@ -83,22 +83,42 @@ export class ApiClient {
         envApiUrl: import.meta.env.VITE_API_BASE_URL
       });
     }
+    
+    // Log da URL base
+    this.logBaseUrl();
   }
 
   private getApiBaseUrl(): string {
-    // Usar a URL configurada no ambiente
     const envUrl = import.meta.env.VITE_API_BASE_URL;
-    if (envUrl) {
+    
+    if (import.meta.env.DEV) {
+      console.log('🔧 getApiBaseUrl: envUrl:', envUrl);
+    }
+    
+    if (envUrl && envUrl !== 'https://your-api-domain.com/api') {
+      if (import.meta.env.DEV) {
+        console.log('🔧 getApiBaseUrl: Using envUrl:', envUrl);
+      }
       return envUrl;
     }
     
     // Fallback para desenvolvimento
     if (import.meta.env.DEV) {
-      return 'http://localhost:5000/api';
+      const devUrl = 'http://localhost:5000/api';
+      console.log('🔧 getApiBaseUrl: Using dev fallback:', devUrl);
+      return devUrl;
     }
     
     // Fallback para produção
-    return 'http://localhost:5000/api';
+    return '/api';
+  }
+  
+  // Debug: Log da URL base
+  private logBaseUrl() {
+    if (import.meta.env.DEV) {
+      console.log('🔧 ApiClient baseUrl:', this.baseUrl);
+      console.log('🔧 Environment VITE_API_BASE_URL:', import.meta.env.VITE_API_BASE_URL);
+    }
   }
 
   private async request<T>(endpoint: string, options?: RequestInit): Promise<T> {
@@ -107,6 +127,9 @@ export class ApiClient {
     
     if (import.meta.env.DEV) {
       console.log(`🌐 Making API Request: ${url}`);
+      console.log(`🔧 Request options:`, options);
+      console.log(`🔧 Full URL: ${url}`);
+      console.log(`🔧 Method: ${options?.method || 'GET'}`);
     }
     
     // Tentar buscar do cache primeiro
@@ -118,8 +141,11 @@ export class ApiClient {
       return cachedData;
     }
     
-    if (import.meta.env.DEV) {
-      console.log(`🌐 Making API Request: ${url}`);
+    // Debug: Forçar busca fresca para trending-coins e market-summary
+    if (import.meta.env.DEV && (endpoint === '/trending-coins' || endpoint === '/market-summary')) {
+      console.log(`🔄 Forcing fresh data for ${endpoint}`);
+      // Limpar cache para forçar busca fresca
+      this.storage.remove(cacheKey);
     }
     
     try {
@@ -146,6 +172,14 @@ export class ApiClient {
 
       const data = await response.json();
       
+      if (import.meta.env.DEV) {
+        console.log(`📡 Raw API Response for ${endpoint}:`, data);
+        console.log(`📡 Response type:`, typeof data);
+        console.log(`📡 Response keys:`, Object.keys(data || {}));
+        console.log(`📡 Response success:`, (data as any)?.success);
+        console.log(`📡 Response data:`, (data as any)?.data);
+      }
+      
       // Cache successful responses (apenas para GET requests)
       if (!options?.method || options.method === 'GET') {
         this.storage.set(cacheKey, data);
@@ -158,15 +192,14 @@ export class ApiClient {
     } catch (error) {
       console.error(`❌ API Error for ${endpoint}:`, error);
       
-      // Simplified error detection for mock data fallback
+      // CORRIGIDO: Lógica de fallback mais restritiva
       const errorMessage = error instanceof Error ? error.message : String(error);
       const shouldUseMock = (
         import.meta.env.VITE_MOCK_API === 'true' ||
-        errorMessage.includes('Failed to fetch') ||
-        errorMessage.includes('NetworkError') ||
-        errorMessage.includes('CORS') ||
-        errorMessage.includes('Connection refused') ||
-        errorMessage.includes('ECONNREFUSED')
+        (errorMessage.includes('Failed to fetch') && import.meta.env.DEV) ||
+        (errorMessage.includes('NetworkError') && import.meta.env.DEV) ||
+        (errorMessage.includes('Connection refused') && import.meta.env.DEV) ||
+        (errorMessage.includes('ECONNREFUSED') && import.meta.env.DEV)
       );
       
       if (shouldUseMock) {
@@ -177,6 +210,28 @@ export class ApiClient {
         // Cache mock data também
         this.storage.set(cacheKey, mockData);
         return mockData as T;
+      }
+      
+      // Se não for para usar mock, vamos tentar uma última vez com um delay
+      if (import.meta.env.DEV) {
+        console.warn(`🔄 Retrying API request for ${endpoint} in 2 seconds...`);
+      }
+      
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      try {
+        const retryResponse = await fetch(url, options);
+        if (retryResponse.ok) {
+          const retryData = await retryResponse.json();
+          if (import.meta.env.DEV) {
+            console.log(`✅ Retry successful for ${endpoint}:`, retryData);
+          }
+          return retryData;
+        }
+      } catch (retryError) {
+        if (import.meta.env.DEV) {
+          console.error(`❌ Retry failed for ${endpoint}:`, retryError);
+        }
       }
       
       if (error instanceof ApiError) {
@@ -344,11 +399,29 @@ export class ApiClient {
 
   // Market endpoints
   async getMarketSummary() {
-    return this.request('/market-summary');
+    if (import.meta.env.DEV) {
+      console.log('🌐 ApiClient: Making request to /market-summary');
+    }
+    const response = await this.request('/market-summary');
+    if (import.meta.env.DEV) {
+      console.log('🌐 ApiClient: Response from /market-summary:', response);
+      console.log('🌐 ApiClient: Response type:', typeof response);
+      console.log('🌐 ApiClient: Response keys:', Object.keys(response || {}));
+      console.log('🌐 ApiClient: Response success:', (response as any)?.success);
+      console.log('🌐 ApiClient: Response data:', (response as any)?.data);
+    }
+    return response;
   }
 
   async getTrendingCoins(): Promise<ApiResponse<any>> {
-    return this.request<ApiResponse<any>>('/trending-coins');
+    if (import.meta.env.DEV) {
+      console.log('🌐 ApiClient: Making request to /trending-coins');
+    }
+    const response = await this.request<ApiResponse<any>>('/trending-coins');
+    if (import.meta.env.DEV) {
+      console.log('🌐 ApiClient: Response from /trending-coins:', response);
+    }
+    return response;
   }
 
   async getChartData(symbol: string) {

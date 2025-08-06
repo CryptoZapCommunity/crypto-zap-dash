@@ -120,6 +120,21 @@ export function TrendingCoins({ trendingCoins, isLoading }: TrendingCoinsProps) 
     );
   }
 
+  // Validate props
+  if (!trendingCoins || !trendingCoins.gainers || !trendingCoins.losers) {
+    console.warn('TrendingCoins: Invalid trendingCoins prop');
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <h2 className="text-2xl font-bold text-foreground">Trending Coins</h2>
+        </div>
+        <div className="text-center py-8">
+          <p className="text-muted-foreground">No trending data available</p>
+        </div>
+      </div>
+    );
+  }
+
   if (!trendingCoins || (!trendingCoins.gainers && !trendingCoins.losers)) {
     return (
       <div className="space-y-6">

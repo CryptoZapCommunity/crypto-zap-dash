@@ -44,16 +44,18 @@ export const getQueryFn: <T>(options: {
 export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      queryFn: getQueryFn({ on401: "throw" }),
       refetchInterval: false, // Disabled - polling handles updates
       refetchOnWindowFocus: false,
-      staleTime: import.meta.env.VITE_CACHE_DURATION ? parseInt(import.meta.env.VITE_CACHE_DURATION) : 5 * 60 * 1000, // 5 minutes (reduced)
+      staleTime: import.meta.env.VITE_CACHE_DURATION ? parseInt(import.meta.env.VITE_CACHE_DURATION) : 5 * 60 * 1000,
       retry: 2,
-      retryDelay: 1000, // 1 second delay (reduced)
-      gcTime: 10 * 60 * 1000, // 10 minutes garbage collection (reduced)
+      retryDelay: 1000,
+      gcTime: 10 * 60 * 1000,
+      refetchOnMount: true,
+      refetchOnReconnect: true,
     },
     mutations: {
       retry: 1,
+      retryDelay: 1000,
     },
   },
 });

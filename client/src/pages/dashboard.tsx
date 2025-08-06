@@ -16,6 +16,11 @@ import { debugApiCalls, debugApiConfig } from '@/lib/api-debug';
 export default function Dashboard() {
   if (import.meta.env.DEV) {
     console.log('🚀 Dashboard component rendering...');
+    console.log('🔧 Environment variables:', {
+      VITE_API_BASE_URL: import.meta.env.VITE_API_BASE_URL,
+      VITE_DEBUG: import.meta.env.VITE_DEBUG,
+      VITE_MOCK_API: import.meta.env.VITE_MOCK_API,
+    });
   }
 
   // Market data queries - usando hooks personalizados com localStorage
@@ -27,6 +32,14 @@ export default function Dashboard() {
     clearCache: clearMarketCache
   } = useMarketSummary();
 
+  if (import.meta.env.DEV) {
+    console.log('📊 Market Summary Hook:', {
+      data: !!marketData,
+      loading: marketLoading,
+      error: marketError,
+    });
+  }
+
   const { 
     data: trendingCoins, 
     isLoading: trendingLoading,
@@ -34,6 +47,14 @@ export default function Dashboard() {
     refetch: refetchTrending,
     clearCache: clearTrendingCache
   } = useTrendingCoins();
+
+  if (import.meta.env.DEV) {
+    console.log('📈 Trending Coins Hook:', {
+      data: !!trendingCoins,
+      loading: trendingLoading,
+      error: trendingError,
+    });
+  }
 
   const { 
     data: latestNews, 
@@ -91,7 +112,7 @@ export default function Dashboard() {
     clearCache: clearSentimentCache
   } = useMarketSentiment();
 
-  // Data processing usando normalizadores com fallbacks
+  // CORRIGIDO: Data processing usando normalizadores com fallbacks e logs de debug
   const marketSummary: MarketSummary | null = normalizeMarketData(marketData);
   const trending: TrendingCoins = normalizeTrendingCoins(trendingCoins);
   const news: News[] = normalizeNews(latestNews) || [];
@@ -99,6 +120,26 @@ export default function Dashboard() {
   const whales: WhaleTransaction[] = normalizeWhaleTransactions(whaleTransactions) || [];
   const cryptoAssets: CryptoAsset[] = normalizeCryptoAssets(cryptoOverview) || [];
   const sentiment: SentimentData | undefined = normalizeSentimentData(marketSentiment) || undefined;
+
+  if (import.meta.env.DEV) {
+    console.log('📊 Dashboard data processing:', {
+      marketSummary: !!marketSummary,
+      trending: !!trending,
+      news: news.length,
+      events: events.length,
+      whales: whales.length,
+      cryptoAssets: cryptoAssets.length,
+      sentiment: !!sentiment
+    });
+    
+    if (marketSummary) {
+      console.log('📊 Market Summary data:', marketSummary);
+    }
+    
+    if (cryptoAssets.length > 0) {
+      console.log('📊 Crypto Assets sample:', cryptoAssets[0]);
+    }
+  }
 
   // Mock portfolio assets baseado em cryptoAssets
   const portfolioAssets: PortfolioAsset[] = cryptoAssets.slice(0, 5).map(asset => ({
@@ -126,9 +167,9 @@ export default function Dashboard() {
     });
   }
 
-  // Simplified error handling - only show error for critical data
-  if (marketError && trendingError) {
-    console.error('❌ Critical dashboard errors:', { 
+  // Improved error handling with better user feedback
+  if (marketError || trendingError) {
+    console.error('❌ Dashboard errors:', { 
       marketError, 
       trendingError
     });
@@ -138,18 +179,30 @@ export default function Dashboard() {
           <p className="text-lg font-semibold text-foreground mb-2">
             {t('common.error')}
           </p>
-          <p className="text-muted-foreground">
-            Failed to load critical dashboard data. Please try again later.
+          <p className="text-muted-foreground mb-4">
+            {marketError && trendingError 
+              ? 'Failed to load critical dashboard data.' 
+              : 'Some data may not be available.'
+            }
           </p>
-          <button 
-            onClick={() => {
-              refetchMarket();
-              refetchTrending();
-            }}
-            className="mt-4 px-4 py-2 bg-primary text-primary-foreground rounded-md"
-          >
-            Retry
-          </button>
+          <div className="flex space-x-2">
+            {marketError && (
+              <button 
+                onClick={() => refetchMarket()}
+                className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90"
+              >
+                Retry Market Data
+              </button>
+            )}
+            {trendingError && (
+              <button 
+                onClick={() => refetchTrending()}
+                className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90"
+              >
+                Retry Trending Data
+              </button>
+            )}
+          </div>
         </div>
       </div>
     );

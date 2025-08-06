@@ -165,7 +165,21 @@ function MarketCapCard({ marketSummary }: { marketSummary: MarketSummary }) {
 }
 
 export function MarketOverview({ cryptoAssets, marketSummary, isLoading }: MarketOverviewProps) {
+  // CORRIGIDO: Adicionar logs de debug
+  if (import.meta.env.DEV) {
+    console.log('📊 MarketOverview render:', {
+      cryptoAssets: cryptoAssets?.length || 0,
+      marketSummary: !!marketSummary,
+      isLoading,
+      cryptoAssetsType: typeof cryptoAssets,
+      marketSummaryType: typeof marketSummary
+    });
+  }
+
   if (isLoading) {
+    if (import.meta.env.DEV) {
+      console.log('📊 MarketOverview: Loading state');
+    }
     return (
       <div className="space-y-6">
         <div className="flex items-center justify-between">
@@ -183,6 +197,32 @@ export function MarketOverview({ cryptoAssets, marketSummary, isLoading }: Marke
           {[1, 2, 3, 4].map((i) => (
             <CryptoAssetSkeleton key={i} />
           ))}
+        </div>
+      </div>
+    );
+  }
+
+  // CORRIGIDO: Melhorar validação de props
+  if (!cryptoAssets || !Array.isArray(cryptoAssets)) {
+    if (import.meta.env.DEV) {
+      console.warn('MarketOverview: Invalid cryptoAssets prop', {
+        cryptoAssets,
+        type: typeof cryptoAssets,
+        isArray: Array.isArray(cryptoAssets)
+      });
+    }
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <h2 className="text-2xl font-bold text-foreground">{t('dashboard.marketOverview')}</h2>
+        </div>
+        <div className="text-center py-8">
+          <p className="text-muted-foreground">No market data available</p>
+          {import.meta.env.DEV && (
+            <p className="text-xs text-muted-foreground mt-2">
+              Debug: cryptoAssets is {typeof cryptoAssets} {Array.isArray(cryptoAssets) ? '(array)' : '(not array)'}
+            </p>
+          )}
         </div>
       </div>
     );

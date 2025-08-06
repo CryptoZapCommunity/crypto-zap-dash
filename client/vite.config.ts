@@ -13,7 +13,6 @@ export default defineConfig({
   server: {
     port: 3000,
     host: true,
-    // Removido o proxy - agora fazemos chamadas diretas
   },
   build: {
     outDir: "./dist",

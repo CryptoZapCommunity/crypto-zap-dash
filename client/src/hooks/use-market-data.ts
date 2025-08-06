@@ -27,18 +27,57 @@ export function useMarketSummary() {
   const query = useQuery({
     queryKey: ['market-summary'],
     queryFn: async () => {
-      const response = await apiClient.getMarketSummary();
-      const normalizedData = normalizeMarketData(response);
-      if (normalizedData) {
-        updateData(normalizedData);
+      if (import.meta.env.DEV) {
+        console.log('📊 useMarketSummary: Fetching data...');
       }
-      return normalizedData;
+      
+      try {
+        const response = await apiClient.getMarketSummary();
+        
+        if (import.meta.env.DEV) {
+          console.log('📊 useMarketSummary: Raw response:', response);
+          console.log('📊 useMarketSummary: Response type:', typeof response);
+          console.log('📊 useMarketSummary: Response keys:', Object.keys(response || {}));
+        }
+        
+        const normalizedData = normalizeMarketData(response);
+        
+        if (import.meta.env.DEV) {
+          console.log('📊 useMarketSummary: Normalized data:', normalizedData);
+          console.log('📊 useMarketSummary: Normalized data type:', typeof normalizedData);
+        }
+        
+        if (normalizedData) {
+          updateData(normalizedData);
+          if (import.meta.env.DEV) {
+            console.log('📊 useMarketSummary: Data updated in cache');
+          }
+          return normalizedData;
+        } else {
+          if (import.meta.env.DEV) {
+            console.log('❌ useMarketSummary: No normalized data returned');
+          }
+          throw new Error('Failed to normalize market data');
+        }
+      } catch (error) {
+        if (import.meta.env.DEV) {
+          console.error('❌ useMarketSummary: Error fetching data:', error);
+        }
+        throw error;
+      }
     },
     staleTime: CACHE_CONFIG.MARKET_SUMMARY.staleTime,
     gcTime: CACHE_CONFIG.MARKET_SUMMARY.gcTime,
-    initialData: cachedData,
-    enabled: !cachedData || isExpired,
-    retry: 3,
+    initialData: cachedData && cachedData !== null ? cachedData : undefined,
+    enabled: true, // Sempre habilitado para fazer requisições
+    refetchOnWindowFocus: true, // CORRIGIDO: Refetch quando janela ganha foco
+    refetchOnMount: true, // CORRIGIDO: Refetch quando componente monta
+    retry: (failureCount, error) => {
+      if (import.meta.env.DEV) {
+        console.log(`🔄 useMarketSummary: Retry attempt ${failureCount + 1}`);
+      }
+      return failureCount < 3;
+    },
     retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
   });
   return { ...query, clearCache: clearData };
@@ -76,18 +115,54 @@ export function useTrendingCoins() {
   const query = useQuery({
     queryKey: ['trending-coins'],
     queryFn: async () => {
-      const response = await apiClient.getTrendingCoins();
-      const normalizedData = normalizeTrendingCoins(response);
-      if (normalizedData.gainers.length > 0 || normalizedData.losers.length > 0) {
-        updateData(normalizedData);
+      if (import.meta.env.DEV) {
+        console.log('🪙 useTrendingCoins: Fetching data...');
       }
-      return normalizedData;
+      
+      try {
+        const response = await apiClient.getTrendingCoins();
+        
+        if (import.meta.env.DEV) {
+          console.log('🪙 useTrendingCoins: Raw response:', response);
+        }
+        
+        const normalizedData = normalizeTrendingCoins(response);
+        
+        if (import.meta.env.DEV) {
+          console.log('🪙 useTrendingCoins: Normalized data:', normalizedData);
+        }
+        
+        if (normalizedData && (normalizedData.gainers.length > 0 || normalizedData.losers.length > 0)) {
+          updateData(normalizedData);
+          if (import.meta.env.DEV) {
+            console.log('🪙 useTrendingCoins: Data updated in cache');
+          }
+          return normalizedData;
+        } else {
+          if (import.meta.env.DEV) {
+            console.log('❌ useTrendingCoins: No valid trending data');
+          }
+          throw new Error('Failed to normalize trending data');
+        }
+      } catch (error) {
+        if (import.meta.env.DEV) {
+          console.error('❌ useTrendingCoins: Error fetching data:', error);
+        }
+        throw error;
+      }
     },
     staleTime: CACHE_CONFIG.TRENDING_COINS.staleTime,
     gcTime: CACHE_CONFIG.TRENDING_COINS.gcTime,
     initialData: cachedData,
-    enabled: !cachedData || isExpired,
-    retry: 3,
+    enabled: true, // Sempre habilitado para fazer requisições
+    refetchOnWindowFocus: true, // CORRIGIDO: Refetch quando janela ganha foco
+    refetchOnMount: true, // CORRIGIDO: Refetch quando componente monta
+    retry: (failureCount, error) => {
+      if (import.meta.env.DEV) {
+        console.log(`🔄 useTrendingCoins: Retry attempt ${failureCount + 1}`);
+      }
+      return failureCount < 3;
+    },
     retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
   });
   return { ...query, clearCache: clearData };

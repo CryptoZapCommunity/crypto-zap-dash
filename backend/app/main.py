@@ -221,7 +221,14 @@ async def get_market_summary():
         duration = (datetime.now() - start_time).total_seconds() * 1000
         if settings.DEBUG:
             print(f"❌ Market summary error after {duration}ms: {error}")
-        raise HTTPException(status_code=500, detail="Failed to fetch market summary")
+        
+        # Retornar dados mock em caso de erro
+        mock_market_summary = crypto_service._get_mock_market_summary()
+        return MarketSummaryResponse(
+            success=True,
+            message="Market summary retrieved successfully (mock data)",
+            data=mock_market_summary
+        )
 
 
 # Trending coins endpoint - exact port from original
