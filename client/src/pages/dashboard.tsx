@@ -10,7 +10,7 @@ import { MarketSentiment } from '@/components/dashboard/market-sentiment';
 import { PortfolioTracker } from '@/components/dashboard/portfolio-tracker';
 import { t } from '@/lib/i18n';
 import type { CryptoAsset, MarketSummary, TrendingCoins, News, EconomicEvent, WhaleTransaction, PortfolioAsset, Alert, SentimentData } from '@/types';
-import { normalizeMarketData, normalizeTrendingCoins, normalizeNews, normalizeEconomicEvents, normalizeWhaleTransactions, normalizeSentimentData, normalizeCryptoAssets } from '@/lib/api-utils';
+import { normalizeCryptoAssets } from '@/lib/api-utils';
 import { debugApiCalls, debugApiConfig } from '@/lib/api-debug';
 
 export default function Dashboard() {
@@ -113,13 +113,13 @@ export default function Dashboard() {
   } = useMarketSentiment();
 
   // CORRIGIDO: Data processing usando normalizadores com fallbacks e logs de debug
-  const marketSummary: MarketSummary | null = normalizeMarketData(marketData);
-  const trending: TrendingCoins = normalizeTrendingCoins(trendingCoins);
-  const news: News[] = normalizeNews(latestNews) || [];
-  const events: EconomicEvent[] = normalizeEconomicEvents(economicEvents) || [];
-  const whales: WhaleTransaction[] = normalizeWhaleTransactions(whaleTransactions) || [];
+  const marketSummary: MarketSummary | null = marketData ?? null;
+  const trending: TrendingCoins = trendingCoins ?? { gainers: [], losers: [] };
+  const news: News[] = latestNews ?? [];
+  const events: EconomicEvent[] = economicEvents ?? [];
+  const whales: WhaleTransaction[] = whaleTransactions ?? [];
   const cryptoAssets: CryptoAsset[] = normalizeCryptoAssets(cryptoOverview) || [];
-  const sentiment: SentimentData | undefined = normalizeSentimentData(marketSentiment) || undefined;
+  const sentiment: SentimentData | undefined = marketSentiment ?? undefined;
 
   if (import.meta.env.DEV) {
     console.log('📊 Dashboard data processing:', {

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { queryClient } from '@/lib/queryClient';
+import { apiClient } from '@/lib/api';
 
 interface UsePollingOptions {
   onUpdate?: () => void;
@@ -7,7 +8,7 @@ interface UsePollingOptions {
   onDisconnect?: () => void;
   onError?: (error: Error) => void;
   interval?: number;
-  queries?: string[];
+  queries?: string[]; // React Query keys, e.g., 'market-summary'
 }
 
 export function usePolling(options: UsePollingOptions = {}) {
@@ -17,7 +18,8 @@ export function usePolling(options: UsePollingOptions = {}) {
     onDisconnect,
     onError,
     interval = import.meta.env.VITE_POLLING_INTERVAL ? parseInt(import.meta.env.VITE_POLLING_INTERVAL) : 5 * 60 * 1000, // 5 minutes default (reduced)
-    queries = ['/api/market-summary', '/api/trending-coins'],
+    // Default to the React Query keys used by hooks
+    queries = ['market-summary', 'trending-coins'],
   } = options;
 
   const [isConnected, setIsConnected] = useState(false);
@@ -42,6 +44,20 @@ export function usePolling(options: UsePollingOptions = {}) {
           // Invalidate queries to trigger refetch
           queries.forEach(queryKey => {
             queryClient.invalidateQueries({ queryKey: [queryKey] });
+          });
+          // Clear ApiClient localStorage cache for corresponding endpoints to force network fetch
+          const keyToEndpointMap: Record<string, string> = {
+            'market-summary': '/market-summary',
+            'trending-coins': '/trending-coins',
+            'crypto-overview': '/crypto-overview',
+            news: '/news',
+            'whale-transactions': '/whale-transactions',
+          };
+          queries.forEach(qk => {
+            const ep = keyToEndpointMap[qk];
+            if (ep) {
+              apiClient.clearCacheForEndpoint(ep);
+            }
           });
           
           onUpdate?.();

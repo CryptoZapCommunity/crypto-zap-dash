@@ -87,7 +87,7 @@ Write-Host ""
 Write-Host "📊 Backend API: http://localhost:5000" -ForegroundColor Cyan
 Write-Host "📚 API Docs: http://localhost:5000/docs" -ForegroundColor Cyan
 Write-Host "🌐 Frontend: http://localhost:5173" -ForegroundColor Cyan
-Write-Host "🔍 Health Check: http://localhost:5000/api/health" -ForegroundColor Cyan
+Write-Host "🔍 Health Check: http://localhost:5000/api/ready" -ForegroundColor Cyan
 Write-Host ""
 Write-Host "📝 Useful Commands:" -ForegroundColor Yellow
 Write-Host "   Backend: cd backend && python main.py" -ForegroundColor White

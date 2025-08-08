@@ -9,6 +9,7 @@ from typing import Dict, List, Optional, Tuple
 from datetime import datetime, timedelta
 import os
 from ..config import settings
+from ..utils.cache import cache
 
 # Real data from original service
 MOCK_TRENDING_COINS = [
@@ -156,7 +157,13 @@ class CryptoService:
     async def get_trending_coins(self) -> Dict[str, List[Dict]]:
         """Get trending coins split into gainers and losers - with fallback to mock data"""
         try:
-            print("🪙 Fetching trending coins from CoinGecko API...")
+            print("🪙 Fetching trending coins...")
+
+            # Try cache first
+            cached = await cache.get_json("trending_coins:v1")
+            if cached:
+                print("✅ Trending coins from cache")
+                return cached
             
             # Verificar se temos API key válida
             if not self.api_key or self.api_key == "demo" or self.api_key == "CG-demo-key":
@@ -219,12 +226,17 @@ class CryptoService:
                 gainers = [coin for coin in processed_coins if coin.get("priceChange24h") and float(coin["priceChange24h"]) > 0]
                 losers = [coin for coin in processed_coins if coin.get("priceChange24h") and float(coin["priceChange24h"]) < 0]
                 
+                result = {"gainers": gainers, "losers": losers}
+                # Cache for 60s
+                await cache.set_json("trending_coins:v1", result, ttl_seconds=60)
                 print(f"✅ Real data: {len(gainers)} gainers, {len(losers)} losers")
-                return {"gainers": gainers, "losers": losers}
+                return result
                 
         except Exception as error:
             print(f"❌ Error fetching trending coins: {error}, using mock data")
-            return await self._get_mock_trending_coins()
+            result = await self._get_mock_trending_coins()
+            await cache.set_json("trending_coins:v1", result, ttl_seconds=60)
+            return result
     
     async def _get_mock_trending_coins(self) -> Dict[str, List[Dict]]:
         """Get mock trending coins as fallback"""
@@ -477,7 +489,13 @@ class CryptoService:
     async def update_market_summary(self):
         """Update market summary from CoinGecko - CORRIGIDO para usar API real"""
         try:
-            print("🔄 Updating market summary from CoinGecko API...")
+            print("🔄 Updating market summary...")
+
+            # Try cache first
+            cached = await cache.get_json("market_summary:v1")
+            if cached:
+                print("✅ Market summary from cache")
+                return cached
             
             # Verificar se temos API key válida
             if not self.api_key or self.api_key == "demo":
@@ -512,12 +530,15 @@ class CryptoService:
                     "lastUpdated": datetime.utcnow().isoformat()
                 }
                 
-                print("✅ Market summary updated from CoinGecko")
+                print("✅ Market summary updated")
+                await cache.set_json("market_summary:v1", market_summary, ttl_seconds=60)
                 return market_summary
                 
         except Exception as error:
             print(f"❌ Error updating market summary: {error}, using mock data")
-            return self._get_mock_market_summary()
+            result = self._get_mock_market_summary()
+            await cache.set_json("market_summary:v1", result, ttl_seconds=60)
+            return result
     
     def _get_mock_market_summary(self):
         """Get mock market summary as fallback"""

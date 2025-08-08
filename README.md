@@ -59,6 +59,7 @@ docker-compose -f docker-compose.dev.yml up -d
 - Frontend: http://localhost:3000
 - Backend API: http://localhost:5000
 - API Docs: http://localhost:5000/docs
+- API Metrics: http://localhost:5000/metrics
 
 ### Opção 2: Desenvolvimento Local
 
@@ -171,7 +172,9 @@ cp env.production .env
 ## 📚 API Endpoints
 
 ### Core Endpoints
-- `GET /api/health` - Health check
+- `GET /api/health` - Health check (legacy)
+- `GET /api/live` - Liveness probe
+- `GET /api/ready` - Readiness probe
 - `GET /api/test` - Test endpoint
 - `GET /api/cors-test` - CORS test
 
@@ -247,7 +250,9 @@ docker-compose -f docker-compose.dev.yml down
 ## 📊 Monitoramento
 
 ### Health Checks
-- Backend: http://localhost:5000/api/health
+- Backend Readiness: http://localhost:5000/api/ready
+- Backend Liveness: http://localhost:5000/api/live
+ - Metrics: http://localhost:5000/metrics
 - Frontend: http://localhost:3000
 - Database: Verificar logs do PostgreSQL
 

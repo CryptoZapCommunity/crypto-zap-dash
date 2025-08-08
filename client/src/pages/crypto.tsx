@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useMarketSummary } from '@/hooks/use-market-data';
+import { useMarketSummary, useCryptoOverview } from '@/hooks/use-market-data';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -24,7 +24,7 @@ import { cn } from '@/lib/utils';
 import { t } from '@/lib/i18n';
 import { CryptoIcon } from '@/components/ui/crypto-icon';
 import type { CryptoAsset, MarketSummary } from '@/types';
-import { normalizeMarketData, normalizeCryptoAssets } from '@/lib/api-utils';
+// Removed over-normalization; hooks already return normalized summary
 
 interface CryptoMarketData {
   cryptoAssets: CryptoAsset[];
@@ -56,15 +56,24 @@ export default function CryptoMarket() {
   // Fetch crypto market data - usando hook personalizado
   const { 
     data: marketData, 
-    isLoading, 
+    isLoading: loadingSummary, 
     error,
     refetch: refetchMarket,
     clearCache: clearMarketCache
   } = useMarketSummary();
 
+  // Crypto overview for assets list
+  const {
+    data: overviewData,
+    isLoading: loadingOverview,
+    refetch: refetchOverview,
+  } = useCryptoOverview();
+
   // Data processing com normalizadores
-  const marketSummary: MarketSummary | null = normalizeMarketData(marketData);
-  const cryptoAssets: CryptoAsset[] = normalizeCryptoAssets(marketData);
+  const marketSummary: MarketSummary | null = marketData ?? null;
+  const cryptoAssets: CryptoAsset[] = Array.isArray((overviewData as any)?.data?.assets)
+    ? ((overviewData as any).data.assets as CryptoAsset[])
+    : [];
 
   // Filter and sort crypto assets
   const filteredAssets = (Array.isArray(cryptoAssets) ? cryptoAssets : [])
@@ -140,10 +149,13 @@ export default function CryptoMarket() {
           <Button
             variant="outline"
             size="sm"
-            onClick={() => refetchMarket()}
-            disabled={isLoading}
+            onClick={() => {
+              refetchMarket();
+              refetchOverview();
+            }}
+            disabled={loadingSummary || loadingOverview}
           >
-            <RefreshCw className={cn("w-4 h-4 mr-2", isLoading && "animate-spin")} />
+            <RefreshCw className={cn("w-4 h-4 mr-2", (loadingSummary || loadingOverview) && "animate-spin")} />
             Refresh
           </Button>
           <Button
@@ -260,7 +272,7 @@ export default function CryptoMarket() {
         </div>
       </div>
       {/* Crypto Assets Grid/List */}
-      {isLoading ? (
+      {loadingSummary || loadingOverview ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {[1, 2, 3, 4, 5, 6].map((i) => (
             <Card key={i} className="glassmorphism">
@@ -350,7 +362,7 @@ export default function CryptoMarket() {
           ))}
         </div>
       )}
-      {!isLoading && filteredAssets.length === 0 && (
+      {!loadingSummary && !loadingOverview && filteredAssets.length === 0 && (
         <div className="text-center py-12">
           <p className="text-muted-foreground">
             {searchTerm ? 'No cryptocurrencies found matching your search.' : 'No cryptocurrencies available.'}

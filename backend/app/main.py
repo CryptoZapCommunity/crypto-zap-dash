@@ -27,8 +27,15 @@ from .services.airdrop_service import AirdropService
 from .services.alerts_service import AlertsService
 from .services.portfolio_service import PortfolioService
 from .services.sentiment_service import SentimentService
-from .middleware.cors import get_cors_middleware
 from .middleware.rate_limiter import rate_limit_middleware
+from .middleware.security_headers import security_headers_middleware
+from prometheus_fastapi_instrumentator import Instrumentator
+import asyncio
+import contextlib
+try:
+    import redis.asyncio as redis
+except Exception:
+    redis = None
 
 
 # Initialize FastAPI app with comprehensive metadata
@@ -64,10 +71,17 @@ app = FastAPI(
     },
 )
 
-# Apply CORS middleware
+# Apply CORS middleware using configured allowed origins
+def _parse_allowed_origins(origins_str: str):
+    try:
+        return [o.strip() for o in origins_str.split(",") if o.strip()]
+    except Exception:
+        return ["http://localhost:5173", "http://localhost:3000"]
+
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Allow all origins for development
+    allow_origins=_parse_allowed_origins(settings.ALLOWED_ORIGINS),
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD"],
     allow_headers=["*"],
@@ -75,6 +89,7 @@ app.add_middleware(
 
 # Apply rate limiting middleware
 app.middleware("http")(rate_limit_middleware)
+app.middleware("http")(security_headers_middleware)
 
 # Initialize services (exact from original)
 crypto_service = CryptoService()
@@ -126,6 +141,43 @@ async def health_check(request: Request):
             "host": request.headers.get("host"),
             "userAgent": request.headers.get("user-agent")
         }
+    )
+
+
+# Liveness and Readiness endpoints (for container orchestration)
+@app.get(
+    "/api/live",
+    response_model=ApiResponse,
+    summary="Liveness Probe",
+    description="Basic liveness check"
+)
+async def liveness():
+    return ApiResponse(success=True, message="live", data={"timestamp": datetime.utcnow().isoformat()})
+
+
+@app.get(
+    "/api/ready",
+    response_model=ApiResponse,
+    summary="Readiness Probe",
+    description="Basic readiness check"
+)
+async def readiness():
+    checks = {"redis": None}
+    ok = True
+    # Redis check (optional)
+    if settings.ENABLE_REDIS and settings.REDIS_URL and redis is not None:
+        try:
+            client = redis.from_url(settings.REDIS_URL, decode_responses=True)
+            with contextlib.suppress(Exception):
+                await client.ping()
+            checks["redis"] = True
+        except Exception:
+            checks["redis"] = False
+            ok = False
+    return ApiResponse(
+        success=ok,
+        message="ready" if ok else "degraded",
+        data={"timestamp": datetime.utcnow().isoformat(), **checks},
     )
 
 
@@ -1182,6 +1234,13 @@ async def startup_event():
         print(f"🌐 CORS Origins: {len(settings.ALLOWED_ORIGINS)} configured")
         print(f"⚡ Rate Limit: {settings.RATE_LIMIT_PER_MINUTE} req/min, {settings.RATE_LIMIT_PER_HOUR} req/hour")
         print(f"🔧 Debug Mode: {settings.DEBUG}")
+
+    # Expose Prometheus metrics
+    try:
+        Instrumentator().instrument(app).expose(app, endpoint="/metrics", include_in_schema=False)
+    except Exception as e:
+        if settings.DEBUG:
+            print(f"⚠️ Prometheus instrumentation failed: {e}")
 
 
 # For local development (exact from original api/index.ts)

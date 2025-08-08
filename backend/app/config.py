@@ -34,11 +34,21 @@ class Settings(BaseSettings):
     ENVIRONMENT: str = "development"
     DEBUG: bool = True
     
-    # CORS Settings - Enhanced for Python backend
-    ALLOWED_ORIGINS: str = "http://localhost:5173,http://localhost:3000,http://localhost:5000,http://frontend:3000,http://localhost:8080,http://127.0.0.1:3000,http://127.0.0.1:5173,http://127.0.0.1:5000"
+    # CORS Settings - string (comma-separated) to avoid JSON decoding issues from env
+    ALLOWED_ORIGINS: str = (
+        "http://localhost:5173,"
+        "http://localhost:3000,"
+        "http://localhost:5000,"
+        "http://frontend:3000,"
+        "http://localhost:8080,"
+        "http://127.0.0.1:3000,"
+        "http://127.0.0.1:5173,"
+        "http://127.0.0.1:5000"
+    )
     
     # Redis (optional for production)
     REDIS_URL: Optional[str] = None
+    ENABLE_REDIS: bool = False
     
     # Security
     SECRET_KEY: str = "your-secret-key-change-in-production"
@@ -62,23 +72,6 @@ class Settings(BaseSettings):
         env_file_encoding = "utf-8"
         case_sensitive = True
         extra = "ignore"
-        
-        @classmethod
-        def parse_env_var(cls, field_name: str, raw_val: str):
-            """Custom parser for environment variables"""
-            if field_name == "ALLOWED_ORIGINS":
-                if not raw_val or raw_val.strip() == "":
-                    # Return default if empty
-                    return [
-                        "http://localhost:5173",
-                        "http://localhost:3000", 
-                        "http://localhost:5000",
-                        "http://frontend:3000",
-                        "http://localhost:8080"
-                    ]
-                # Split by comma if provided as string
-                return [origin.strip() for origin in raw_val.split(",") if origin.strip()]
-            return raw_val
 
 
 # Global settings instance
@@ -88,7 +81,11 @@ settings = Settings()
 if settings.DEBUG:
     print(f"Configuration loaded for {settings.ENVIRONMENT} environment")
     print(f"Database: {settings.DATABASE_URL.split('@')[-1] if '@' in settings.DATABASE_URL else 'Not configured'}")
-    print(f"CORS Origins: {len(settings.ALLOWED_ORIGINS.split(','))} origins configured")
+    try:
+        origins_count = len([o for o in settings.ALLOWED_ORIGINS.split(",") if o.strip()])
+    except Exception:
+        origins_count = 0
+    print(f"CORS Origins: {origins_count} origins configured")
     
     # Check API keys status
     api_keys = {
